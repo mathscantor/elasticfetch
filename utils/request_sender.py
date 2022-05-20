@@ -214,7 +214,7 @@ class RequestSender:
         return
 
     def get_indices_status(self):
-        url = "https://18.196.237.176:9200/_cat/indices/*beat*?v=true&s=index&pretty"
+        url = "https://{}:{}/_cat/indices/*beat*?v=true&s=index&pretty".format(self.elastic_ip, self.elastic_port)
         try:
             response = requests.get(url=url,
                                     verify=False,
