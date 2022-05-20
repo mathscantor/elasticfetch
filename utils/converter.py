@@ -38,14 +38,17 @@ class Converter:
 
             csv_writer.writerow(row_list)
 
-    def convert_match_to_dict(self, filter_match_raw: str) -> dict:
-        temp_dict = {}
-        filter_match_raw_tokens = filter_match_raw.strip().split(";")
+    def convert_match_to_list(self, filter_match_raw: str) -> list:
+        filter_match_dict_list = []
+        filter_match_raw_tokens = filter_match_raw.strip().split(";")[0:-1]
+        #print("filtler_match_raw_tokens: ", filter_match_raw_tokens)
         for filter_match_raw_token in filter_match_raw_tokens:
-            tokens = filter_match_raw_token.strip().split(" is ")
-            key = token[0].strip()
-            value = token[1].strip()
+            temp_dict = {}
+            tokens = filter_match_raw_token.strip().split("is")
+            #print("tokens: ", tokens)
+            key = tokens[0].strip()
+            value = tokens[1].strip()
             temp_dict[key] = value
-        
-        filter_match_dict = {"match": temp_dict}
-        return filter_match_dict
+            filter_match_dict_list.append({"match": temp_dict})
+
+        return filter_match_dict_list

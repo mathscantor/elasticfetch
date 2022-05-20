@@ -98,14 +98,14 @@ class Menu:
 
         # currently only supporting "is"
         filter_match_raw = input("Filter your queries (FIELD1 is VALUE; FIELD2 is VALUE;): ")
-        filter_match_dict = self.converter.convert_match_to_dict(filter_match_raw=filter_match_raw)
+        filter_match_dict_list = self.converter.convert_match_to_list(filter_match_raw=filter_match_raw)
 
         pit_id = self.request_sender.post_fetch_pit_id(index_name=self.index_name)
         if pit_id is None:
             return
 
         data_json = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(pit_id=pit_id, num_logs=num_logs,
-                                                                          start_ts=start_ts, end_ts=end_ts, fields_list=fields_list, filter_match_dict=filter_match_dict)
+                                                                          start_ts=start_ts, end_ts=end_ts, fields_list=fields_list, filter_match_dict_list=filter_match_dict_list)
         self.request_sender.delete_pit_id(pit_id)
         self.request_sender.put_max_result_window(10000)
         if data_json is None:
