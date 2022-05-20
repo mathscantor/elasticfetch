@@ -148,26 +148,47 @@ class RequestSender:
     def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list):
         url = "https://{}:{}/_search?pretty".format(self.elastic_ip, self.elastic_port)
         data = \
-            {
-                "size": num_logs,
-                #"_source": ["event.created", "message", "event.code"],
-                "_source": fields_list,
-                "query": {
-                    "range": {
-                        "@timestamp": {
-                            "gte": start_ts,
-                            "lte": end_ts
+        {
+            "size": num_logs,
+            "_source": fields_list,
+            "query": {
+                "bool": {
+                    "filter": [
+                        {
+                            "range": {
+                                "@timestamp": {
+                                    "gte": start_ts,
+                                    "lte": end_ts
+                                }
+                            }
                         }
-                    }
+                        #{
+                        #    "match": {
+                        #        "event.code": "3"
+                        #    }
+                        #}
+                    ]
+                }
+            },
+            "pit": {
+                "id": pit_id,
+                "keep_alive": "60m"
                 },
-                "pit": {
-                    "id": pit_id,
-                    "keep_alive": "60m"
-                    },
-                "sort": [
-                    {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
-                ]
-            }
+            "sort": [
+                {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
+            ]
+        }
+
+        #if user wants to match certain fields to some value
+        a = {}
+        while True:
+            key, value = input("Field name __ is __: ").split()
+
+            a[key] = value
+            s = {"match": a}
+            data["query"]["bool"]["filter"].append(s)
+            break
+        print(data["query"]["bool"]["filter"])
         messenger(3, "Fetching elastic data...{}")
         try:
             response = requests.get(url=url,

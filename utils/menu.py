@@ -96,9 +96,14 @@ class Menu:
         if num_logs > 10000:
             self.request_sender.put_max_result_window(num_logs)
 
+        # currently only supporting "is"
+        filter_match_raw = input("Filter your queries (FIELD1 is VALUE; FIELD2 is VALUE): ")
+        filter_match_dict = self.converter.convert_match_to_dict(filter_match_raw=filter_match_raw)
+
         pit_id = self.request_sender.post_fetch_pit_id(index_name=self.index_name)
         if pit_id is None:
             return
+
         data_json = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(pit_id=pit_id, num_logs=num_logs,
                                                                           start_ts=start_ts, end_ts=end_ts, fields_list=fields_list)
         self.request_sender.delete_pit_id(pit_id)
