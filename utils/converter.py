@@ -39,19 +39,13 @@ class Converter:
             csv_writer.writerow(row_list)
 
     def convert_match_to_dict(self, filter_match_raw: str) -> dict:
-        filter_match_raw_tokens = filter_match_raw.split(";")
+        temp_dict = {}
+        filter_match_raw_tokens = filter_match_raw.strip().split(";")
         for filter_match_raw_token in filter_match_raw_tokens:
             tokens = filter_match_raw_token.strip().split(" is ")
-            print(tokens)
-        exit()
-
-        '''a = {}
-
-        key, value = input("Field name __ is __: ").split()
-
-        a[key] = value
-        s = {"match": a}
-        data["query"]["bool"]["filter"].append(s)
-
-        print(data["query"]["bool"]["filter"])'''
-        return
+            key = token[0].strip()
+            value = token[1].strip()
+            temp_dict[key] = value
+        
+        filter_match_dict = {"match": temp_dict}
+        return filter_match_dict
