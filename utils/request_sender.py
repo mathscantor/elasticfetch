@@ -42,10 +42,10 @@ class RequestSender:
 
     '''
     A point in time must be opened explicitly before being used in search requests. 
-    The keep_alive parameter tells Elasticsearch how long it should keep a point in time alive, e.g. ?keep_alive=5m
+    The keep_alive parameter tells Elasticsearch how long it should keep a point in time alive, e.g. ?keep_alive=60m
     '''
     def post_fetch_pit_id(self, index_name):
-        url = "https://{}:{}/{}/_pit?keep_alive=5m&pretty".format(self.elastic_ip, self.elastic_port, index_name)
+        url = "https://{}:{}/{}/_pit?keep_alive=60m&pretty".format(self.elastic_ip, self.elastic_port, index_name)
         messenger(3, "Fetching PIT id...")
         try:
             response = requests.post(url=url,
@@ -154,7 +154,7 @@ class RequestSender:
                 "_source": fields_list,
                 "query": {
                     "range": {
-                        "event.created": {
+                        "@timestamp": {
                             "gte": start_ts,
                             "lte": end_ts
                         }
@@ -162,10 +162,10 @@ class RequestSender:
                 },
                 "pit": {
                     "id": pit_id,
-                    "keep_alive": "5m"
+                    "keep_alive": "60m"
                     },
                 "sort": [
-                    {"event.created":{"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
+                    {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
                 ]
             }
         messenger(3, "Fetching elastic data...{}")

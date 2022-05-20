@@ -1,6 +1,6 @@
 import csv
 from utils.messenger import messenger
-
+import os
 
 class Converter:
 
@@ -8,8 +8,10 @@ class Converter:
         self.description = "Converter class to convert objects into more maningful objects"
 
     def convert_json_to_csv(self, data_json, fields_list, filename):
-        messenger(3, "Saving data to datasets/{}".format(filename))
-        f_csv = open("datasets/{}".format(filename), "w", newline='', encoding="utf8")
+        file_path = "datasets/"+filename
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        messenger(3, "Saving data to {}".format(file_path))
+        f_csv = open(file_path, "w", newline='', encoding="utf8")
         csv_writer = csv.writer(f_csv)
 
         # Write header
