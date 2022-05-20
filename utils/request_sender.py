@@ -143,9 +143,9 @@ class RequestSender:
         return
 
     '''
-    
+    Sends GET request to fetch data between 2 timestamps
     '''
-    def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list):
+    def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list, filter_match_dict):
         url = "https://{}:{}/_search?pretty".format(self.elastic_ip, self.elastic_port)
         data = \
         {
@@ -178,17 +178,8 @@ class RequestSender:
                 {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
             ]
         }
-
-        #if user wants to match certain fields to some value
-        a = {}
-        while True:
-            key, value = input("Field name __ is __: ").split()
-
-            a[key] = value
-            s = {"match": a}
-            data["query"]["bool"]["filter"].append(s)
-            break
-        print(data["query"]["bool"]["filter"])
+        data["query"]["bool"]["filter"].append(filter_match_dict)
+    
         messenger(3, "Fetching elastic data...{}")
         try:
             response = requests.get(url=url,
