@@ -1,1 +1,8 @@
 elasticfetch.ini
+.idea/elasticfetch.iml
+.idea/inspectionProfiles/
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+utils/__pycache__/
+
