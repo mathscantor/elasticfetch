@@ -182,7 +182,8 @@ class RequestSender:
       ]
     }
     '''
-    def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list, query_bool_must_list):
+    def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list,
+                                               query_bool_must_list, query_bool_must_not_list):
         url = "https://{}:{}/_search?pretty".format(self.elastic_ip, self.elastic_port)
         data = \
         {
@@ -210,9 +211,11 @@ class RequestSender:
                 {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
             ]
         }
-        data["query"]["bool"]["must"] = query_bool_must_list
-        #print(json.dumps(data, indent=4))
-        messenger(3, "Fetching elastic data...{}")
+        if len(query_bool_must_list) > 0:
+            data["query"]["bool"]["must"] = query_bool_must_list
+        if len(query_bool_must_not_list) > 0:
+            data["query"]["bool"]["must_not"] = query_bool_must_not_list
+        messenger(3, "Send the following request:\nGET {}\n{}".format(url, json.dumps(data, indent=4)))
         try:
             response = requests.get(url=url,
                                     headers=self.headers,

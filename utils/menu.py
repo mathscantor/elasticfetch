@@ -1,6 +1,6 @@
 class Menu:
 
-    def __init__(self, request_sender, converter, input_validation):
+    def __init__(self, request_sender, converter, input_validation, parser):
         self.description = "Provides users different options when feteching elastic data"
         self.request_sender = request_sender
         self.converter = converter
@@ -12,6 +12,7 @@ class Menu:
             4: 'Exit',
         }
         self.input_validation = input_validation
+        self.parser = parser
         self.index_name = ""
 
     def show_menu(self):
@@ -77,6 +78,7 @@ class Menu:
         self.index_name = index_dict[index_option]
 
     def fetch_elastic_data_between_ts1_ts2(self):
+        keyword_sentences_dict = {}
         print("timestamp format: <YYYY-MM-DD>T<HH:mm:ss>\neg. 2022-05-01T00:00:00")
 
         start_ts = input("start timestamp: ")
@@ -93,20 +95,28 @@ class Menu:
         fields = input("Select your field names (eg. event.created,event.code,message): ")
         fields_list = [x.strip() for x in fields.split(',')]
         num_logs = int(num_logs)
+
+        # currently only supporting "is" and "is not"
+        #TODO: support "is not"
+        print("Filter Format: FIELD1 is VALUE; FIELD2 is_not VALUE;) ")
+        filter_raw = input("(OPTIONAL) Filter your queries: ")
+        keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
+        query_bool_must_list = self.converter.convert_is_raw_to_list(filter_is_raw_list=keyword_sentences_dict["is"])
+        query_bool_must_not_list = self.converter.convert_is_not_raw_to_list(filter_is_not_raw_list=keyword_sentences_dict["is_not"])
+
         if num_logs > 10000:
             self.request_sender.put_max_result_window(num_logs)
-
-        # currently only supporting "is"
-        #TODO: support "is not"
-        filter_raw = input("Filter your queries (FIELD1 is VALUE; FIELD2 is VALUE;): ")
-        query_bool_must_list = self.converter.convert_is_raw_to_list(filter_is_raw=filter_raw)
-
         pit_id = self.request_sender.post_fetch_pit_id(index_name=self.index_name)
         if pit_id is None:
             return
 
-        data_json = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(pit_id=pit_id, num_logs=num_logs,
-                                                                               start_ts=start_ts, end_ts=end_ts, fields_list=fields_list, query_bool_must_list=query_bool_must_list)
+        data_json = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(pit_id=pit_id,
+                                                                               num_logs=num_logs,
+                                                                               start_ts=start_ts,
+                                                                               end_ts=end_ts,
+                                                                               fields_list=fields_list,
+                                                                               query_bool_must_list=query_bool_must_list,
+                                                                               query_bool_must_not_list = query_bool_must_not_list)
         self.request_sender.delete_pit_id(pit_id)
         self.request_sender.put_max_result_window(10000)
         if data_json is None:

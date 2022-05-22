@@ -38,12 +38,11 @@ class Converter:
 
             csv_writer.writerow(row_list)
 
-    def convert_is_raw_to_list(self, filter_is_raw: str) -> list:
+    def convert_is_raw_to_list(self, filter_is_raw_list: list) -> list:
         query_bool_must_list = []
-        filter_is_raw_tokens = filter_is_raw.strip().split(";")[0:-1]
-        for filter_is_raw_token in filter_is_raw_tokens:
+        for filter_is_raw in filter_is_raw_list:
             temp_dict = {}
-            tokens = filter_is_raw_token.strip().split("is")
+            tokens = filter_is_raw.strip().split("is")
             key = tokens[0].strip()
             value = tokens[1].strip()
             temp_dict[key] = value
@@ -51,15 +50,13 @@ class Converter:
 
         return query_bool_must_list
 
-    def convert_is_not_raw_to_list(self, filter_is_not_raw: str) -> list:
+    def convert_is_not_raw_to_list(self, filter_is_not_raw_list: list) -> list:
         query_bool_must_not_list = []
-        filter_is_not_raw_tokens = filter_is_not_raw.strip().split(";")[0:-1]
-        for filter_is_not_raw_token in filter_is_not_raw_tokens:
+        for filter_is_not_raw in filter_is_not_raw_list:
             temp_dict = {}
-            tokens = filter_is_not_raw_token.strip().split("is not")
+            tokens = filter_is_not_raw.strip().split("is_not")
             key = tokens[0].strip()
             value = tokens[1].strip()
             temp_dict[key] = value
             query_bool_must_not_list.append({"term": temp_dict})
-
         return query_bool_must_not_list

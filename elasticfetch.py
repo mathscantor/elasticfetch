@@ -4,6 +4,7 @@ from utils.converter import Converter
 from utils.menu import Menu
 from utils.input_validation import InputValidation
 from utils.messenger import messenger
+from utils.parser import Parser
 
 
 def validate_config_inputs():
@@ -35,7 +36,10 @@ if __name__ == "__main__":
         password=config_dict["credentials.password"]
     )
     input_validation = InputValidation()
+    parser = Parser()
     menu = Menu(request_sender=request_sender,
                 converter=converter,
-                input_validation=input_validation)
+                input_validation=input_validation,
+                parser=parser)
+
     main()
