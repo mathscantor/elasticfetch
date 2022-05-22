@@ -144,8 +144,45 @@ class RequestSender:
 
     '''
     Sends GET request to fetch data between 2 timestamps
+    Example:
+    GET _search
+    {
+      "size": 1000,
+      "_source": ["event.created","event.code"],
+      "query": {
+        "bool": {
+          "filter": [
+            {
+              "range": {
+                "@timestamp": {
+                  "gte": "2022-05-01T00:00:00",
+                  "lte": "2022-05-20T00:00:00"
+                }
+              }
+            }
+          ], 
+          "must" : [
+            {"term" : { "event.outcome" : "success" }},
+            {"term" : { "event.category": "authentication" }}
+          ]
+        }
+      },
+      "pit": {
+        "id": "8_LoAwEQd2lubG9nYmVhdC04LjAuMRZOTlg2bVVzb1Q0bV8yR1B4bVNaQzZnABY1SFNJbG5fWlE3QzB3NU1uRERDbHpnAAAAAAAAb642FlBWekRTejRvU09HV0VITFBLdEtKTkEAARZOTlg2bVVzb1Q0bV8yR1B4bVNaQzZnAAA=",
+        "keep_alive": "1m"
+      },
+      "sort": [
+        {
+          "@timestamp": {
+            "order": "asc",
+            "format": "strict_date_optional_time_nanos",
+            "numeric_type" : "date_nanos"
+          }
+        }
+      ]
+    }
     '''
-    def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list, filter_match_dict_list):
+    def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list, query_bool_must_list):
         url = "https://{}:{}/_search?pretty".format(self.elastic_ip, self.elastic_port)
         data = \
         {
@@ -162,24 +199,19 @@ class RequestSender:
                                 }
                             }
                         }
-                        #{
-                        #    "match": {
-                        #        "event.code": "3"
-                        #    }
-                        #}
                     ]
                 }
             },
             "pit": {
                 "id": pit_id,
                 "keep_alive": "60m"
-                },
+            },
             "sort": [
                 {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
             ]
         }
-        data["query"]["bool"]["filter"] += filter_match_dict_list
-    
+        data["query"]["bool"]["must"] = query_bool_must_list
+        #print(json.dumps(data, indent=4))
         messenger(3, "Fetching elastic data...{}")
         try:
             response = requests.get(url=url,
