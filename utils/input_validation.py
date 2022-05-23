@@ -62,4 +62,26 @@ class InputValidation:
             return True
         else:
             messenger(2, "Invalid option number. Please try again.")
+            return False
+
+    def is_filter_valid(self, filter_raw):
+
+        filter_raw_regex = re.compile(r"(([_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not|is_gte|is_lte|is_gt|is_lt) [_.a-zA-Z\d]+;(\s+|))+)$")
+
+        match = filter_raw_regex.search(filter_raw)
+        if match:
             return True
+        else:
+            messenger(2, "Invalid filter command/commands detected. Please end your filters with ';'!\nPlease also check that your filter keywords are:\n"
+                         "- is_not_gte\n"
+                         "- is_not_lte\n"
+                         "- is_not_gt\n"
+                         "- is_not_lt\n"
+                         "- is_not\n"
+                         "- is_gte\n"
+                         "- is_lte\n"
+                         "- is_gt\n"
+                         "- is_lt\n"
+                         "- is\n")
+            return False
+
