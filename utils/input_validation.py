@@ -53,7 +53,7 @@ class InputValidation:
         if tstamp2 >= tstamp1:
             return True
         else:
-            messenger(2, "Invalid end timestamp because"
+            messenger(2, "Invalid end timestamp because "
                          "end timestamp is earlier than start timestamp. Please try again.")
             return False
 
