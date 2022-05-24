@@ -78,7 +78,6 @@ class Menu:
         self.index_name = index_dict[index_option]
 
     def fetch_elastic_data_between_ts1_ts2(self):
-        keyword_sentences_dict = {}
         print("timestamp format: <YYYY-MM-DD>T<HH:mm:ss>\neg. 2022-05-01T00:00:00")
 
         start_ts = input("start timestamp: ")
@@ -96,20 +95,44 @@ class Menu:
         fields_list = [x.strip() for x in fields.split(',')]
         num_logs = int(num_logs)
 
-        # currently only supporting "is" and "is not"
+        # currently only supporting "is" and "is_not"
         #TODO: support "is not"
+
         print("Filter Format: FIELD1 is VALUE; FIELD2 is_not VALUE;) ")
         filter_raw = input("(OPTIONAL - Press Enter to skip) Filter your queries : ")
+
+        print("\nFilter Format: <FIELD_NAME> <FILTER_KEYWORD> <VALUE>;")
+        print("Supported Filter Keywords:\n"
+              "- is_not_gte\n"
+              "- is_not_lte\n"
+              "- is_not_gt\n"
+              "- is_not_lt\n"
+              "- is_not\n"
+              "- is_gte\n"
+              "- is_lte\n"
+              "- is_gt\n"
+              "- is_lt\n"
+              "- is\n")
+        print("eg. event.code is_gt 4000; event.code is_lte 5000; event.category is authentication;")
+        filter_raw = input("(OPTIONAL - PRESS ENTER TO SKIP) Filter your queries: ")
+        if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
+            return
+
         keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
-        query_bool_must_list = self.converter.convert_is_raw_to_list(filter_is_raw_list=keyword_sentences_dict["is"])
-        query_bool_must_not_list = self.converter.convert_is_not_raw_to_list(filter_is_not_raw_list=keyword_sentences_dict["is_not"])
+        query_bool_must_list = self.converter.convert_all_is_list_to_must_list(filter_is_list=keyword_sentences_dict["is"],
+                                                                               filter_is_gte_list=keyword_sentences_dict["is_gte"],
+                                                                               filter_is_lte_list=keyword_sentences_dict["is_lte"],
+                                                                               filter_is_gt_list=keyword_sentences_dict["is_gt"],
+                                                                               filter_is_lt_list=keyword_sentences_dict["is_lt"])
+        query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(filter_is_not_list=keyword_sentences_dict["is_not"],
+                                                                                       filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
+                                                                                       filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
+                                                                                       filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
+                                                                                       filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
 
         if num_logs > 10000:
             self.request_sender.put_max_result_window(num_logs)
         pit_id = self.request_sender.post_fetch_pit_id(index_name=self.index_name)
-        if pit_id is None:
-            return
-
         data_json = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(pit_id=pit_id,
                                                                                num_logs=num_logs,
                                                                                start_ts=start_ts,
@@ -118,7 +141,8 @@ class Menu:
                                                                                query_bool_must_list=query_bool_must_list,
                                                                                query_bool_must_not_list = query_bool_must_not_list)
         self.request_sender.delete_pit_id(pit_id)
-        self.request_sender.put_max_result_window(10000)
+        if num_logs > 10000:
+            self.request_sender.put_max_result_window(10000)
         if data_json is None:
             return
         filename = input("File name to save as: ")

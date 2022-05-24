@@ -215,7 +215,7 @@ class RequestSender:
             data["query"]["bool"]["must"] = query_bool_must_list
         if len(query_bool_must_not_list) > 0:
             data["query"]["bool"]["must_not"] = query_bool_must_not_list
-        messenger(3, "Send the following request:\nGET {}\n{}".format(url, json.dumps(data, indent=4)))
+        messenger(3, "Sending the following request:\nGET {}\n{}".format(url, json.dumps(data, indent=4)))
         try:
             response = requests.get(url=url,
                                     headers=self.headers,
