@@ -67,8 +67,10 @@ class Menu:
             index_name = entry.split()[2]
             index_dict[i] = index_name
             i += 1
+        print("Listing all beats indices:\n")
         for key in index_dict.keys():
             print(key, '--', index_dict[key])
+        print("")
         index_option = input('Enter your index choice: ')
         if not self.input_validation.is_numeric_valid(index_option):
             return
@@ -97,10 +99,6 @@ class Menu:
 
         # currently only supporting "is" and "is_not"
         #TODO: support "is not"
-
-        print("Filter Format: FIELD1 is VALUE; FIELD2 is_not VALUE;) ")
-        filter_raw = input("(OPTIONAL - Press Enter to skip) Filter your queries : ")
-
         print("\nFilter Format: <FIELD_NAME> <FILTER_KEYWORD> <VALUE>;")
         print("Supported Filter Keywords:\n"
               "- is_not_gte\n"
