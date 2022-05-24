@@ -26,7 +26,7 @@ class InputValidation:
             return False
 
     def is_numeric_valid(self, user_input):
-        numeric_regex = re.compile("\d+")
+        numeric_regex = re.compile("\d+$")
         match = numeric_regex.search(user_input)
         if match:
             return True
@@ -38,7 +38,7 @@ class InputValidation:
         timestamp_regex = re.compile("\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
                                      "(0[0-9]|1[0-9]|2[0-3]?):"
                                      "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
-                                     "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)")
+                                     "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)$")
         match = timestamp_regex.search(user_input)
         if match:
             return True
@@ -84,5 +84,13 @@ class InputValidation:
                          "- is_lt\n"
                          "- is\n")
             return False
+
+    def is_file_extension_valid(self, filename):
+        if filename.lower().endswith(('.json', '.csv')):
+            return True
+        else:
+            messenger(2, "Invalid File Extension. Current supported extensions: .json, .csv")
+            return False
+
 
 

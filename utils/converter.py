@@ -14,9 +14,7 @@ class Converter:
     object1.object2
     object1.object2.object3
     '''
-    def convert_json_to_csv(self, data_json, fields_list, filename):
-        file_path = "datasets/"+filename
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+    def convert_json_to_csv(self, data_json, fields_list, file_path):
         messenger(3, "Saving data to {}".format(file_path))
         f_csv = open(file_path, "w", newline='', encoding="utf8")
         csv_writer = csv.writer(f_csv)

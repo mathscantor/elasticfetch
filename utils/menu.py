@@ -1,3 +1,7 @@
+import json
+import os
+
+
 class Menu:
 
     def __init__(self, request_sender, converter, input_validation, parser):
@@ -113,8 +117,9 @@ class Menu:
               "- is\n")
         print("eg. event.code is_gt 4000; event.code is_lte 5000; event.category is authentication;")
         filter_raw = input("(OPTIONAL - PRESS ENTER TO SKIP) Filter your queries: ")
-        if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
-            return
+        if filter_raw.strip() != "":
+            if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
+                return
 
         keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
         query_bool_must_list = self.converter.convert_all_is_list_to_must_list(filter_is_list=keyword_sentences_dict["is"],
@@ -143,8 +148,18 @@ class Menu:
             self.request_sender.put_max_result_window(10000)
         if data_json is None:
             return
-        filename = input("File name to save as: ")
-        self.converter.convert_json_to_csv(data_json=data_json, fields_list=fields_list, filename=filename)
+        while True:
+            filename = input("File name to save as (.json, .csv): ")
+            is_valid_file_extension = self.input_validation.is_file_extension_valid(filename=filename)
+            if is_valid_file_extension:
+                break
+        file_path = "datasets/" + filename
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        if file_path.lower().endswith(".csv"):
+            self.converter.convert_json_to_csv(data_json=data_json, fields_list=fields_list, file_path=file_path)
+        elif file_path.lower().endswith(".json"):
+            with open(file_path, "w", encoding="utf-8") as f:
+                json.dump(data_json, f, ensure_ascii=False, indent=4)
         return
 
 
