@@ -99,7 +99,7 @@ class Menu:
         # currently only supporting "is" and "is not"
         #TODO: support "is not"
         print("Filter Format: FIELD1 is VALUE; FIELD2 is_not VALUE;) ")
-        filter_raw = input("(OPTIONAL) Filter your queries: ")
+        filter_raw = input("(OPTIONAL - Press Enter to skip) Filter your queries : ")
         keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
         query_bool_must_list = self.converter.convert_is_raw_to_list(filter_is_raw_list=keyword_sentences_dict["is"])
         query_bool_must_not_list = self.converter.convert_is_not_raw_to_list(filter_is_not_raw_list=keyword_sentences_dict["is_not"])

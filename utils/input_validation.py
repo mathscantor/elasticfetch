@@ -63,3 +63,4 @@ class InputValidation:
         else:
             messenger(2, "Invalid option number. Please try again.")
             return True
+
