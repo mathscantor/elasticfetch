@@ -1,6 +1,7 @@
 import csv
 from utils.messenger import messenger
-import os
+import json
+
 
 class Converter:
 
@@ -14,7 +15,7 @@ class Converter:
     object1.object2
     object1.object2.object3
     '''
-    def convert_json_to_csv(self, data_json, fields_list, file_path):
+    def convert_json_data_to_csv(self, data_json, fields_list, file_path):
         messenger(3, "Saving data to {}".format(file_path))
         f_csv = open(file_path, "w", newline='', encoding="utf8")
         csv_writer = csv.writer(f_csv)
@@ -40,8 +41,14 @@ class Converter:
                             if field_tokens[2] in hit["_source"][field_tokens[0]][field_tokens[1]].keys():
                                 value = hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]]
                 row_list.append(value)
-
             csv_writer.writerow(row_list)
+        messenger(0, "Successfully saved data to {}".format(file_path))
+
+    def convert_json_data_to_json(self, data_json, file_path):
+        messenger(3, "Saving data to {}".format(file_path))
+        with open(file_path, "w", encoding="utf-8") as f:
+            json.dump(data_json, f, ensure_ascii=False, indent=4)
+        messenger(0, "Successfully saved data to {}".format(file_path))
 
     def convert_all_is_list_to_must_list(self,
                                          filter_is_list: list,

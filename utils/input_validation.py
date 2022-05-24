@@ -91,6 +91,3 @@ class InputValidation:
         else:
             messenger(2, "Invalid File Extension. Current supported extensions: .json, .csv")
             return False
-
-
-

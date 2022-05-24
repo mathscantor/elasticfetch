@@ -1,4 +1,3 @@
-import json
 import os
 
 
@@ -156,10 +155,9 @@ class Menu:
         file_path = "datasets/" + filename
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         if file_path.lower().endswith(".csv"):
-            self.converter.convert_json_to_csv(data_json=data_json, fields_list=fields_list, file_path=file_path)
+            self.converter.convert_json_data_to_csv(data_json=data_json, fields_list=fields_list, file_path=file_path)
         elif file_path.lower().endswith(".json"):
-            with open(file_path, "w", encoding="utf-8") as f:
-                json.dump(data_json, f, ensure_ascii=False, indent=4)
+            self.converter.convert_json_data_to_json(data_json=data_json, file_path=file_path)
         return
 
 
