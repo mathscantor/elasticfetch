@@ -7,6 +7,7 @@ Thus, this tool helps to eliminate the tedious process of getting data out of el
 ## Required Python Packages
 ```sh
 pip3 install requests
+pip3 install tqdm
 ```
 
 ## Current Features
