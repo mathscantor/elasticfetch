@@ -51,7 +51,8 @@ class Menu:
         elif menu_option == 2:
             self.set_current_index()
         elif menu_option == 3:
-            self.fetch_elastic_data_between_ts1_ts2()
+            if self.input_validation.is_index_name_set(self.index_name):
+                self.fetch_elastic_data_between_ts1_ts2()
         elif menu_option == 4:
             exit(0)
         return
@@ -132,20 +133,15 @@ class Menu:
                                                                                        filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
                                                                                        filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
 
-        if num_logs > 10000:
-            self.request_sender.put_max_result_window(num_logs)
-        pit_id = self.request_sender.post_fetch_pit_id(index_name=self.index_name)
-        data_json = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(pit_id=pit_id,
+        data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
                                                                                num_logs=num_logs,
                                                                                start_ts=start_ts,
                                                                                end_ts=end_ts,
                                                                                fields_list=fields_list,
                                                                                query_bool_must_list=query_bool_must_list,
-                                                                               query_bool_must_not_list = query_bool_must_not_list)
-        self.request_sender.delete_pit_id(pit_id)
-        if num_logs > 10000:
-            self.request_sender.put_max_result_window(10000)
-        if data_json is None:
+                                                                               query_bool_must_not_list=query_bool_must_not_list)
+
+        if len(data_json_list) == 0:
             return
         while True:
             filename = input("File name to save as (.json, .csv): ")
@@ -155,9 +151,9 @@ class Menu:
         file_path = "datasets/" + filename
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         if file_path.lower().endswith(".csv"):
-            self.converter.convert_json_data_to_csv(data_json=data_json, fields_list=fields_list, file_path=file_path)
+            self.converter.convert_json_data_to_csv(data_json_list=data_json_list, fields_list=fields_list, file_path=file_path)
         elif file_path.lower().endswith(".json"):
-            self.converter.convert_json_data_to_json(data_json=data_json, file_path=file_path)
+            self.converter.convert_json_data_to_json(data_json_list=data_json_list, file_path=file_path)
         return
 
 

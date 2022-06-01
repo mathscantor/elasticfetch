@@ -26,7 +26,7 @@ class InputValidation:
             return False
 
     def is_numeric_valid(self, user_input):
-        numeric_regex = re.compile("\d+$")
+        numeric_regex = re.compile("^\d+$")
         match = numeric_regex.search(user_input)
         if match:
             return True
@@ -66,7 +66,7 @@ class InputValidation:
 
     def is_filter_valid(self, filter_raw):
 
-        filter_raw_regex = re.compile(r"(([-_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not|is_gte|is_lte|is_gt|is_lt|is) [-_.a-zA-Z\d]+;(\s+|))+)$")
+        filter_raw_regex = re.compile(r"^(([-_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not|is_gte|is_lte|is_gt|is_lt|is) [-_.a-zA-Z\d]+;(\s+|))+)$")
 
         match = filter_raw_regex.search(filter_raw)
         if match:
@@ -90,4 +90,11 @@ class InputValidation:
             return True
         else:
             messenger(2, "Invalid File Extension. Current supported extensions: .json, .csv")
+            return False
+
+    def is_index_name_set(self, index_name):
+        if index_name != "":
+            return True
+        else:
+            messenger(2, "No index currently selected. Please set your index first!")
             return False

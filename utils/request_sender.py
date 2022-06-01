@@ -2,6 +2,7 @@ import requests
 from utils.messenger import messenger
 import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
+from tqdm import tqdm
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -182,62 +183,90 @@ class RequestSender:
       ]
     }
     '''
-    def get_fetch_elastic_data_between_ts1_ts2(self, pit_id, num_logs, start_ts, end_ts, fields_list,
+    def get_fetch_elastic_data_between_ts1_ts2(self, index_name, num_logs, start_ts, end_ts, fields_list,
                                                query_bool_must_list, query_bool_must_not_list):
-        url = "https://{}:{}/_search?pretty".format(self.elastic_ip, self.elastic_port)
-        data = \
-        {
-            "size": num_logs,
-            "_source": fields_list,
-            "query": {
-                "bool": {
-                    "filter": [
-                        {
+        url = "https://{}:{}/{}/_search?pretty".format(self.elastic_ip, self.elastic_port, index_name)
+        data_json_list = []
+        is_first_loop = True
+        last_ids = []
+        messenger(3, "Fetching elastic data...")
+        pbar = tqdm(total=num_logs, desc="Fetch Progress")
+        while num_logs > 0:
+            if num_logs >= 10000:
+                size = 10000
+            else:
+                size = num_logs
+            num_logs -= size
+            data = \
+            {
+                "size": size,
+                "_source": fields_list,
+                "query": {
+                    "bool": {
+                        "filter": {
                             "range": {
                                 "@timestamp": {
                                     "gte": start_ts,
                                     "lte": end_ts
                                 }
                             }
-                        }
-                    ]
-                }
-            },
-            "pit": {
-                "id": pit_id,
-                "keep_alive": "60m"
-            },
-            "sort": [
-                {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
-            ]
-        }
-        if len(query_bool_must_list) > 0:
-            data["query"]["bool"]["must"] = query_bool_must_list
-        if len(query_bool_must_not_list) > 0:
-            data["query"]["bool"]["must_not"] = query_bool_must_not_list
-        messenger(3, "Sending the following request:\nGET {}\n{}".format(url, json.dumps(data, indent=4)))
-        try:
-            response = requests.get(url=url,
-                                    headers=self.headers,
-                                    data=json.dumps(data),
-                                    verify=False,
-                                    auth=(self.username, self.password))
-            data_json = response.json()
-            if response.status_code == 200:
-                messenger(0, "Successfully fetched elastic data ({} hits) ".format(len(data_json["hits"]["hits"])))
-                return data_json
-            elif response.status_code == 400:
-                messenger(2, "Unable to fetch elastic data. Bad Request in headers/data.")
-            elif response.status_code == 401:
-                messenger(2, "Unable to fetch elastic data. Authentication Error.")
-            return None
-        except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}".format(url))
-        except requests.ConnectTimeout:
-            messenger(2, "Connection timeout to {}".format(url))
-        except requests.ConnectionError:
-            messenger(2, "Cannot connect to {}".format(url))
-        return
+                        },
+                    }
+                },
+                "sort": [
+                    {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
+                ]
+            }
+            if len(query_bool_must_list) > 0:
+                data["query"]["bool"]["must"] = query_bool_must_list
+            if len(query_bool_must_not_list) > 0:
+                data["query"]["bool"]["must_not"] = query_bool_must_not_list
+                if not is_first_loop:
+                    data["query"]["bool"]["must_not"] += last_ids
+
+            else:
+                if not is_first_loop:
+                    data["query"]["bool"]["must_not"] = last_ids
+
+            try:
+                response = requests.get(url=url,
+                                        headers=self.headers,
+                                        data=json.dumps(data),
+                                        verify=False,
+                                        auth=(self.username, self.password))
+                data_json = response.json()
+                if response.status_code == 200:
+                    results_size = len(data_json["hits"]["hits"])
+                    pbar.update(results_size)
+                    data_json_list.append(data_json)
+                    start_ts = data_json["hits"]["hits"][results_size - 1]["sort"][0]
+                    last_ids.clear()
+                    for i in range(1, results_size):
+                        last_id = data_json["hits"]["hits"][results_size-i]["_id"]
+                        last_ids.append({"term": {"_id": last_id}})
+                        if data_json["hits"]["hits"][results_size - i]["sort"][0] != start_ts:
+                            break
+                    is_first_loop = False
+                    if results_size < size:
+                        break
+                elif response.status_code == 400:
+                    messenger(2, "Unable to fetch elastic data. Bad Request in headers/data.")
+                elif response.status_code == 401:
+                    messenger(2, "Unable to fetch elastic data. Authentication Error.")
+
+            except requests.RequestException:
+                messenger(2, "Cannot resolve request to {}".format(url))
+            except requests.ConnectTimeout:
+                messenger(2, "Connection timeout to {}".format(url))
+            except requests.ConnectionError:
+                messenger(2, "Cannot connect to {}".format(url))
+
+        total_size = 0
+        for result in data_json_list:
+            total_size += len(result["hits"]["hits"])
+
+        messenger(0, "Successfully fetched {} data entries!".format(total_size))
+        return data_json_list
 
     def get_indices_status(self):
         url = "https://{}:{}/_cat/indices/*beat*?v=true&s=index&pretty".format(self.elastic_ip, self.elastic_port)

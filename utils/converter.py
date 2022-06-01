@@ -15,39 +15,53 @@ class Converter:
     object1.object2
     object1.object2.object3
     '''
-    def convert_json_data_to_csv(self, data_json, fields_list, file_path):
+    def convert_json_data_to_csv(self, data_json_list, fields_list, file_path):
         messenger(3, "Saving data to {}".format(file_path))
         f_csv = open(file_path, "w", newline='', encoding="utf8")
         csv_writer = csv.writer(f_csv)
 
         # Write header
         csv_writer.writerow(fields_list)
-
-        for hit in data_json["hits"]["hits"]:
-            row_list = []
-            for field in fields_list:
-                field_tokens = field.split('.')
-                value = ""
-                if len(field_tokens) == 1:
-                    if field_tokens[0] in hit["_source"].keys():
-                        value = hit["_source"][field_tokens[0]]
-                elif len(field_tokens) == 2:
-                    if field_tokens[0] in hit["_source"].keys():
-                        if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
-                            value = hit["_source"][field_tokens[0]][field_tokens[1]]
-                elif len(field_tokens) == 3:
-                    if field_tokens[0] in hit["_source"].keys():
-                        if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
-                            if field_tokens[2] in hit["_source"][field_tokens[0]][field_tokens[1]].keys():
-                                value = hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]]
-                row_list.append(value)
-            csv_writer.writerow(row_list)
+        for data_json in data_json_list:
+            for hit in data_json["hits"]["hits"]:
+                row_list = []
+                for field in fields_list:
+                    field_tokens = field.split('.')
+                    value = ""
+                    if len(field_tokens) == 1:
+                        if field_tokens[0] in hit["_source"].keys():
+                            value = hit["_source"][field_tokens[0]]
+                    elif len(field_tokens) == 2:
+                        if field_tokens[0] in hit["_source"].keys():
+                            if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
+                                value = hit["_source"][field_tokens[0]][field_tokens[1]]
+                    elif len(field_tokens) == 3:
+                        if field_tokens[0] in hit["_source"].keys():
+                            if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
+                                if field_tokens[2] in hit["_source"][field_tokens[0]][field_tokens[1]].keys():
+                                    value = hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]]
+                    row_list.append(value)
+                csv_writer.writerow(row_list)
         messenger(0, "Successfully saved data to {}".format(file_path))
 
-    def convert_json_data_to_json(self, data_json, file_path):
+    def convert_json_data_to_json(self, data_json_list, file_path):
         messenger(3, "Saving data to {}".format(file_path))
+
+        is_first_data_json = True
+        master_data_json = None
+        master_size = 0
         with open(file_path, "w", encoding="utf-8") as f:
-            json.dump(data_json, f, ensure_ascii=False, indent=4)
+            for data_json in data_json_list:
+                if is_first_data_json:
+                    master_data_json = data_json
+                    is_first_data_json = False
+                else:
+                    master_data_json["hits"]["hits"] += (data_json["hits"]["hits"])
+
+                master_size += len(data_json["hits"]["hits"])
+
+            master_data_json["hits"]["total"]["value"] = master_size
+            json.dump(master_data_json, f, ensure_ascii=False, indent=4)
         messenger(0, "Successfully saved data to {}".format(file_path))
 
     def convert_all_is_list_to_must_list(self,
