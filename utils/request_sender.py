@@ -237,6 +237,9 @@ class RequestSender:
                 data_json = response.json()
                 if response.status_code == 200:
                     results_size = len(data_json["hits"]["hits"])
+                    if results_size == 0:
+                        # Return an empty data_json_list
+                        return data_json_list
                     pbar.update(results_size)
                     data_json_list.append(data_json)
                     start_ts = data_json["hits"]["hits"][results_size - 1]["sort"][0]
@@ -269,12 +272,27 @@ class RequestSender:
         return data_json_list
 
     def get_indices_status(self):
-        url = "https://{}:{}/_cat/indices/*beat*?v=true&s=index&pretty".format(self.elastic_ip, self.elastic_port)
+        url = "https://{}:{}/_cat/indices/*?v=true&s=index&pretty".format(self.elastic_ip, self.elastic_port)
         try:
             response = requests.get(url=url,
                                     verify=False,
                                     auth=(self.username, self.password))
 
+            return response.text
+        except requests.RequestException:
+            messenger(2, "Cannot resolve request to {}".format(url))
+        except requests.ConnectTimeout:
+            messenger(2, "Connection timeout to {}".format(url))
+        except requests.ConnectionError:
+            messenger(2, "Cannot connect to {}".format(url))
+        return
+
+    def get_available_fields(self, index_name):
+        url = "https://{}:{}/{}/_mapping/field/*".format(self.elastic_ip, self.elastic_port, index_name)
+        try:
+            response = requests.get(url=url,
+                                    verify=False,
+                                    auth=(self.username, self.password))
             return response.text
         except requests.RequestException:
             messenger(2, "Cannot resolve request to {}".format(url))
