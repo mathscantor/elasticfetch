@@ -1,6 +1,5 @@
 import os
 
-
 class Menu:
 
     def __init__(self, request_sender, converter, input_validation, parser):
@@ -11,8 +10,9 @@ class Menu:
         self.menu_options = {
             1: 'Show indices status',
             2: 'Set current index',
-            3: 'Fetch data between two timestamps',
-            4: 'Exit',
+            3: 'Show available field names',
+            4: 'Fetch data between two timestamps',
+            5: 'Exit',
         }
         self.input_validation = input_validation
         self.parser = parser
@@ -52,8 +52,11 @@ class Menu:
             self.set_current_index()
         elif menu_option == 3:
             if self.input_validation.is_index_name_set(self.index_name):
-                self.fetch_elastic_data_between_ts1_ts2()
+                self.show_available_fields()
         elif menu_option == 4:
+            if self.input_validation.is_index_name_set(self.index_name):
+                self.fetch_elastic_data_between_ts1_ts2()
+        elif menu_option == 5:
             exit(0)
         return
 
@@ -82,6 +85,11 @@ class Menu:
         if not self.input_validation.is_option_in_available(option=index_option, options_dict=index_dict):
             return
         self.index_name = index_dict[index_option]
+
+    def show_available_fields(self):
+        response = self.request_sender.get_available_fields(index_name=self.index_name)
+        print(response)
+        return
 
     def fetch_elastic_data_between_ts1_ts2(self):
         print("timestamp format: <YYYY-MM-DD>T<HH:mm:ss>\neg. 2022-05-01T00:00:00")
