@@ -1,5 +1,4 @@
 import os
-import json
 
 class Menu:
 
@@ -89,7 +88,12 @@ class Menu:
 
     def show_available_fields(self):
         response = self.request_sender.get_available_fields(index_name=self.index_name)
-        print(response[self.index_name]["mappings"].keys())
+        if response is not None:
+            parent_field_to_fields_dict = self.converter.convert_field_mapping_keys_pretty(field_list=list(response[self.index_name]["mappings"].keys()))
+            print("{:<30} {:<30}".format('TOP LEVEL PARENT', 'ALL RELATED FIELDS'))
+            print("{:<30} {:<30}".format('----------------', '------------------'))
+            for parent_field in parent_field_to_fields_dict.keys():
+                print("{:<30} {:<30}".format(parent_field, ', '.join(parent_field_to_fields_dict[parent_field])))
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):

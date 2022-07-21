@@ -199,7 +199,8 @@ class RequestSender:
                 size = num_logs
             num_logs -= size
 
-            #TODO: Add support for different timestamp formats
+            # TODO: Add support for different timestamp formats
+            # TODO: Add support to sort different fields apart from @timestamp
             data = \
             {
                 "size": size,
@@ -217,7 +218,8 @@ class RequestSender:
                     }
                 },
                 "sort": [
-                    {"@timestamp": {"order": "asc","format": "strict_date_optional_time_nanos","numeric_type" : "date_nanos"}}
+                    {"@timestamp": {"order": "asc"}}
+                    # {"@timestamp": {"order": "asc", "format": "strict_date_optional_time_nanos", "numeric_type": "date_nanos"}}
                 ]
             }
             if len(query_bool_must_list) > 0:
@@ -297,7 +299,11 @@ class RequestSender:
             response = requests.get(url=url,
                                     verify=False,
                                     auth=(self.username, self.password))
-            return response.json()
+            if response is not None:
+                messenger(0, "Showing all available fields...\n\n")
+                return response.json()
+            else:
+                messenger(2, "No fields are available! Please check whether elasticsearch is parsing properly!")
         except requests.RequestException:
             messenger(2, "Cannot resolve request to {}".format(url))
         except requests.ConnectTimeout:

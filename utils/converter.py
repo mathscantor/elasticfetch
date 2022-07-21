@@ -1,12 +1,14 @@
 import csv
 from utils.messenger import messenger
 import json
+import time
 
 
 class Converter:
 
     def __init__(self):
         self.description = "Converter class to convert objects into more maningful objects"
+        self.timestamp_format = '%Y-%m-%dT%H:%M:%S'
 
     '''
     Converts a json object into a csv file. Currently, this can only read from a maximum of 3 nested json object
@@ -166,3 +168,25 @@ class Converter:
             query_bool_must_not_list.append({"range": temp_dict})
 
         return query_bool_must_not_list
+
+    def convert_timestamp_to_epoch(self,
+                                   timestamp: str) -> int:
+
+        epoch = int(time.mktime(time.strptime(timestamp, self.timestamp_format)))
+        return epoch
+
+    def convert_field_mapping_keys_pretty(self,
+                                          field_list: list) -> dict:
+        tmp_string = ''
+        max_length_per_row = 10
+        field_list.sort()
+
+        i = 0
+        tmp_dict = {}
+        for field in field_list:
+            parent_field = field.split('.')[0]
+            if parent_field not in tmp_dict:
+                tmp_dict[parent_field] = [field]
+            else:
+                tmp_dict[parent_field].append(field)
+        return tmp_dict
