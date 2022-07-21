@@ -198,6 +198,8 @@ class RequestSender:
             else:
                 size = num_logs
             num_logs -= size
+
+            #TODO: Add support for different timestamp formats
             data = \
             {
                 "size": size,
@@ -240,6 +242,7 @@ class RequestSender:
                     results_size = len(data_json["hits"]["hits"])
                     if results_size == 0:
                         # Return an empty data_json_list
+                        messenger(2, "There are no hits! Please try again with a different time range!")
                         return data_json_list
                     pbar.update(results_size)
                     data_json_list.append(data_json)
