@@ -19,7 +19,6 @@ class Converter:
         messenger(3, "Saving data to {}".format(file_path))
         f_csv = open(file_path, "w", newline='', encoding="utf8")
         csv_writer = csv.writer(f_csv)
-
         # Write header
         csv_writer.writerow(fields_list)
         for data_json in data_json_list:
@@ -40,6 +39,12 @@ class Converter:
                             if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
                                 if field_tokens[2] in hit["_source"][field_tokens[0]][field_tokens[1]].keys():
                                     value = hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]]
+                    elif len(field_tokens) == 4:
+                        if field_tokens[0] in hit["_source"].keys():
+                            if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
+                                if field_tokens[2] in hit["_source"][field_tokens[0]][field_tokens[1]].keys():
+                                    if field_tokens[3] in hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]].keys():
+                                        value = hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]][field_tokens[3]]
                     row_list.append(value)
                 csv_writer.writerow(row_list)
         messenger(0, "Successfully saved data to {}".format(file_path))

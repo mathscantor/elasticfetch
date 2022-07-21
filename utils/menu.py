@@ -1,4 +1,5 @@
 import os
+import json
 
 class Menu:
 
@@ -88,7 +89,7 @@ class Menu:
 
     def show_available_fields(self):
         response = self.request_sender.get_available_fields(index_name=self.index_name)
-        print(response)
+        print(response[self.index_name]["mappings"].keys())
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):

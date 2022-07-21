@@ -297,7 +297,7 @@ class RequestSender:
             response = requests.get(url=url,
                                     verify=False,
                                     auth=(self.username, self.password))
-            return response.text
+            return response.json()
         except requests.RequestException:
             messenger(2, "Cannot resolve request to {}".format(url))
         except requests.ConnectTimeout:

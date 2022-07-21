@@ -9,6 +9,8 @@ from utils.parser import Parser
 
 def validate_config_inputs():
     messenger(3, "Checking elasticfetch.ini configuration inputs...")
+    if not input_validation.is_protocol_valid(config_dict["elastic.protocol"]):
+        exit(1)
     if not input_validation.is_ip(config_dict["elastic.ip"]):
         exit(1)
     if not input_validation.is_port(config_dict["elastic.port"]):
