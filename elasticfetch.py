@@ -30,6 +30,7 @@ if __name__ == "__main__":
     config_dict = config_reader.read_config_file()
     converter = Converter()
     request_sender = RequestSender(
+        protocol=config_dict["elastic.protocol"],
         elastic_ip=config_dict["elastic.ip"],
         elastic_port=config_dict["elastic.port"],
         username=config_dict["credentials.username"],

@@ -8,16 +8,17 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class RequestSender:
 
-    def __init__(self, elastic_ip, elastic_port, username, password):
+    def __init__(self, protocol, elastic_ip, elastic_port, username, password):
         self.description = "Sends POST/GET request to elasticsearch server"
         self.headers = {"Content-Type": "application/json"}
+        self.protocol = protocol
         self.elastic_ip = elastic_ip
         self.elastic_port = elastic_port
         self.username = username
         self.password = password
 
     def get_authentication_status_bool(self):
-        url = "https://{}:{}/_security/_authenticate?pretty".format(self.elastic_ip, self.elastic_port)
+        url = "{}://{}:{}/_security/_authenticate?pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
         messenger(3, "Checking Authentication Credentials...")
         try:
             response = requests.get(url=url,
@@ -46,7 +47,7 @@ class RequestSender:
     The keep_alive parameter tells Elasticsearch how long it should keep a point in time alive, e.g. ?keep_alive=60m
     '''
     def post_fetch_pit_id(self, index_name):
-        url = "https://{}:{}/{}/_pit?keep_alive=60m&pretty".format(self.elastic_ip, self.elastic_port, index_name)
+        url = "{}://{}:{}/{}/_pit?keep_alive=60m&pretty".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
         messenger(3, "Fetching PIT id...")
         try:
             response = requests.post(url=url,
@@ -83,7 +84,7 @@ class RequestSender:
     '''
     def delete_pit_id(self, pit_id):
         data = {"id": pit_id}
-        url = "https://{}:{}/_pit?pretty".format(self.elastic_ip, self.elastic_port)
+        url = "{}://{}:{}/_pit?pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
         messenger(3, "Deleting PIT id {}...".format(pit_id))
         try:
             response = requests.delete(url=url,
@@ -115,7 +116,7 @@ class RequestSender:
     '''
     def put_max_result_window(self, size):
         data = {"index.max_result_window": size}
-        url = "https://{}:{}/_settings".format(self.elastic_ip, self.elastic_port)
+        url = "{}://{}:{}/_settings".format(self.protocol, self.elastic_ip, self.elastic_port)
         messenger(3, "Changing max_results_window size to {}".format(size))
         try:
             response = requests.put(url=url,
@@ -185,7 +186,7 @@ class RequestSender:
     '''
     def get_fetch_elastic_data_between_ts1_ts2(self, index_name, num_logs, start_ts, end_ts, fields_list,
                                                query_bool_must_list, query_bool_must_not_list):
-        url = "https://{}:{}/{}/_search?pretty".format(self.elastic_ip, self.elastic_port, index_name)
+        url = "{}://{}:{}/{}/_search?pretty".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
         data_json_list = []
         is_first_loop = True
         last_ids = []
@@ -272,7 +273,7 @@ class RequestSender:
         return data_json_list
 
     def get_indices_status(self):
-        url = "https://{}:{}/_cat/indices/*?v=true&s=index&pretty".format(self.elastic_ip, self.elastic_port)
+        url = "{}://{}:{}/_cat/indices/*?v=true&s=index&pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
         try:
             response = requests.get(url=url,
                                     verify=False,
@@ -288,7 +289,7 @@ class RequestSender:
         return
 
     def get_available_fields(self, index_name):
-        url = "https://{}:{}/{}/_mapping/field/*".format(self.elastic_ip, self.elastic_port, index_name)
+        url = "{}://{}:{}/{}/_mapping/field/*".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
         try:
             response = requests.get(url=url,
                                     verify=False,

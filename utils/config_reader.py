@@ -12,6 +12,8 @@ class ConfigReader:
         config_options = ConfigParser()
         config_options.read("elasticfetch.ini")
         if config_options.has_section("elastic"):
+            if config_options.has_option("elastic", "protocol"):
+                config_dict["elastic.protocol"] = ast.literal_eval(config_options.get("elastic", "protocol"))
             if config_options.has_option("elastic", "ip"):
                 config_dict["elastic.ip"] = ast.literal_eval(config_options.get("elastic", "ip"))
             if config_options.has_option("elastic", "port"):
