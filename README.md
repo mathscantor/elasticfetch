@@ -1,9 +1,9 @@
-# elasticfetch
-Elasticfetch is a simple tool to fetch more than 10,000 data entries from elasticsearch. <br />
-Fetching data out of elasticsearch is tough but there are numerous workarounds with their APIs. <br />
-However, it is a rather manual process to do CURL commands each time you need to fetch some data. <br />
-Thus, this tool helps to eliminate the tedious process of getting data out of elasticsearch.
+# elasticfetch - overview
+Elasticfetch is a simple tool to export huge amounts of data from elasticsearch. <br>
 
+Currently, this tool is not reliant on the `scroll API` and in the event where elasticsearch decides to discontinue the support for `scroll API`, this tool will remain to function propely. <br>
+
+This tool aims to facilitate work flow of threat hunting and data analysis in the event where you need to query huge amount of data without killing the server.
 ## Required Python Packages
 ```sh
 pip3 install requests
