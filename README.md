@@ -27,13 +27,51 @@ Edit **elasticfetch.ini** and set it to the correct : <br />
 ```sh
 python3 elasticfetch.py
 ```
-![main_menu](./screenshots/main_menu.png)
+```text
+Current index selected:  N/A (Please set an index before fetching any data!)
+Main Timestamp Field:  @timestamp
+Main Timestamp Type:  date
 
-### Step 3 (Optional) - Listing indices status
-![indices_status](./screenshots/indices_status.png)
+1 -- Show indices status
+2 -- Set current index
+3 -- Set main timestamp
+4 -- Show available field names
+5 -- Fetch data between two timestamps
+6 -- Exit
+```
+
+### Step 3 (Optional) - Show indices status
+```text
+health status index                                           uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+yellow open   .internal.alerts-security.alerts-default-000001 ######################   1   1       1094            0      3.7mb          3.7mb
+yellow open   .internal.alerts-security.alerts-default-000002 ######################   1   1        213            0      1.5mb          1.5mb
+yellow open   .internal.alerts-security.alerts-default-000003 ######################   1   1        264            0      1.5mb          1.5mb
+yellow open   .internal.alerts-security.alerts-default-000004 ######################   1   1        237            0      2.2mb          2.2mb
+yellow open   .internal.alerts-security.alerts-default-000005 ######################   1   1         33            0    614.5kb        614.5kb
+yellow open   .items-default-000001                           ######################   1   1          0            0       225b           225b
+yellow open   .lists-default-000001                           ######################   1   1          0            0       225b           225b
+yellow open   auditbeat-8.0.1                                 ######################   1   1   40024180            0     25.9gb         25.9gb
+yellow open   auditbeat-8.1.0                                 ######################   1   1   12285275            0      7.9gb          7.9gb
+yellow open   auditbeat-8.1.2                                 ######################   1   1    4298254            0      3.1gb          3.1gb
+yellow open   filebeat-7.15.2-2022.03.11-000001               ######################   1   1       1008            0    455.6kb        455.6kb
+yellow open   filebeat-7.15.2-2022.04.10-000002               ######################   1   1          0            0       225b           225b
+yellow open   filebeat-7.15.2-2022.05.10-000003               ######################   1   1          0            0       225b           225b
+yellow open   filebeat-7.15.2-2022.06.09-000004               ######################   1   1          0            0       225b           225b
+yellow open   filebeat-7.15.2-2022.07.09-000005               ######################   1   1          0            0       225b           225b
+yellow open   filebeat-8.0.1                                  ######################   1   1   15815910            0        9gb            9gb
+yellow open   filebeat-8.1.0                                  ######################   1   1   22087647            0     13.6gb         13.6gb
+yellow open   filebeat-8.1.2                                  ######################   1   1    6655497            0      4.1gb          4.1gb
+green  open   metrics-endpoint.metadata_current_default       ######################   1   0          0            0       225b           225b
+yellow open   packetbeat-8.0.1                                ######################   1   1  215773987            0     92.1gb         92.1gb
+yellow open   packetbeat-8.1.0                                ######################   1   1   21195763            0      9.8gb          9.8gb
+yellow open   packetbeat-8.1.2                                ######################   1   1   52814104            0     20.8gb         20.8gb
+yellow open   winlogbeat-8.0.1                                ######################   1   1  102336389            0    103.9gb        103.9gb
+```
 
 ### Step 4 - Choosing your index to get data from.
-![setting_index](./screenshots/setting_index.png) <br />
+```text
+
+```
 In the above example, I have chosen the winlogbeat-8.0.1 index.
 Once you have chosen your index, it will be shown that you are fetching from that particular index
 ### Step 5 - Fetching data from a chosen index.

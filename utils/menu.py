@@ -1,5 +1,6 @@
 import os
 
+
 class Menu:
 
     def __init__(self, request_sender, converter, input_validation, parser):
@@ -20,17 +21,15 @@ class Menu:
         self.index_name = ""
         self.main_timestamp_field_name = "@timestamp"
         self.main_timestamp_field_type = "date"
-        self.header = header = "============================================================================================================\n" \
-                                 "           /$$                       /$$     /$$             /$$$$$$             /$$               /$$      \n" \
-                                 "          | $$                      | $$    |__/            /$$__  $$           | $$              | $$      \n" \
-                                 "  /$$$$$$ | $$  /$$$$$$   /$$$$$$$ /$$$$$$   /$$  /$$$$$$$ | $$  \__/ /$$$$$$  /$$$$$$    /$$$$$$$| $$$$$$$ \n" \
-                                 " /$$__  $$| $$ |____  $$ /$$_____/|_  $$_/  | $$ /$$_____/ | $$$$    /$$__  $$|_  $$_/   /$$_____/| $$__  $$\n" \
-                                 "| $$$$$$$$| $$  /$$$$$$$|  $$$$$$   | $$    | $$| $$       | $$_/   | $$$$$$$$  | $$    | $$      | $$  \ $$\n" \
-                                 "| $$_____/| $$ /$$__  $$ \____  $$  | $$ /$$| $$| $$       | $$     | $$_____/  | $$ /$$| $$      | $$  | $$\n" \
-                                 "|  $$$$$$$| $$|  $$$$$$$ /$$$$$$$/  |  $$$$/| $$|  $$$$$$$ | $$     |  $$$$$$$  |  $$$$/|  $$$$$$$| $$  | $$\n" \
-                                 " \_______/|__/ \_______/|_______/    \___/  |__/ \_______/ |__/      \_______/   \___/   \_______/|__/  |__/\n\n" \
-                                 "Developed by: Gerald Lim Wee Koon (github: mathscantor)                                                     \n" \
-                                 "============================================================================================================\n"
+        self.header = "===============================================================\n" \
+                      "        _              _    _         __       _         _     \n" \
+                      "       | |            | |  (_)       / _|     | |       | |    \n" \
+                      "   ___ | |  __ _  ___ | |_  _   ___ | |_  ___ | |_  ___ | |__  \n" \
+                      "  / _ \| | / _` |/ __|| __|| | / __||  _|/ _ \| __|/ __|| '_ \ \n" \
+                      " |  __/| || (_| |\__ \| |_ | || (__ | | |  __/| |_| (__ | | | |\n" \
+                      "  \___||_| \__,_||___/ \__||_| \___||_|  \___| \__|\___||_| |_|\n\n" \
+                      "    Developed by: Gerald Lim Wee Koon (github: mathscantor)    \n" \
+                      "===============================================================\n"
 
     def show_menu(self):
 
@@ -112,12 +111,14 @@ class Menu:
                     if not has_printed_parent:
                         print("{:<30} {:<10} {:<30}".format(top_parent_field, field_type,
                                                             ', '.join(
-                                                                parent_field_to_type_dict[top_parent_field][field_type])))
+                                                                parent_field_to_type_dict[top_parent_field][
+                                                                    field_type])))
                         has_printed_parent = True
                     else:
                         print("{:<30} {:<10} {:<30}".format('', field_type,
                                                             ', '.join(
-                                                                parent_field_to_type_dict[top_parent_field][field_type])))
+                                                                parent_field_to_type_dict[top_parent_field][
+                                                                    field_type])))
                     print("")
 
         chosen_timestamp_name = input("Main Timestamp Name: ").strip()
@@ -135,11 +136,12 @@ class Menu:
     '''
     Lists all available fields for the current index.
     '''
+
     def show_available_fields(self):
         response = self.request_sender.get_available_fields(index_name=self.index_name)
         if response is not None:
             parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.index_name,
-                                                                                           fields_json=response)
+                                                                                         fields_json=response)
             print("{:<30} {:<10} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
             print("{:<30} {:<10} {:<30}".format('----------------', '----', '------------------'))
 
@@ -148,11 +150,13 @@ class Menu:
                 for field_type in parent_field_to_type_dict[top_parent_field].keys():
                     if not has_printed_parent:
                         print("{:<30} {:<10} {:<30}".format(top_parent_field, field_type,
-                                                            ', '.join(parent_field_to_type_dict[top_parent_field][field_type])))
+                                                            ', '.join(parent_field_to_type_dict[top_parent_field][
+                                                                          field_type])))
                         has_printed_parent = True
                     else:
                         print("{:<30} {:<10} {:<30}".format('', field_type,
-                                                            ', '.join(parent_field_to_type_dict[top_parent_field][field_type])))
+                                                            ', '.join(parent_field_to_type_dict[top_parent_field][
+                                                                          field_type])))
                 print("")
 
         return
@@ -201,16 +205,18 @@ class Menu:
                 return
 
         keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
-        query_bool_must_list = self.converter.convert_all_is_list_to_must_list(filter_is_list=keyword_sentences_dict["is"],
-                                                                               filter_is_gte_list=keyword_sentences_dict["is_gte"],
-                                                                               filter_is_lte_list=keyword_sentences_dict["is_lte"],
-                                                                               filter_is_gt_list=keyword_sentences_dict["is_gt"],
-                                                                               filter_is_lt_list=keyword_sentences_dict["is_lt"])
-        query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(filter_is_not_list=keyword_sentences_dict["is_not"],
-                                                                                           filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
-                                                                                           filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
-                                                                                           filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
-                                                                                           filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
+        query_bool_must_list = self.converter.convert_all_is_list_to_must_list(
+            filter_is_list=keyword_sentences_dict["is"],
+            filter_is_gte_list=keyword_sentences_dict["is_gte"],
+            filter_is_lte_list=keyword_sentences_dict["is_lte"],
+            filter_is_gt_list=keyword_sentences_dict["is_gt"],
+            filter_is_lt_list=keyword_sentences_dict["is_lt"])
+        query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(
+            filter_is_not_list=keyword_sentences_dict["is_not"],
+            filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
+            filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
+            filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
+            filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
 
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
                                                                                     num_logs=num_logs,
@@ -232,12 +238,8 @@ class Menu:
         file_path = "datasets/" + filename
         os.makedirs(os.path.dirname(file_path), exist_ok=True)
         if file_path.lower().endswith(".csv"):
-            self.converter.convert_json_data_to_csv(data_json_list=data_json_list, fields_list=fields_list, file_path=file_path)
+            self.converter.convert_json_data_to_csv(data_json_list=data_json_list, fields_list=fields_list,
+                                                    file_path=file_path)
         elif file_path.lower().endswith(".json"):
             self.converter.convert_json_data_to_json(data_json_list=data_json_list, file_path=file_path)
         return
-
-
-
-
-
