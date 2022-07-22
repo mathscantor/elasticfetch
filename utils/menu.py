@@ -177,6 +177,14 @@ class Menu:
         if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
                                                         timestamp=end_ts):
             return
+
+        # Since elasticsearch only supports epoch_millis by default, standardize all user input epoch to epoch_millis
+        if self.main_timestamp_field_type == "epoch":
+            if len(start_ts) == 10:
+                start_ts += "000"
+            if len(end_ts) == 10:
+                end_ts += "000"
+
         if not self.input_validation.is_endts_gte_startts(timestamp_type=self.main_timestamp_field_type,
                                                           start_ts=start_ts,
                                                           end_ts=end_ts):

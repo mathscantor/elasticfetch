@@ -169,11 +169,6 @@ class Converter:
 
         return query_bool_must_not_list
 
-    def convert_timestamp_to_epoch(self,
-                                   timestamp: str) -> int:
-
-        epoch = int(time.mktime(time.strptime(timestamp, self.timestamp_format))) * 1000
-        return epoch
 
     def convert_field_mapping_keys_pretty(self,
                                           index_name: str,

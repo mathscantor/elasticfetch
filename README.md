@@ -139,29 +139,113 @@ The default main timestamp field is @timestamp as elasticsearch uses this field 
 However, I am aware that certain users / organization do rename '@timestamp' to something else. Therefore, I have added this feature to support existing organizations that require this. <br>
 
 In addition, I have given the liberty to the user to choose between timestamp types:
-1. 'date' <br>
-format: <br>
-(`YYYY-MM-DD`T`HH:mm:ss`) - smallet unit in seconds - eg. `2022-05-01T00:00:00`
-2. 'epoch' format: <br>
-(`10 digit number`) -  
 
+<!-- Output copied to clipboard! -->
+
+<!-----
+
+Yay, no errors, warnings, or alerts!
+
+Conversion time: 0.389 seconds.
+
+
+Using this Markdown file:
+
+1. Paste this output into your source file.
+2. See the notes and action items below regarding this conversion run.
+3. Check the rendered output (headings, lists, code blocks, tables) for proper
+   formatting and use a linkchecker before you publish this page.
+
+Conversion notes:
+
+* Docs to Markdown version 1.0β33
+* Fri Jul 22 2022 03:51:52 GMT-0700 (PDT)
+* Source doc: Untitled document
+* Tables are currently converted to HTML tables.
+----->
+<table>
+  <tr>
+   <td>Type
+   </td>
+   <td>Supported Formats
+   </td>
+   <td>Smallest Unit
+   </td>
+   <td>Examples
+   </td>
+  </tr>
+  <tr>
+   <td rowspan="2" >date
+   </td>
+   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S>
+   </td>
+   <td>seconds
+   </td>
+   <td>2022-05-01T00:00:00
+   </td>
+  </tr>
+  <tr>
+   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S.%f>Z
+   </td>
+   <td>milliseconds
+   </td>
+   <td>2022-05-01T00:00:00.000Z
+   </td>
+  </tr>
+  <tr>
+   <td rowspan="2" >epoch
+   </td>
+   <td>10 digit string
+   </td>
+   <td>seconds
+   </td>
+   <td>1420070400
+   </td>
+  </tr>
+  <tr>
+   <td>13 digit string
+   </td>
+   <td>milliseconds
+   </td>
+   <td>1420070400000
+   </td>
+  </tr>
+</table>
+
+### Option 4 - Listing all available fields within the current chosen index
+It is a known grievance that the users have to manually check what fields are available to them. Option 4 allows users to list the whole shebang of fields.
 ```text
-Current index selected: winlogbeat-8.0.1
-Main Timestamp Field:  @timestamp
-Main Timestamp Type:  epoch
+[SUCCESS] Showing available fields...
 
-1 -- Show indices status
-2 -- Set current index
-3 -- Set main timestamp
-4 -- Show available field names
-5 -- Fetch data between two timestamps
-6 -- Exit
-Enter your choice: 
+
+TOP LEVEL PARENT               TYPE       ALL RELATED FIELDS            
+----------------               ----       ------------------            
+@timestamp                     date       @timestamp                    
+
+_data_stream_timestamp         NoType     _data_stream_timestamp        
+
+_doc_count                     NoType     _doc_count                    
+
+_feature                       NoType     _feature                      
+
+_field_names                   NoType     _field_names
+
+file                           text       file.code_signature.status, file.code_signature.subject_name, file.directory, file.extension, file.hash.md5, file.hash.sha256, file.name, file.path, file.pe.imphash
+                               keyword    file.code_signature.status.keyword, file.code_signature.subject_name.keyword, file.directory.keyword, file.extension.keyword, file.hash.md5.keyword, file.hash.sha256.keyword, file.name.keyword, file.path.keyword, file.pe.imphash.keyword
+                               boolean    file.code_signature.valid     
+
+group                          text       group.domain, group.id, group.name
+                               keyword    group.domain.keyword, group.id.keyword, group.name.keyword
+
+host                           text       host.architecture, host.hostname, host.id, host.ip, host.mac, host.name, host.os.build, host.os.family, host.os.kernel, host.os.name, host.os.platform, host.os.type, host.os.version
+                               keyword    host.architecture.keyword, host.hostname.keyword, host.id.keyword, host.ip.keyword, host.mac.keyword, host.name.keyword, host.os.build.keyword, host.os.family.keyword, host.os.kernel.keyword, host.os.name.keyword, host.os.platform.keyword, host.os.type.keyword, host.os.version.keyword
+.
+.
+.
 ```
+### Option 5 - Fetching data from a chosen index.
 
-### Step 5 - Fetching data from a chosen index.
-Select option 3 in the main menu. <br />
-![Fetching Data Example](./screenshots/option_3.png "Fetching Data Example") <br />
+
 This will prompt you for:
 - start timestamp
 - end timestamp

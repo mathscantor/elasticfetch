@@ -176,27 +176,50 @@ class RequestSender:
                 size = num_logs
             num_logs -= size
 
-            data = \
-            {
-                "size": size,
-                "_source": fields_list,
-                "query": {
-                    "bool": {
-                        "filter": {
-                            "range": {
-                                main_timestamp_field_name: {
-                                    "gte": start_ts,
-                                    "lte": end_ts
+            if main_timestamp_field_type == "date":
+                data = \
+                {
+                    "size": size,
+                    "_source": fields_list,
+                    "query": {
+                        "bool": {
+                            "filter": {
+                                "range": {
+                                    main_timestamp_field_name: {
+                                        "gte": start_ts,
+                                        "lte": end_ts
+                                    }
                                 }
+                            },
+                        }
+                    },
+                    "sort": [
+                        {main_timestamp_field_name: {"order": "asc", "format": "strict_date_optional_time_nanos"}}
+                    ]
+                }
+            elif main_timestamp_field_type == "epoch":
+                data = \
+                    {
+                        "size": size,
+                        "_source": fields_list,
+                        "query": {
+                            "bool": {
+                                "filter": {
+                                    "range": {
+                                        main_timestamp_field_name: {
+                                            "gte": start_ts,
+                                            "lte": end_ts
+                                        }
+                                    }
+                                },
                             }
                         },
+                        "sort": [
+                            # BUG: KEEP GETTING NO HITS epoch seconds
+                            {main_timestamp_field_name: {"order": "asc", "format": "epoch_millis"}}
+                        ]
                     }
-                },
-                "sort": [
-                    {main_timestamp_field_name: {"order": "asc"}}
-                    # {"@timestamp": {"order": "asc", "format": "strict_date_optional_time_nanos", "numeric_type": "date_nanos"}}
-                ]
-            }
+            #print(json.dumps(data, indent=4))
             if len(query_bool_must_list) > 0:
                 data["query"]["bool"]["must"] = query_bool_must_list
             if len(query_bool_must_not_list) > 0:
