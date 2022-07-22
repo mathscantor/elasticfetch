@@ -163,9 +163,11 @@ class Menu:
 
     def fetch_elastic_data_between_ts1_ts2(self):
         if self.main_timestamp_field_type == "date":
-            print("timestamp format: <YYYY-MM-DD>T<HH:mm:ss>\neg. 2022-05-01T00:00:00")
+            print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z\n"
+                  "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z")
         elif self.main_timestamp_field_type == "epoch":
-            print("timestamp format: <standard unix epoch time>\neg. 1420070400001 or 1420070400")
+            print("timestamp format: <10 / 13 digit string>\n"
+                  "eg. 1420070400 or 1420070400001")
 
         start_ts = input("Start Timestamp: ")
         if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,

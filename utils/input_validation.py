@@ -10,12 +10,17 @@ class InputValidation:
         self.port_regex = re.compile("^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$")
         self.ip_regex = re.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
         self.numeric_regex = re.compile("^\d+$")
-        self.timestamp_date_type_regex = re.compile("^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
-                                     "(0[0-9]|1[0-9]|2[0-3]?):"
-                                     "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
-                                     "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)$")
+        self.timestamp_date_type_seconds_regex = re.compile("^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
+                                                            "(0[0-9]|1[0-9]|2[0-3]?):"
+                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
+                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)$")
+        self.timestamp_date_type_milliseconds_regex = re.compile("^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
+                                                            "(0[0-9]|1[0-9]|2[0-3]?):"
+                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
+                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)(.\d{3}Z)?$")
         self.timestamp_epoch_type_regex = re.compile('^\d{10}$|^\d{13}$')
-        self.datetime_format = '%Y-%m-%dT%H:%M:%S'
+        self.datetime_format_seconds = '%Y-%m-%dT%H:%M:%S'
+        self.datetime_format_milliseconds = '%Y-%m-%dT%H:%M:%S.%fZ'
         self.filter_raw_regex = re.compile(
             r"^(([-_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not|is_gte|is_lte|is_gt|is_lt|is) [-_.a-zA-Z\d]+;(\s+|))+)$")
         self.valid_file_extensions = ('.json', '.csv')
@@ -56,15 +61,13 @@ class InputValidation:
                            timestamp_type: str,
                            timestamp: str):
         if timestamp_type == "date":
-            match = self.timestamp_date_type_regex.search(timestamp)
-            if match:
+            if self.timestamp_date_type_seconds_regex.search(timestamp) or self.timestamp_date_type_milliseconds_regex.search(timestamp):
                 return True
             else:
-                messenger(2, "Invalid input! Expected <YYYY-MM-DD>T<HH:mm:ss> but got something else instead. Please try again!")
+                messenger(2, "Invalid input! Expected <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z but got something else instead. Please try again!")
                 return False
         elif timestamp_type == "epoch":
-            match = self.timestamp_epoch_type_regex.search(timestamp)
-            if match:
+            if self.timestamp_epoch_type_regex.search(timestamp):
                 return True
             else:
                 messenger(2, "Invalid input! <standard unix epoch time> but got something else instead. Please try again!")
@@ -73,8 +76,16 @@ class InputValidation:
     def is_endts_gte_startts(self, timestamp_type, start_ts, end_ts):
 
         if timestamp_type == "date":
-            tstamp1 = datetime.strptime(start_ts, self.datetime_format)
-            tstamp2 = datetime.strptime(end_ts, self.datetime_format)
+            if self.timestamp_date_type_seconds_regex.search(start_ts):
+                tstamp1 = datetime.strptime(start_ts, self.datetime_format_seconds)
+            elif self.timestamp_date_type_milliseconds_regex.search(start_ts):
+                tstamp1 = datetime.strptime(start_ts, self.datetime_format_milliseconds)
+
+            if self.timestamp_date_type_seconds_regex.search(end_ts):
+                tstamp2 = datetime.strptime(end_ts, self.datetime_format_seconds)
+            elif self.timestamp_date_type_milliseconds_regex.search(end_ts):
+                tstamp2 = datetime.strptime(end_ts, self.datetime_format_milliseconds)
+
             if tstamp2 >= tstamp1:
                 return True
             else:
