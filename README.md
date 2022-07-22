@@ -244,6 +244,49 @@ host                           text       host.architecture, host.hostname, host
 .
 ```
 ### Option 5 - Fetching data from a chosen index.
+```text
+Current index selected: winlogbeat-8.0.1
+Main Timestamp Field:  @timestamp
+Main Timestamp Type:  date
+
+1 -- Show indices status
+2 -- Set current index
+3 -- Set main timestamp
+4 -- Show available field names
+5 -- Fetch data between two timestamps
+6 -- Exit
+Enter your choice: 5
+
+timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z
+eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z
+Start Timestamp: 2022-05-01T00:00:00
+End Timestamp: 2022-05-20T00:00:00
+Number of logs to retrieve: 50000
+Select your field names (eg. event.created,event.code,message): event.created, event.code, message
+
+Filter Format: <FIELD_NAME> <FILTER_KEYWORD> <VALUE>;
+Supported Filter Keywords:
+- is_not_gte
+- is_not_lte
+- is_not_gt
+- is_not_lt
+- is_not
+- is_gte
+- is_lte
+- is_gt
+- is_lt
+- is
+
+eg. event.code is_gt 4000; event.code is_lte 5000; event.category is authentication;
+(OPTIONAL - PRESS ENTER TO SKIP) Filter your queries: event.code is_gte 1000;
+ [INFO] Fetching elastic data...
+Fetch Progress: 100%|██████████| 50000/50000 [01:26<00:00, 577.40it/s]
+ [SUCCESS] Successfully fetched 50000 data entries!
+File name to save as (.json, .csv): test.csv
+ [INFO] Saving data to datasets/test.csv
+ [SUCCESS] Successfully saved data to datasets/test.csv
+
+```
 
 
 This will prompt you for:
