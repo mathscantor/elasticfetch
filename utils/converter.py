@@ -172,7 +172,7 @@ class Converter:
     def convert_timestamp_to_epoch(self,
                                    timestamp: str) -> int:
 
-        epoch = int(time.mktime(time.strptime(timestamp, self.timestamp_format)))
+        epoch = int(time.mktime(time.strptime(timestamp, self.timestamp_format))) * 1000
         return epoch
 
     def convert_field_mapping_keys_pretty(self,

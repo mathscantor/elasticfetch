@@ -5,12 +5,16 @@ class ConfigReader:
 
     def __init__(self):
         self.description = "reads configuration from elasticfetch.ini"
+        self.config_path = "elasticfetch.ini"
 
-    def read_config_file(self):
-
+    '''
+    Reads in the user input from the configuration file and put them into a config_dict for easy access to 
+    user's chosen parameters.
+    '''
+    def read_config_file(self) -> dict:
         config_dict = {}
         config_options = ConfigParser()
-        config_options.read("elasticfetch.ini")
+        config_options.read(self.config_path)
         if config_options.has_section("elastic"):
             if config_options.has_option("elastic", "protocol"):
                 config_dict["elastic.protocol"] = ast.literal_eval(config_options.get("elastic", "protocol"))

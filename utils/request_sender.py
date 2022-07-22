@@ -3,6 +3,7 @@ from utils.messenger import messenger
 import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tqdm import tqdm
+from utils.converter import Converter
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -34,7 +35,8 @@ class RequestSender:
                 messenger(2, "Unable to Authenticate. General Error.")
             return False
         except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}".format(url))
+            messenger(2, "Cannot resolve request to {}. Please ensure your elasticsearch's server "
+                         "firewall is configured properly!".format(url))
         except requests.ConnectTimeout:
             messenger(2, "Connection timeout to {}".format(url))
         except requests.ConnectionError:
@@ -82,7 +84,8 @@ class RequestSender:
     has a cost, as discussed in the previous section. Point-in-times should be closed 
     as soon as they are no longer used in search requests.
     '''
-    def delete_pit_id(self, pit_id):
+    def delete_pit_id(self,
+                      pit_id: str):
         data = {"id": pit_id}
         url = "{}://{}:{}/_pit?pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
         messenger(3, "Deleting PIT id {}...".format(pit_id))
@@ -114,7 +117,8 @@ class RequestSender:
     The maximum value of from + size for searches to this index. Defaults to 10000. 
     Search requests take heap memory and time proportional to from + size and this limits that memory.
     '''
-    def put_max_result_window(self, size):
+    def put_max_result_window(self,
+                              size: int):
         data = {"index.max_result_window": size}
         url = "{}://{}:{}/_settings".format(self.protocol, self.elastic_ip, self.elastic_port)
         messenger(3, "Changing max_results_window size to {}".format(size))
@@ -145,53 +149,26 @@ class RequestSender:
         return
 
     '''
-    Sends GET request to fetch data between 2 timestamps
-    Example:
-    GET _search
-    {
-      "size": 1000,
-      "_source": ["event.created","event.code"],
-      "query": {
-        "bool": {
-          "filter": [
-            {
-              "range": {
-                "@timestamp": {
-                  "gte": "2022-05-01T00:00:00",
-                  "lte": "2022-05-20T00:00:00"
-                }
-              }
-            }
-          ], 
-          "must" : [
-            {"term" : { "event.outcome" : "success" }},
-            {"term" : { "event.category": "authentication" }}
-          ]
-        }
-      },
-      "pit": {
-        "id": "8_LoAwEQd2lubG9nYmVhdC04LjAuMRZOTlg2bVVzb1Q0bV8yR1B4bVNaQzZnABY1SFNJbG5fWlE3QzB3NU1uRERDbHpnAAAAAAAAb642FlBWekRTejRvU09HV0VITFBLdEtKTkEAARZOTlg2bVVzb1Q0bV8yR1B4bVNaQzZnAAA=",
-        "keep_alive": "1m"
-      },
-      "sort": [
-        {
-          "@timestamp": {
-            "order": "asc",
-            "format": "strict_date_optional_time_nanos",
-            "numeric_type" : "date_nanos"
-          }
-        }
-      ]
-    }
+    Loops through and through to fetch in batches of 10,000 data entries.
+    Returns a list of data_json objects which will be converted into either a .json or .csv file.
     '''
-    def get_fetch_elastic_data_between_ts1_ts2(self, index_name, num_logs, start_ts, end_ts, fields_list,
-                                               query_bool_must_list, query_bool_must_not_list):
+    def get_fetch_elastic_data_between_ts1_ts2(self,
+                                               index_name: str,
+                                               num_logs: int,
+                                               main_timestamp_field_name: str,
+                                               main_timestamp_field_type: str,
+                                               start_ts: str,
+                                               end_ts: str,
+                                               fields_list: list,
+                                               query_bool_must_list: list,
+                                               query_bool_must_not_list: list) -> list:
         url = "{}://{}:{}/{}/_search?pretty".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
         data_json_list = []
         is_first_loop = True
         last_ids = []
         messenger(3, "Fetching elastic data...")
         pbar = tqdm(total=num_logs, desc="Fetch Progress")
+
         while num_logs > 0:
             if num_logs >= 10000:
                 size = 10000
@@ -199,8 +176,6 @@ class RequestSender:
                 size = num_logs
             num_logs -= size
 
-            # TODO: Add support for different timestamp formats
-            # TODO: Add support to sort different fields apart from @timestamp
             data = \
             {
                 "size": size,
@@ -209,7 +184,7 @@ class RequestSender:
                     "bool": {
                         "filter": {
                             "range": {
-                                "@timestamp": {
+                                main_timestamp_field_name: {
                                     "gte": start_ts,
                                     "lte": end_ts
                                 }
@@ -218,7 +193,7 @@ class RequestSender:
                     }
                 },
                 "sort": [
-                    {"@timestamp": {"order": "asc"}}
+                    {main_timestamp_field_name: {"order": "asc"}}
                     # {"@timestamp": {"order": "asc", "format": "strict_date_optional_time_nanos", "numeric_type": "date_nanos"}}
                 ]
             }
@@ -300,7 +275,7 @@ class RequestSender:
                                     verify=False,
                                     auth=(self.username, self.password))
             if response is not None:
-                messenger(0, "Showing all available fields...\n\n")
+                messenger(0, "Showing available fields...\n\n")
                 return response.json()
             else:
                 messenger(2, "No fields are available! Please check whether elasticsearch is parsing properly!")

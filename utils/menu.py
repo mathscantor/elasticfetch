@@ -1,5 +1,4 @@
 import os
-import json
 
 class Menu:
 
@@ -11,31 +10,37 @@ class Menu:
         self.menu_options = {
             1: 'Show indices status',
             2: 'Set current index',
-            3: 'Show available field names',
-            4: 'Fetch data between two timestamps',
-            5: 'Exit',
+            3: 'Set main timestamp',
+            4: 'Show available field names',
+            5: 'Fetch data between two timestamps',
+            6: 'Exit',
         }
         self.input_validation = input_validation
         self.parser = parser
         self.index_name = ""
+        self.main_timestamp_field_name = "@timestamp"
+        self.main_timestamp_field_type = "date"
+        self.header = header = "============================================================================================================\n" \
+                                 "           /$$                       /$$     /$$             /$$$$$$             /$$               /$$      \n" \
+                                 "          | $$                      | $$    |__/            /$$__  $$           | $$              | $$      \n" \
+                                 "  /$$$$$$ | $$  /$$$$$$   /$$$$$$$ /$$$$$$   /$$  /$$$$$$$ | $$  \__/ /$$$$$$  /$$$$$$    /$$$$$$$| $$$$$$$ \n" \
+                                 " /$$__  $$| $$ |____  $$ /$$_____/|_  $$_/  | $$ /$$_____/ | $$$$    /$$__  $$|_  $$_/   /$$_____/| $$__  $$\n" \
+                                 "| $$$$$$$$| $$  /$$$$$$$|  $$$$$$   | $$    | $$| $$       | $$_/   | $$$$$$$$  | $$    | $$      | $$  \ $$\n" \
+                                 "| $$_____/| $$ /$$__  $$ \____  $$  | $$ /$$| $$| $$       | $$     | $$_____/  | $$ /$$| $$      | $$  | $$\n" \
+                                 "|  $$$$$$$| $$|  $$$$$$$ /$$$$$$$/  |  $$$$/| $$|  $$$$$$$ | $$     |  $$$$$$$  |  $$$$/|  $$$$$$$| $$  | $$\n" \
+                                 " \_______/|__/ \_______/|_______/    \___/  |__/ \_______/ |__/      \_______/   \___/   \_______/|__/  |__/\n\n" \
+                                 "Developed by: Gerald Lim Wee Koon (github: mathscantor)                                                     \n" \
+                                 "============================================================================================================\n"
 
     def show_menu(self):
-        header = "============================================================================================================\n" \
-                 "           /$$                       /$$     /$$             /$$$$$$             /$$               /$$      \n" \
-                 "          | $$                      | $$    |__/            /$$__  $$           | $$              | $$      \n" \
-                 "  /$$$$$$ | $$  /$$$$$$   /$$$$$$$ /$$$$$$   /$$  /$$$$$$$ | $$  \__/ /$$$$$$  /$$$$$$    /$$$$$$$| $$$$$$$ \n" \
-                 " /$$__  $$| $$ |____  $$ /$$_____/|_  $$_/  | $$ /$$_____/ | $$$$    /$$__  $$|_  $$_/   /$$_____/| $$__  $$\n" \
-                 "| $$$$$$$$| $$  /$$$$$$$|  $$$$$$   | $$    | $$| $$       | $$_/   | $$$$$$$$  | $$    | $$      | $$  \ $$\n" \
-                 "| $$_____/| $$ /$$__  $$ \____  $$  | $$ /$$| $$| $$       | $$     | $$_____/  | $$ /$$| $$      | $$  | $$\n" \
-                 "|  $$$$$$$| $$|  $$$$$$$ /$$$$$$$/  |  $$$$/| $$|  $$$$$$$ | $$     |  $$$$$$$  |  $$$$/|  $$$$$$$| $$  | $$\n" \
-                 " \_______/|__/ \_______/|_______/    \___/  |__/ \_______/ |__/      \_______/   \___/   \_______/|__/  |__/\n\n" \
-                 "Developed by: Gerald Lim Wee Koon (github: mathscantor)                                                     \n" \
-                 "============================================================================================================\n"
-        print(header)
+
+        print(self.header)
         if self.index_name == "":
-            print("Current index selected:\033[93m N/A (Please set an index before fetching any data!)\033[0m\n")
+            print("Current index selected:\033[93m N/A (Please set an index before fetching any data!)\033[0m")
         else:
-            print("Current index selected:\033[93m {}\033[0m\n".format(self.index_name))
+            print("Current index selected:\033[93m {}\033[0m".format(self.index_name))
+        print("Main Timestamp Field: \033[93m {}\033[0m".format(self.main_timestamp_field_name))
+        print("Main Timestamp Type: \033[93m {}\033[0m\n".format(self.main_timestamp_field_type))
 
         for key in self.menu_options.keys():
             print(key, '--', self.menu_options[key])
@@ -53,11 +58,14 @@ class Menu:
             self.set_current_index()
         elif menu_option == 3:
             if self.input_validation.is_index_name_set(self.index_name):
-                self.show_available_fields()
+                self.set_main_timestamp()
         elif menu_option == 4:
             if self.input_validation.is_index_name_set(self.index_name):
-                self.fetch_elastic_data_between_ts1_ts2()
+                self.show_available_fields()
         elif menu_option == 5:
+            if self.input_validation.is_index_name_set(self.index_name):
+                self.fetch_elastic_data_between_ts1_ts2()
+        elif menu_option == 6:
             exit(0)
         return
 
@@ -87,6 +95,46 @@ class Menu:
             return
         self.index_name = index_dict[index_option]
 
+    def set_main_timestamp(self):
+
+        response = self.request_sender.get_available_fields(index_name=self.index_name)
+        if response is not None:
+            parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.index_name,
+                                                                                         fields_json=response)
+        print("{:<30} {:<10} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
+        print("{:<30} {:<10} {:<30}".format('----------------', '----', '------------------'))
+        valid_timestamp_name_list = []
+        for top_parent_field in parent_field_to_type_dict.keys():
+            has_printed_parent = False
+            for field_type in parent_field_to_type_dict[top_parent_field].keys():
+                if field_type == "date":
+                    valid_timestamp_name_list += parent_field_to_type_dict[top_parent_field][field_type]
+                    if not has_printed_parent:
+                        print("{:<30} {:<10} {:<30}".format(top_parent_field, field_type,
+                                                            ', '.join(
+                                                                parent_field_to_type_dict[top_parent_field][field_type])))
+                        has_printed_parent = True
+                    else:
+                        print("{:<30} {:<10} {:<30}".format('', field_type,
+                                                            ', '.join(
+                                                                parent_field_to_type_dict[top_parent_field][field_type])))
+                    print("")
+
+        chosen_timestamp_name = input("Main Timestamp Name: ").strip()
+        if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=chosen_timestamp_name,
+                                                             valid_timestamp_name_list=valid_timestamp_name_list):
+            return
+        chosen_timestamp_type = input("Timestamp Type: ").strip()
+        if not self.input_validation.is_timestamp_type_valid(chosen_timestamp_type=chosen_timestamp_type):
+            return
+
+        self.main_timestamp_field_name = chosen_timestamp_name
+        self.main_timestamp_field_type = chosen_timestamp_type
+        return
+
+    '''
+    Lists all available fields for the current index.
+    '''
     def show_available_fields(self):
         response = self.request_sender.get_available_fields(index_name=self.index_name)
         if response is not None:
@@ -110,15 +158,22 @@ class Menu:
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
-        print("timestamp format: <YYYY-MM-DD>T<HH:mm:ss>\neg. 2022-05-01T00:00:00")
+        if self.main_timestamp_field_type == "date":
+            print("timestamp format: <YYYY-MM-DD>T<HH:mm:ss>\neg. 2022-05-01T00:00:00")
+        elif self.main_timestamp_field_type == "epoch":
+            print("timestamp format: <standard unix epoch time>\neg. 1420070400001 or 1420070400")
 
-        start_ts = input("start timestamp: ")
-        if not self.input_validation.is_timestamp_valid(start_ts):
+        start_ts = input("Start Timestamp: ")
+        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
+                                                        timestamp=start_ts):
             return
-        end_ts = input("end timestamp: ")
-        if not self.input_validation.is_timestamp_valid(end_ts):
+        end_ts = input("End Timestamp: ")
+        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
+                                                        timestamp=end_ts):
             return
-        if not self.input_validation.is_endts_gte_startts(start_ts=start_ts, end_ts=end_ts):
+        if not self.input_validation.is_endts_gte_startts(timestamp_type=self.main_timestamp_field_type,
+                                                          start_ts=start_ts,
+                                                          end_ts=end_ts):
             return
         num_logs = input("Number of logs to retrieve: ")
         if not self.input_validation.is_numeric_valid(num_logs):
@@ -152,18 +207,20 @@ class Menu:
                                                                                filter_is_gt_list=keyword_sentences_dict["is_gt"],
                                                                                filter_is_lt_list=keyword_sentences_dict["is_lt"])
         query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(filter_is_not_list=keyword_sentences_dict["is_not"],
-                                                                                       filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
-                                                                                       filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
-                                                                                       filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
-                                                                                       filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
+                                                                                           filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
+                                                                                           filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
+                                                                                           filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
+                                                                                           filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
 
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
-                                                                               num_logs=num_logs,
-                                                                               start_ts=start_ts,
-                                                                               end_ts=end_ts,
-                                                                               fields_list=fields_list,
-                                                                               query_bool_must_list=query_bool_must_list,
-                                                                               query_bool_must_not_list=query_bool_must_not_list)
+                                                                                    num_logs=num_logs,
+                                                                                    main_timestamp_field_name=self.main_timestamp_field_name,
+                                                                                    main_timestamp_field_type=self.main_timestamp_field_type,
+                                                                                    start_ts=start_ts,
+                                                                                    end_ts=end_ts,
+                                                                                    fields_list=fields_list,
+                                                                                    query_bool_must_list=query_bool_must_list,
+                                                                                    query_bool_must_not_list=query_bool_must_not_list)
 
         if len(data_json_list) == 0:
             return
