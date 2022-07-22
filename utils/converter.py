@@ -176,17 +176,29 @@ class Converter:
         return epoch
 
     def convert_field_mapping_keys_pretty(self,
-                                          field_list: list) -> dict:
-        tmp_string = ''
-        max_length_per_row = 10
-        field_list.sort()
+                                          index_name: str,
+                                          fields_json: dict) -> dict:
 
-        i = 0
-        tmp_dict = {}
+        field_list = list(fields_json[index_name]["mappings"].keys())
+
+        field_list.sort()
+        top_parent_to_type_dict = {}
+
         for field in field_list:
-            parent_field = field.split('.')[0]
-            if parent_field not in tmp_dict:
-                tmp_dict[parent_field] = [field]
+            field_tokens = field.split('.')
+            top_parent_field = field_tokens[0]
+            last_child_field = field_tokens[-1]
+            if len(fields_json[index_name]["mappings"][field]["mapping"]) != 0:
+                last_child_field_type = fields_json[index_name]["mappings"][field]["mapping"][last_child_field]["type"]
             else:
-                tmp_dict[parent_field].append(field)
-        return tmp_dict
+                last_child_field_type = "NoType"
+
+            if top_parent_field not in top_parent_to_type_dict:
+                top_parent_to_type_dict[top_parent_field] = {}
+
+            if last_child_field_type not in top_parent_to_type_dict[top_parent_field]:
+                    top_parent_to_type_dict[top_parent_field][last_child_field_type] = [field]
+            else:
+                top_parent_to_type_dict[top_parent_field][last_child_field_type].append(field)
+
+        return top_parent_to_type_dict
