@@ -3,7 +3,7 @@ from utils.messenger import messenger
 import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tqdm import tqdm
-from utils.converter import Converter
+import sys
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 
@@ -167,7 +167,7 @@ class RequestSender:
         is_first_loop = True
         last_ids = []
         messenger(3, "Fetching elastic data...")
-        pbar = tqdm(total=num_logs, desc="Fetch Progress")
+        pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stdout)
 
         while num_logs > 0:
             if num_logs >= 10000:
