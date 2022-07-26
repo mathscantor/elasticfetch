@@ -13,7 +13,9 @@ pip3 install tqdm
 ## Current Features
 1. Show index health status
 2. Setting Index to fetch from
-3. Fetching data between timestamps
+3. Set main timestamp (This field will be used to sort your data in chronological order)
+4. Showing available field names related to your index (**Not Hardcoded**)
+5. Fetching data between two timestamps
 
 ## How to use
 ### Setting parameters in configuration file
