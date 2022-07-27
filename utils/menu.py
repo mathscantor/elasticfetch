@@ -142,19 +142,19 @@ class Menu:
         if response is not None:
             parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.index_name,
                                                                                          fields_json=response)
-            print("{:<30} {:<10} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
-            print("{:<30} {:<10} {:<30}".format('----------------', '----', '------------------'))
+            print("{:<30} {:<20} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
+            print("{:<30} {:<20} {:<30}".format('----------------', '----', '------------------'))
 
             for top_parent_field in parent_field_to_type_dict.keys():
                 has_printed_parent = False
                 for field_type in parent_field_to_type_dict[top_parent_field].keys():
                     if not has_printed_parent:
-                        print("{:<30} {:<10} {:<30}".format(top_parent_field, field_type,
+                        print("{:<30} {:<20} {:<30}".format(top_parent_field, field_type,
                                                             ', '.join(parent_field_to_type_dict[top_parent_field][
                                                                           field_type])))
                         has_printed_parent = True
                     else:
-                        print("{:<30} {:<10} {:<30}".format('', field_type,
+                        print("{:<30} {:<20} {:<30}".format('', field_type,
                                                             ', '.join(parent_field_to_type_dict[top_parent_field][
                                                                           field_type])))
                 print("")
