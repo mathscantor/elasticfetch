@@ -121,11 +121,11 @@ class Converter:
         return query_bool_must_list
 
     def convert_all_is_not_list_to_must_not_list(self,
-                                         filter_is_not_list: list,
-                                         filter_is_not_gte_list: list,
-                                         filter_is_not_lte_list: list,
-                                         filter_is_not_gt_list: list,
-                                         filter_is_not_lt_list: list) -> list:
+                                                 filter_is_not_list: list,
+                                                 filter_is_not_gte_list: list,
+                                                 filter_is_not_lte_list: list,
+                                                 filter_is_not_gt_list: list,
+                                                 filter_is_not_lt_list: list) -> list:
         query_bool_must_not_list = []
         for filter_is_not in filter_is_not_list:
             temp_dict = {}
@@ -169,7 +169,6 @@ class Converter:
 
         return query_bool_must_not_list
 
-
     def convert_field_mapping_keys_pretty(self,
                                           index_name: str,
                                           fields_json: dict) -> dict:
@@ -182,7 +181,8 @@ class Converter:
             field_tokens = field.split('.')
             top_parent_field = field_tokens[0]
             last_child_field = field_tokens[-1]
-            if len(fields_json[index_name]["mappings"][field]["mapping"]) != 0 and "type" in fields_json[index_name]["mappings"][field]["mapping"][last_child_field].keys():
+            if len(fields_json[index_name]["mappings"][field]["mapping"]) != 0 and "type" in \
+                    fields_json[index_name]["mappings"][field]["mapping"][last_child_field].keys():
                 last_child_field_type = fields_json[index_name]["mappings"][field]["mapping"][last_child_field]["type"]
             else:
                 last_child_field_type = "NoType"
@@ -191,7 +191,7 @@ class Converter:
                 top_parent_to_type_dict[top_parent_field] = {}
 
             if last_child_field_type not in top_parent_to_type_dict[top_parent_field]:
-                    top_parent_to_type_dict[top_parent_field][last_child_field_type] = [field]
+                top_parent_to_type_dict[top_parent_field][last_child_field_type] = [field]
             else:
                 top_parent_to_type_dict[top_parent_field][last_child_field_type].append(field)
 
