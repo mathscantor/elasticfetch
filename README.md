@@ -1,7 +1,7 @@
 # elasticfetch - overview
 Elasticfetch is a simple tool to export huge amounts of data from elasticsearch. <br>
 
-Currently, this tool is not reliant on the `scroll API` and in the event where elasticsearch decides to discontinue the support for `scroll API`, this tool will remain to function propely. <br>
+Currently, this tool is not reliant on the `scroll API` and in the event where elasticsearch decides to discontinue the support for `scroll API`, this tool will remain to function properly. <br>
 
 This tool aims to facilitate work flow of threat hunting and data analysis in the event where you need to query huge amount of data without killing the server.
 ## Required Python Packages

@@ -175,7 +175,6 @@ class Converter:
                                           fields_json: dict) -> dict:
 
         field_list = list(fields_json[index_name]["mappings"].keys())
-
         field_list.sort()
         top_parent_to_type_dict = {}
 
@@ -183,7 +182,7 @@ class Converter:
             field_tokens = field.split('.')
             top_parent_field = field_tokens[0]
             last_child_field = field_tokens[-1]
-            if len(fields_json[index_name]["mappings"][field]["mapping"]) != 0:
+            if len(fields_json[index_name]["mappings"][field]["mapping"]) != 0 and "type" in fields_json[index_name]["mappings"][field]["mapping"][last_child_field].keys():
                 last_child_field_type = fields_json[index_name]["mappings"][field]["mapping"][last_child_field]["type"]
             else:
                 last_child_field_type = "NoType"
