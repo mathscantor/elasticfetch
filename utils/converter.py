@@ -175,7 +175,6 @@ class Converter:
                                           fields_json: dict) -> dict:
 
         field_list = list(fields_json[index_name]["mappings"].keys())
-        print(json.dumps(fields_json[index_name]["mappings"], indent=4))
         field_list.sort()
         top_parent_to_type_dict = {}
 
