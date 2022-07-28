@@ -167,7 +167,7 @@ class RequestSender:
         is_first_loop = True
         last_ids = []
         messenger(3, "Fetching elastic data...")
-        pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stdout)
+        pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stderr)
 
         while num_logs > 0:
             if num_logs >= 10000:
