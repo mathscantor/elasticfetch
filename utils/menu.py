@@ -13,8 +13,9 @@ class Menu:
             2: 'Set current index',
             3: 'Set main timestamp',
             4: 'Show available field names',
-            5: 'Fetch data between two timestamps',
-            6: 'Exit',
+            5: 'Convert datetime range to epoch range',
+            6: 'Fetch data between two timestamps',
+            7: 'Exit',
         }
         self.input_validation = input_validation
         self.parser = parser
@@ -62,9 +63,11 @@ class Menu:
             if self.input_validation.is_index_name_set(self.index_name):
                 self.show_available_fields()
         elif menu_option == 5:
+            self.convert_datetime_range_to_epoch_range()
+        elif menu_option == 6:
             if self.input_validation.is_index_name_set(self.index_name):
                 self.fetch_elastic_data_between_ts1_ts2()
-        elif menu_option == 6:
+        elif menu_option == 7:
             exit(0)
         return
 
@@ -158,6 +161,24 @@ class Menu:
                                                             ', '.join(parent_field_to_type_dict[top_parent_field][
                                                                           field_type])))
                 print("")
+
+        return
+
+    def convert_datetime_range_to_epoch_range(self):
+        print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z\n"
+              "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z")
+        start_ts = input("Start Timestamp: ")
+        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
+                                                        timestamp=start_ts):
+            return
+        end_ts = input("End Timestamp: ")
+        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
+                                                        timestamp=end_ts):
+            return
+        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts)
+        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts)
+
+        print("Epoch Range: {} - {}".format(start_ts_epoch, end_ts_epoch))
 
         return
 

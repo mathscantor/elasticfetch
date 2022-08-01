@@ -73,7 +73,6 @@ class InputValidation:
                 messenger(2, "Invalid input! <standard unix epoch time> but got something else instead. Please try again!")
                 return False
 
-
     def is_endts_gte_startts(self, timestamp_type, start_ts, end_ts):
 
         if timestamp_type == "date":
