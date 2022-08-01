@@ -246,8 +246,18 @@ host                           text       host.architecture, host.hostname, host
 .
 ```
 
+### Option 5 - Converting datetime string to unix epoch
+```text
+Enter your choice: 5
 
-### Option 5 - Fetching data from a chosen index.
+timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z
+eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z
+Start Timestamp: 2022-05-01T00:00:00                                                                     ← (Your input)
+End Timestamp: 2022-05-20T00:00:00                                                                       ← (Your input)
+Epoch Range: 1651363200000 - 1653004800000
+```
+
+### Option 6 - Fetching data from a chosen index.
 ```text
 Current index selected: winlogbeat-8.0.1
 Main Timestamp Field:  @timestamp
