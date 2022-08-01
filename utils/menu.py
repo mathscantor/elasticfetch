@@ -21,7 +21,7 @@ class Menu:
         self.parser = parser
         self.index_name = ""
         self.main_timestamp_field_name = "@timestamp"
-        self.main_timestamp_field_type = "date"
+        self.main_timestamp_field_format = "datetime"
         self.header = "===============================================================\n" \
                       "        _              _    _         __       _         _     \n" \
                       "       | |            | |  (_)       / _|     | |       | |    \n" \
@@ -40,7 +40,7 @@ class Menu:
         else:
             print("Current index selected:\033[93m {}\033[0m".format(self.index_name))
         print("Main Timestamp Field: \033[93m {}\033[0m".format(self.main_timestamp_field_name))
-        print("Main Timestamp Type: \033[93m {}\033[0m\n".format(self.main_timestamp_field_type))
+        print("Main Timestamp Format: \033[93m {}\033[0m\n".format(self.main_timestamp_field_format))
 
         for key in self.menu_options.keys():
             print(key, '--', self.menu_options[key])
@@ -129,11 +129,11 @@ class Menu:
                                                              valid_timestamp_name_list=valid_timestamp_name_list):
             return
         chosen_timestamp_type = input("Timestamp Type: ").strip()
-        if not self.input_validation.is_timestamp_type_valid(chosen_timestamp_type=chosen_timestamp_type):
+        if not self.input_validation.is_timestamp_format_valid(chosen_timestamp_format=chosen_timestamp_type):
             return
 
         self.main_timestamp_field_name = chosen_timestamp_name
-        self.main_timestamp_field_type = chosen_timestamp_type
+        self.main_timestamp_field_format = chosen_timestamp_type
         return
 
     '''
@@ -168,12 +168,10 @@ class Menu:
         print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z\n"
               "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z")
         start_ts = input("Start Timestamp: ")
-        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
-                                                        timestamp=start_ts):
+        if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
             return
         end_ts = input("End Timestamp: ")
-        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
-                                                        timestamp=end_ts):
+        if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
             return
         start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts)
         end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts)
@@ -183,30 +181,35 @@ class Menu:
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
-        if self.main_timestamp_field_type == "date":
+        if self.main_timestamp_field_format == "date":
             print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z\n"
                   "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z")
-        elif self.main_timestamp_field_type == "epoch":
+        elif self.main_timestamp_field_format == "epoch":
             print("timestamp format: <10 / 13 digit string>\n"
                   "eg. 1420070400 or 1420070400001")
 
         start_ts = input("Start Timestamp: ")
-        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
-                                                        timestamp=start_ts):
-            return
-        end_ts = input("End Timestamp: ")
-        if not self.input_validation.is_timestamp_valid(timestamp_type=self.main_timestamp_field_type,
-                                                        timestamp=end_ts):
-            return
+        if self.main_timestamp_field_format == "datetime":
+            if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
+                return
+            end_ts = input("End Timestamp: ")
+            if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
+                return
 
-        # Since elasticsearch only supports epoch_millis by default, standardize all user input epoch to epoch_millis
-        if self.main_timestamp_field_type == "epoch":
+        elif self.main_timestamp_field_format == "epoch":
+            if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
+                return
+            end_ts = input("End Timestamp: ")
+            if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
+                return
+            # Since elasticsearch only supports epoch_millis by default,
+            # standardize all user input epoch to epoch_millis
             if len(start_ts) == 10:
                 start_ts += "000"
             if len(end_ts) == 10:
                 end_ts += "000"
 
-        if not self.input_validation.is_endts_gte_startts(timestamp_type=self.main_timestamp_field_type,
+        if not self.input_validation.is_endts_gte_startts(timestamp_format=self.main_timestamp_field_format,
                                                           start_ts=start_ts,
                                                           end_ts=end_ts):
             return
@@ -252,7 +255,7 @@ class Menu:
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
                                                                                     num_logs=num_logs,
                                                                                     main_timestamp_field_name=self.main_timestamp_field_name,
-                                                                                    main_timestamp_field_type=self.main_timestamp_field_type,
+                                                                                    main_timestamp_field_type=self.main_timestamp_field_format,
                                                                                     start_ts=start_ts,
                                                                                     end_ts=end_ts,
                                                                                     fields_list=fields_list,
