@@ -17,7 +17,7 @@ class InputValidation:
         self.timestamp_datetime_format_milliseconds_regex = re.compile("^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
                                                             "(0[0-9]|1[0-9]|2[0-3]?):"
                                                             "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
-                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)(.\d{3}Z)?$")
+                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)(.\d{3})?$")
         self.timestamp_epoch_format_regex = re.compile('^\d{10}$|^\d{13}$')
         self.datetime_format_seconds = '%Y-%m-%dT%H:%M:%S'
         self.datetime_format_milliseconds = '%Y-%m-%dT%H:%M:%S.%f'
@@ -25,8 +25,8 @@ class InputValidation:
             r"^(([-_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not|is_gte|is_lte|is_gt|is_lt|is) [-_.a-zA-Z\d]+;(\s+|))+)$")
         self.valid_file_extensions = ('.json', '.csv')
         self.valid_timestamp_format_list = ['datetime', 'epoch']
-        self.valid_timezone_list = ["+00:00", "+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00","+08:00", "+09:00", "+10:00", "+11:00", "+12:00",
-                                    "-01:00", "-02:00", "-03:00", "-04:00", "-05:00", "-06:00", "-07:00", "-08:00", "-09:00" ,"-10:00" ,"-11:00" ,"-12:00"]
+        self.valid_timezone_list = ["+00:00", "+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00",
+                                    "-01:00", "-02:00", "-03:00", "-04:00", "-05:00", "-06:00", "-07:00", "-08:00", "-09:00" , "-10:00", "-11:00", "-12:00"]
 
     def is_protocol_valid(self, protocol):
         if protocol not in self.valid_protocols:

@@ -219,7 +219,7 @@ class RequestSender:
                         },
                         "sort": [
                             # BUG: KEEP GETTING NO HITS epoch seconds
-                            {main_timestamp_field_name: {"order": "asc", "format": "epoch_millis"}}
+                            {main_timestamp_field_name: {"order": "asc"}}
                         ]
                     }
             #print(json.dumps(data, indent=4))

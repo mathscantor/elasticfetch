@@ -172,7 +172,7 @@ class Menu:
         return
 
     def convert_datetime_range_to_epoch_range(self):
-        print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z\n"
+        print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
               "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
         start_ts = input("Start Timestamp: ")
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
