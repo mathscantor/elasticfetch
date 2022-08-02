@@ -200,8 +200,8 @@ class Converter:
 
     def convert_datetime_to_epoch_millis(self, date_time):
         epoch_milliseconds_string = "000"
-        if "Z" in date_time:
-            pattern = self.timestamp_format+".%fZ"
+        if "." in date_time:
+            pattern = self.timestamp_format+".%f"
             epoch_milliseconds_string = date_time.split('.')[1][0:3]
         else:
             pattern = self.timestamp_format

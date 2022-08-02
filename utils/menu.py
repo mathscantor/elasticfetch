@@ -11,7 +11,7 @@ class Menu:
         self.menu_options = {
             1: 'Show indices status',
             2: 'Set current index',
-            3: 'Set main timestamp',
+            3: 'Set main timestamp name, format and timezone',
             4: 'Show available field names',
             5: 'Convert datetime range to epoch range',
             6: 'Fetch data between two timestamps',
@@ -22,6 +22,7 @@ class Menu:
         self.index_name = ""
         self.main_timestamp_field_name = "@timestamp"
         self.main_timestamp_field_format = "datetime"
+        self.main_timezone = "+00:00"
         self.header = "===============================================================\n" \
                       "        _              _    _         __       _         _     \n" \
                       "       | |            | |  (_)       / _|     | |       | |    \n" \
@@ -40,7 +41,8 @@ class Menu:
         else:
             print("Current index selected:\033[93m {}\033[0m".format(self.index_name))
         print("Main Timestamp Field: \033[93m {}\033[0m".format(self.main_timestamp_field_name))
-        print("Main Timestamp Format: \033[93m {}\033[0m\n".format(self.main_timestamp_field_format))
+        print("Main Timestamp Format: \033[93m {}\033[0m".format(self.main_timestamp_field_format))
+        print("Main Timezone: \033[93m {}\033[0m\n".format(self.main_timezone))
 
         for key in self.menu_options.keys():
             print(key, '--', self.menu_options[key])
@@ -128,12 +130,17 @@ class Menu:
         if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=chosen_timestamp_name,
                                                              valid_timestamp_name_list=valid_timestamp_name_list):
             return
-        chosen_timestamp_type = input("Timestamp Type: ").strip()
+        chosen_timestamp_type = input("Main Timestamp Format: ").strip()
         if not self.input_validation.is_timestamp_format_valid(chosen_timestamp_format=chosen_timestamp_type):
+            return
+
+        chosen_timezone = input("Main Timezone: ").strip()
+        if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
             return
 
         self.main_timestamp_field_name = chosen_timestamp_name
         self.main_timestamp_field_format = chosen_timestamp_type
+        self.main_timezone = chosen_timezone
         return
 
     '''
@@ -166,7 +173,7 @@ class Menu:
 
     def convert_datetime_range_to_epoch_range(self):
         print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z\n"
-              "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z")
+              "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
         start_ts = input("Start Timestamp: ")
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
             return
@@ -181,7 +188,7 @@ class Menu:
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
-        if self.main_timestamp_field_format == "date":
+        if self.main_timestamp_field_format == "datetime":
             print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z\n"
                   "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z")
         elif self.main_timestamp_field_format == "epoch":
@@ -255,7 +262,8 @@ class Menu:
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
                                                                                     num_logs=num_logs,
                                                                                     main_timestamp_field_name=self.main_timestamp_field_name,
-                                                                                    main_timestamp_field_type=self.main_timestamp_field_format,
+                                                                                    main_timestamp_field_format=self.main_timestamp_field_format,
+                                                                                    main_timezone=self.main_timezone,
                                                                                     start_ts=start_ts,
                                                                                     end_ts=end_ts,
                                                                                     fields_list=fields_list,

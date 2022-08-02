@@ -156,7 +156,8 @@ class RequestSender:
                                                index_name: str,
                                                num_logs: int,
                                                main_timestamp_field_name: str,
-                                               main_timestamp_field_type: str,
+                                               main_timestamp_field_format: str,
+                                               main_timezone: str,
                                                start_ts: str,
                                                end_ts: str,
                                                fields_list: list,
@@ -176,7 +177,7 @@ class RequestSender:
                 size = num_logs
             num_logs -= size
 
-            if main_timestamp_field_type == "date":
+            if main_timestamp_field_format == "datetime":
                 data = \
                 {
                     "size": size,
@@ -186,6 +187,7 @@ class RequestSender:
                             "filter": {
                                 "range": {
                                     main_timestamp_field_name: {
+                                        "time_zone": main_timezone,
                                         "gte": start_ts,
                                         "lte": end_ts
                                     }
@@ -197,7 +199,7 @@ class RequestSender:
                         {main_timestamp_field_name: {"order": "asc", "format": "strict_date_optional_time_nanos"}}
                     ]
                 }
-            elif main_timestamp_field_type == "epoch":
+            elif main_timestamp_field_format == "epoch":
                 data = \
                     {
                         "size": size,
@@ -207,6 +209,7 @@ class RequestSender:
                                 "filter": {
                                     "range": {
                                         main_timestamp_field_name: {
+                                            "time_zone": main_timezone,
                                             "gte": start_ts,
                                             "lte": end_ts
                                         }
