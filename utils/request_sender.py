@@ -224,7 +224,6 @@ class RequestSender:
                             {main_timestamp_field_name: {"order": "asc"}}
                         ]
                     }
-            #print(json.dumps(data, indent=4))
             if len(query_bool_must_list) > 0:
                 data["query"]["bool"]["must"] = query_bool_must_list
             if len(query_bool_must_not_list) > 0:
@@ -235,7 +234,7 @@ class RequestSender:
             else:
                 if not is_first_loop:
                     data["query"]["bool"]["must_not"] = last_ids
-
+            print(json.dumps(data, indent=4))
             try:
                 response = requests.get(url=url,
                                         headers=self.headers,
