@@ -198,14 +198,22 @@ class Converter:
 
         return top_parent_to_type_dict
 
-    def convert_datetime_to_epoch_millis(self, date_time):
+    def convert_datetime_to_epoch_millis(self, date_time, timezone):
         epoch_milliseconds_string = "000"
         if "." in date_time:
             pattern = self.timestamp_format+".%f"
             epoch_milliseconds_string = date_time.split('.')[1][0:3]
         else:
             pattern = self.timestamp_format
-        epoch = str(int(time.mktime(time.strptime(date_time, pattern))))
+
+        epoch_delta_sign = timezone[0]
+        epoch_delta_seconds = int(timezone[1:3]) * 3600
+
+        if epoch_delta_sign == "+":
+            epoch = str(int(time.mktime(time.strptime(date_time, pattern))) - epoch_delta_seconds)
+        elif epoch_delta_sign == "-":
+            epoch = str(int(time.mktime(time.strptime(date_time, pattern))) + epoch_delta_seconds)
+
         epoch += epoch_milliseconds_string
         return epoch
 

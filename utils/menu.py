@@ -87,7 +87,7 @@ class Menu:
             index_name = entry.split()[2]
             index_dict[i] = index_name
             i += 1
-        print("Listing all beats indices:\n")
+        print("Listing all indices:\n")
         for key in index_dict.keys():
             print(key, '--', index_dict[key])
         print("")
@@ -180,8 +180,8 @@ class Menu:
         end_ts = input("End Timestamp: ")
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
             return
-        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts)
-        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts)
+        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts, timezone=self.main_timezone)
+        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts, timezone=self.main_timezone)
 
         print("Epoch Range: {} - {}".format(start_ts_epoch, end_ts_epoch))
 

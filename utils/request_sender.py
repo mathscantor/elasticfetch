@@ -199,6 +199,8 @@ class RequestSender:
                         {main_timestamp_field_name: {"order": "asc", "format": "strict_date_optional_time_nanos"}}
                     ]
                 }
+
+            # epoch time is according to UTC 0
             elif main_timestamp_field_format == "epoch":
                 data = \
                     {
@@ -209,7 +211,7 @@ class RequestSender:
                                 "filter": {
                                     "range": {
                                         main_timestamp_field_name: {
-                                            "time_zone": main_timezone,
+                                            "time_zone": "+00:00",
                                             "gte": start_ts,
                                             "lte": end_ts
                                         }
