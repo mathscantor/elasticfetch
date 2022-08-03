@@ -41,7 +41,7 @@ if __name__ == "__main__":
     main_timestamp_format = "datetime"
     main_timezone = "+08:00"
     index_name = "winlogbeat-8"
-    num_logs = 10000
+    num_logs = 100000
     start_ts = "2022-01-01T00:00:00"
     end_ts = "2022-08-01T00:00:00"
     fields_list = ["@timestamp", "event.code"]
