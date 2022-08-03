@@ -2,9 +2,12 @@ from utils.request_sender import RequestSender
 from utils.config_reader import ConfigReader
 from utils.converter import Converter
 import os
+from datetime import datetime
 
 
 def main():
+
+    print("Cronjob ran @ {}".format(datetime.now()))
     config_reader = ConfigReader()
     config_dict = config_reader.read_config_file()
     converter = Converter()
@@ -16,6 +19,7 @@ def main():
                                    password=config_dict["credentials.password"])
 
     if not request_sender.get_authentication_status_bool():
+        print("--------------------------------")
         return
     data_json_list = request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=index_name,
                                                                            num_logs=num_logs,
@@ -28,12 +32,14 @@ def main():
                                                                            query_bool_must_list=query_bool_must_list,
                                                                            query_bool_must_not_list=query_bool_must_not_list)
     if len(data_json_list) == 0:
+        print("--------------------------------")
         return
     file_path = "datasets/{}.csv".format(index_name)
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     if file_path.lower().endswith(".csv"):
         converter.convert_json_data_to_csv(data_json_list=data_json_list, fields_list=fields_list,
                                                 file_path=file_path)
+    print("--------------------------------")
     return
 
 
