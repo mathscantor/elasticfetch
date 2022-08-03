@@ -15,7 +15,8 @@ def main():
                                    username=config_dict["credentials.username"],
                                    password=config_dict["credentials.password"])
 
-    request_sender.get_authentication_status_bool()
+    if not request_sender.get_authentication_status_bool():
+        return
     data_json_list = request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=index_name,
                                                                            num_logs=num_logs,
                                                                            main_timestamp_field_name=main_timestamp_field_name,
@@ -40,7 +41,7 @@ if __name__ == "__main__":
     main_timestamp_field_name = "@timestamp"
     main_timestamp_format = "datetime"
     main_timezone = "+08:00"
-    index_name = "winlogbeat-8"
+    index_name = "winlogbeat-bay-2021.11.30-000001"
     num_logs = 100000
     start_ts = "2022-01-01T00:00:00"
     end_ts = "2022-08-01T00:00:00"
