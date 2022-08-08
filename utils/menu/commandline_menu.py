@@ -1,7 +1,7 @@
 import os
 
 
-class Menu:
+class CommandLineMenu:
 
     def __init__(self, request_sender, converter, input_validation, parser):
         self.description = "Provides users different options when feteching elastic data"

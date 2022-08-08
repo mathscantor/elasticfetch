@@ -29,4 +29,8 @@ class ConfigReader:
             if config_options.has_option("credentials", "password"):
                 config_dict["credentials.password"] = ast.literal_eval(config_options.get("credentials", "password"))
 
+        if config_options.has_section("interface"):
+            if config_options.has_option("interface", "graphical"):
+                config_dict["interface.graphical"] = ast.literal_eval(config_options.get("interface", "graphical"))
+
         return config_dict

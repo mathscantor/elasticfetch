@@ -1,7 +1,8 @@
 from utils.request_sender import RequestSender
 from utils.config_reader import ConfigReader
 from utils.converter import Converter
-from utils.menu import Menu
+from utils.menu.commandline_menu import CommandLineMenu
+from utils.menu.gui_menu import GUIMenu
 from utils.input_validation import InputValidation
 from utils.messenger import messenger
 from utils.parser import Parser
@@ -23,8 +24,21 @@ def main():
     validate_config_inputs()
     if config_dict["elastic.protocol"] == "https" and not request_sender.get_authentication_status_bool():
         exit(1)
-    while True:
+
+    if not config_dict["interface.graphical"]:
+        menu = CommandLineMenu(request_sender=request_sender,
+                               converter=converter,
+                               input_validation=input_validation,
+                               parser=parser)
+        while True:
+            menu.show_menu()
+    else:
+        menu = GUIMenu(request_sender=request_sender,
+                       converter=converter,
+                       input_validation=input_validation,
+                       parser=parser)
         menu.show_menu()
+
 
 
 if __name__ == "__main__":
@@ -40,9 +54,4 @@ if __name__ == "__main__":
     )
     input_validation = InputValidation()
     parser = Parser()
-    menu = Menu(request_sender=request_sender,
-                converter=converter,
-                input_validation=input_validation,
-                parser=parser)
-
     main()
