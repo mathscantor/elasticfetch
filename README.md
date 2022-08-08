@@ -42,16 +42,18 @@ python3 elasticfetch.py
     Developed by: Gerald Lim Wee Koon (github: mathscantor)    
 ===============================================================
 
-Current index selected:  N/A (Please set an index before fetching any data!)
+Current index selected: N/A (Please set an index before fetching any data!)
 Main Timestamp Field:  @timestamp
-Main Timestamp Type:  date
+Main Timestamp Format:  datetime
+Main Timezone:  +00:00
 
 1 -- Show indices status
 2 -- Set current index
-3 -- Set main timestamp
+3 -- Set main timestamp name, format and timezone
 4 -- Show available field names
-5 -- Fetch data between two timestamps
-6 -- Exit
+5 -- Convert datetime range to epoch range
+6 -- Fetch data between two timestamps
+7 -- Exit
 ```
 
 ### Option 1 - Show indices status
@@ -115,7 +117,7 @@ Enter your index choice: 23
 In the above example, I have chosen the winlogbeat-8.0.1 index.
 Once you have chosen your index, it will be shown that you are fetching from that particular index
 
-### Option 3 - Set main timestamp
+### Option 3 - Set main timestamp, format and timezone
 
 The main timestamp field name will be used in sorting the timestamps in ascending order. 
 Option 3 allows you to set a new main timestamp field name from the displayed 'ALL RELATED FIELDS' column.
@@ -132,7 +134,8 @@ event                          date       event.created, event.ingested
 winlog                         date       winlog.event_data.ClientCreationTime, winlog.event_data.DeviceTime, winlog.event_data.NewTime, winlog.event_data.OldTime, winlog.event_data.ProcessCreationTime, winlog.event_data.StartTime, winlog.event_data.StopTime, winlog.user_data.UTCStartTime
 
 Main Timestamp Name: @timestamp
-Timestamp Type: epoch
+Main Timestamp Format: epoch
+Main Timezone: +08:00
 ```
 In this example, option 3 will show you all related fields that are of 'date' type. <br>
 
@@ -142,32 +145,9 @@ However, I am aware that certain users / organization do rename '@timestamp' to 
 
 In addition, I have given the liberty to the user to choose between timestamp types:
 
-<!-- Output copied to clipboard! -->
-
-<!-----
-
-Yay, no errors, warnings, or alerts!
-
-Conversion time: 0.389 seconds.
-
-
-Using this Markdown file:
-
-1. Paste this output into your source file.
-2. See the notes and action items below regarding this conversion run.
-3. Check the rendered output (headings, lists, code blocks, tables) for proper
-   formatting and use a linkchecker before you publish this page.
-
-Conversion notes:
-
-* Docs to Markdown version 1.0β33
-* Fri Jul 22 2022 03:51:52 GMT-0700 (PDT)
-* Source doc: Untitled document
-* Tables are currently converted to HTML tables.
------>
 <table>
   <tr>
-   <td>Type
+   <td>Format
    </td>
    <td>Supported Formats
    </td>
@@ -177,7 +157,7 @@ Conversion notes:
    </td>
   </tr>
   <tr>
-   <td rowspan="2" >date
+   <td rowspan="2" >datetime
    </td>
    <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S>
    </td>
@@ -191,7 +171,7 @@ Conversion notes:
    </td>
    <td>milliseconds
    </td>
-   <td>2022-05-01T00:00:00.000Z
+   <td>2022-05-01T00:00:00.000
    </td>
   </tr>
   <tr>
@@ -247,21 +227,22 @@ host                           text       host.architecture, host.hostname, host
 ```
 
 ### Option 5 - Converting datetime string to unix epoch
+This takes into account of your current timezone when converting to epoch time.
 ```text
 Enter your choice: 5
 
-timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z
-eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z
-Start Timestamp: 2022-05-01T00:00:00                                                                     ← (Your input)
-End Timestamp: 2022-05-20T00:00:00                                                                       ← (Your input)
-Epoch Range: 1651363200000 - 1653004800000
+timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>
+eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000
+Start Timestamp: 2022-05-01T00:00:00            ← (Your input)
+End Timestamp: 2022-05-20T00:00:00              ← (Your input)
+Epoch Range: 1651334400000 - 1652976000000
 ```
 
 ### Option 6 - Fetching data from a chosen index.
 ```text
 Current index selected: winlogbeat-8.0.1
 Main Timestamp Field:  @timestamp
-Main Timestamp Type:  date
+Main Timestamp Type:  datetime
 
 1 -- Show indices status
 2 -- Set current index
@@ -271,8 +252,8 @@ Main Timestamp Type:  date
 6 -- Exit
 Enter your choice: 5                                                                                ← (Your input)
 
-timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>Z
-eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000Z
+timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>
+eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000
 Start Timestamp: 2022-05-01T00:00:00                                                                ← (Your input)
 End Timestamp: 2022-05-20T00:00:00                                                                  ← (Your input)
 Number of logs to retrieve: 50000                                                                   ← (Your input)
