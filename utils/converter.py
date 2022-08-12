@@ -3,6 +3,7 @@ from utils.messenger import messenger
 import json
 import time
 import os
+import datetime
 os.environ['TZ'] = 'UTC'
 
 class Converter:
@@ -216,4 +217,22 @@ class Converter:
 
         epoch += epoch_milliseconds_string
         return epoch
+
+    def convert_epoch_millis_to_datetime(self, epoch, timezone):
+
+        if len(epoch) == 13:
+            epoch = float(int(epoch) / 1000.0)
+        elif len(epoch) == 10:
+            epoch = int(epoch)
+
+        epoch_delta_sign = timezone[0]
+        epoch_delta_seconds = int(timezone[1:3]) * 3600
+
+        if epoch_delta_sign == "+":
+            epoch = epoch + epoch_delta_seconds
+        elif epoch_delta_sign == "-":
+            epoch = epoch - epoch_delta_seconds
+
+        date_time = datetime.datetime.fromtimestamp(epoch).strftime(self.timestamp_format+".%f")[0:-3]
+        return date_time
 

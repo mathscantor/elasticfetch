@@ -70,11 +70,12 @@ class InputValidation:
         if self.timestamp_epoch_format_regex.search(timestamp):
             return True
         else:
-            messenger(2, "Invalid input! <standard unix epoch time> but got something else instead. Please try again!")
+            messenger(2, "Invalid input! Expected <standard unix epoch time> but got something else instead. Please try again!")
             return False
 
     def is_endts_gte_startts(self, timestamp_format, start_ts, end_ts):
-
+        tstamp1 = ""
+        tstamp2 = ""
         if timestamp_format == "datetime":
             if self.timestamp_datetime_format_seconds_regex.search(start_ts):
                 tstamp1 = datetime.strptime(start_ts, self.datetime_format_seconds)

@@ -10,7 +10,6 @@ PATH = os.path.dirname(os.path.realpath(__file__))
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
-
 class GUIMenu:
 
     def __init__(self,
@@ -65,7 +64,7 @@ class GUIMenu:
 
     def init_primary_app_window(self):
         self.primary_app_window.title("elasticfetch - Main")
-        self.primary_app_window.geometry("1080x520")
+        self.primary_app_window.geometry("1120x520")
 
         # configure grid layout (2x1)
         self.primary_app_window.grid_columnconfigure(1, weight=1)
@@ -142,6 +141,7 @@ class GUIMenu:
         # Theme Option Menu
         self.theme_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_left,
                                                             values=self.available_themes,
+                                                            dynamic_resizing=False,
                                                             command=self.change_appearance_mode)
         self.theme_optionmenu.grid(row=10, column=0, sticky="s")
         self.theme_optionmenu.set("Dark Theme")
@@ -150,14 +150,17 @@ class GUIMenu:
         self.current_index_label = customtkinter.CTkLabel(master=self.frame_info,
                                                           text="Selected Index:",
                                                           text_font=("Arial", 11))  # font name and size in px
-        self.current_index_label.grid(row=0, column=2, pady=5, padx=0)
+        self.current_index_label.grid(row=0, column=2, pady=20, padx=0)
         self.current_index_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
                                                                     values=self.index_list,
+                                                                    width=200,
+                                                                    dynamic_resizing=False,
                                                                     command=self.set_current_index)
         # Show available fields button
         self.show_available_field_names_button = customtkinter.CTkButton(master=self.frame_info,
                                                                          state=customtkinter.DISABLED,
                                                                          text="Show Available Fields",
+                                                                         fg_color="grey",
                                                                          command=self.show_available_field_names)
         self.show_available_field_names_button.grid(row=0, column=4, pady=10, padx=20)
 
@@ -166,13 +169,16 @@ class GUIMenu:
         self.current_index_optionmenu.set(self.current_index)
         self.main_timestamp_field_name_label = customtkinter.CTkLabel(master=self.frame_info,
                                                                       text="Timestamp Field:",
-                                                                      text_font=(
-                                                                      "Arial", 11))  # font name and size in px
+                                                                      text_font=("Arial", 11))
 
         self.main_timestamp_field_name_label.grid(row=1, column=2, pady=5, padx=0)
         self.main_timestamp_field_name_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
                                                                                 values=self.valid_timestamp_name_list,
                                                                                 state=customtkinter.DISABLED,
+                                                                                width=200,
+                                                                                dynamic_resizing=False,
+                                                                                button_color="grey",
+                                                                                fg_color="grey",
                                                                                 command=self.set_main_timestamp_field_name)
         self.main_timestamp_field_name_optionmenu.set(self.main_timestamp_field_name)
         self.main_timestamp_field_name_optionmenu.grid(row=1, column=3, pady=5, padx=0)
@@ -186,6 +192,10 @@ class GUIMenu:
         self.main_timestamp_field_format_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
                                                                                   values=self.input_validation.valid_timestamp_format_list,
                                                                                   state=customtkinter.DISABLED,
+                                                                                  width=200,
+                                                                                  dynamic_resizing=False,
+                                                                                  button_color="grey",
+                                                                                  fg_color="grey",
                                                                                   command=self.set_main_timestamp_format)
         self.main_timestamp_field_format_optionmenu.set(self.main_timestamp_format)
         self.main_timestamp_field_format_optionmenu.grid(row=2, column=3, pady=5, padx=0)
@@ -198,6 +208,10 @@ class GUIMenu:
         self.main_timezone_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
                                                                     values=self.input_validation.valid_timezone_list,
                                                                     state=customtkinter.DISABLED,
+                                                                    width=200,
+                                                                    dynamic_resizing=False,
+                                                                    button_color="grey",
+                                                                    fg_color="grey",
                                                                     command=self.set_main_timezone)
         self.main_timezone_optionmenu.set(self.main_timezone)
         self.main_timezone_optionmenu.grid(row=3, column=3, pady=5, padx=0)
@@ -263,11 +277,19 @@ class GUIMenu:
                     fields_json=response)
                 self.get_valid_timestamp_name_list()
                 self.get_available_field_list()
-                self.show_available_field_names_button.configure(state=customtkinter.ACTIVE)
+                self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
+                                                                 fg_color="#395E9C")
                 self.main_timestamp_field_name_optionmenu.configure(values=self.valid_timestamp_name_list,
-                                                                    state=customtkinter.ACTIVE)
-                self.main_timestamp_field_format_optionmenu.configure(state=customtkinter.ACTIVE)
-                self.main_timezone_optionmenu.configure(state=customtkinter.ACTIVE)
+                                                                    state=customtkinter.NORMAL,
+                                                                    button_color="#144870",
+                                                                    fg_color="#395E9C"
+                                                                    )
+                self.main_timestamp_field_format_optionmenu.configure(state=customtkinter.NORMAL,
+                                                                      button_color="#144870",
+                                                                      fg_color="#395E9C")
+                self.main_timezone_optionmenu.configure(state=customtkinter.NORMAL,
+                                                        button_color="#144870",
+                                                        fg_color="#395E9C")
         else:
             self.parent_field_to_type_dict = {}
 
@@ -285,7 +307,8 @@ class GUIMenu:
         return
 
     def display_ts_converter_window(self):
-        gui_ts_converter = GUITSConverter()
+        gui_ts_converter = GUITSConverter(converter=self.converter,
+                                          input_validation=self.input_validation)
         gui_ts_converter.mainloop()
         return
 

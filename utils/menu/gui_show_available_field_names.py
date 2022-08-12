@@ -13,21 +13,21 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         super().__init__()
 
         self.title("elasticfetch - Available Fields for {}".format(current_index))
-        self.geometry("780x520")
-
+        self.geometry("800x400")
+        self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=4)
+        self.grid_rowconfigure(1, weight=5)
         self.grid_columnconfigure(0, weight=1)
 
         # root window is the parent window
-        fram = tkinter.Frame(self)
-        fram.grid(row=0, column=0, sticky="we")
+        self.frame = tkinter.Frame(self)
+        self.frame.grid(row=0, column=0, sticky="ew")
 
         # adding label to search box
-        tkinter.Label(fram, text='Text to find:').grid(row=0, column=0)
+        tkinter.Label(self.frame, text='Text to find:').grid(row=0, column=0)
 
         # adding of single line text box
-        search_term = tkinter.Entry(fram)
+        search_term = tkinter.Entry(self.frame)
 
         # positioning of text box
         search_term.grid(row=0, column=1)
@@ -36,7 +36,7 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         search_term.focus_set()
 
         # adding of search button
-        butt = tkinter.Button(fram, text='Find')
+        butt = tkinter.Button(self.frame, text='Find')
         butt.grid(row=0, column=2)
         butt.config(command=lambda: self.find_in_textbox(textbox=tk_textbox, search_term=search_term))
 
@@ -63,15 +63,17 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
                                                                                              top_parent_field][
                                                                                              field_type]))
                 available_fields_pretty += "\n"
+            available_fields_pretty += "―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――\n"
 
         tk_textbox.insert(tkinter.INSERT, available_fields_pretty)
+        tk_textbox.configure(state=tkinter.DISABLED)
 
         # create CTk scrollbar
-        ctk_textbox_scrollbar = customtkinter.CTkScrollbar(self, command=tk_textbox.yview)
-        ctk_textbox_scrollbar.grid(row=1, column=1, sticky="ns")
+        ctk_textbox_yscrollbar = customtkinter.CTkScrollbar(self, command=tk_textbox.yview)
+        ctk_textbox_yscrollbar.grid(row=1, column=1, sticky="ns")
 
         # connect textbox scroll event to CTk scrollbar
-        tk_textbox.configure(yscrollcommand=ctk_textbox_scrollbar.set)
+        tk_textbox.configure(yscrollcommand=ctk_textbox_yscrollbar.set)
 
     def find_in_textbox(self, textbox, search_term):
         # remove tag 'found' from index 1 to END
@@ -79,6 +81,7 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
 
         # returns to widget currently in focus
         s = search_term.get()
+        total = 0
         if s:
             idx = '1.0'
             while 1:
@@ -94,10 +97,17 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
                 # overwrite 'Found' at idx
                 textbox.tag_add('found', idx, lastidx)
                 idx = lastidx
+                total += 1
 
             # mark located string as red
             textbox.tag_config('found', foreground='red')
         search_term.focus_set()
+
+        total_count_textbox = tkinter.Text(master=self.frame, height=1)
+        total_count_textbox.grid(row=0, column=3)
+        total_count_textbox.insert(tkinter.INSERT, "Found {} results!".format(total))
+        total_count_textbox.configure(state=tkinter.DISABLED)
+        return
 
 
 

@@ -11,21 +11,21 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
         super().__init__()
 
         self.title("elasticfetch - Indices Status")
-        self.geometry("900x520")
-
+        self.geometry("1120x400")
+        self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=4)
         self.grid_columnconfigure(0, weight=1)
 
         # root window is the parent window
-        fram = tkinter.Frame(self)
-        fram.grid(row=0, column=0, sticky="we")
+        self.frame = tkinter.Frame(self)
+        self.frame.grid(row=0, column=0, sticky="we")
 
         # adding label to search box
-        tkinter.Label(fram, text='Text to find:').grid(row=0, column=0)
+        tkinter.Label(self.frame, text='Text to find:').grid(row=0, column=0)
 
         # adding of single line text box
-        search_term = tkinter.Entry(fram)
+        search_term = tkinter.Entry(self.frame)
 
         # positioning of text box
         search_term.grid(row=0, column=1)
@@ -34,7 +34,7 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
         search_term.focus_set()
 
         # adding of search button
-        butt = tkinter.Button(fram, text='Find')
+        butt = tkinter.Button(self.frame, text='Find')
         butt.grid(row=0, column=2)
         butt.config(command=lambda: self.find_in_textbox(textbox=tk_textbox, search_term=search_term))
 
@@ -56,6 +56,7 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
 
         # returns to widget currently in focus
         s = search_term.get()
+        total = 0
         if s:
             idx = '1.0'
             while 1:
@@ -71,10 +72,16 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
                 # overwrite 'Found' at idx
                 textbox.tag_add('found', idx, lastidx)
                 idx = lastidx
+                total += 1
 
             # mark located string as red
             textbox.tag_config('found', foreground='red')
         search_term.focus_set()
 
+        total_count_textbox = tkinter.Text(master=self.frame, height=1)
+        total_count_textbox.grid(row=0, column=3)
+        total_count_textbox.insert(tkinter.INSERT, "Found {} results!".format(total))
+        total_count_textbox.configure(state=tkinter.DISABLED)
+        return
 
 
