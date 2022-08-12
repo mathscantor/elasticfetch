@@ -25,9 +25,12 @@ class GUIMenu:
         self.frame_left = None
         self.frame_right = None
         self.frame_info = None
+        self.theme_optionmenu = None
+        self.label_options = None
+
+        # Index related Assets
         self.show_indices_status_button = None
         self.current_index_label = None
-        self.theme_optionmenu = None
         self.current_index_optionmenu = None
         self.indices_status = "placeholder"
         self.current_index = "N/A"
@@ -35,6 +38,7 @@ class GUIMenu:
         self.available_field_list = ["placeholder"]
         self.parent_field_to_type_dict = {}
 
+        # Time related assets
         self.main_timestamp_field_name_label = None
         self.main_timestamp_field_name_optionmenu = None
         self.main_timestamp_field_format_label = None
@@ -45,6 +49,7 @@ class GUIMenu:
         self.main_timestamp_field_name = "N/A"
         self.main_timestamp_format = "datetime"
         self.main_timezone = "+00:00"  # Default UTC
+        self.datetime_to_epoch_button = None
 
         self.primary_app_window.protocol("WM_DELETE_WINDOW", self.on_closing_primary_app_window)
         self.available_themes = ["Light Theme", "Dark Theme", "System Default"]
@@ -95,6 +100,8 @@ class GUIMenu:
         del self.index_list
 
         self.indices_status = self.request_sender.get_indices_status()
+        if self.indices_status is None:
+            exit(1)
         temp_list = self.indices_status.split("\n")[1:-1]
         i = 1
         self.index_list = []
@@ -107,8 +114,8 @@ class GUIMenu:
     def show_menu(self):
 
         self.label_options = customtkinter.CTkLabel(master=self.frame_left,
-                                              text="Options",
-                                              text_font=("Arial", 15))  # font name and size in px
+                                                    text="Options",
+                                                    text_font=("Arial", 15))  # font name and size in px
         self.label_options.grid(row=1, column=0, pady=10, padx=10)
 
         self.label_mode = customtkinter.CTkLabel(master=self.frame_left, text="Appearance Mode:")
@@ -120,10 +127,10 @@ class GUIMenu:
                                                                   command=self.show_indices_status)
         self.show_indices_status_button.grid(row=2, column=0, pady=10, padx=20)
 
-        #DateTime to Epoch
+        # DateTime to Epoch
         self.datetime_to_epoch_button = customtkinter.CTkButton(master=self.frame_left,
                                                                 text="DateTime To Epoch",
-                                                                command=self.show_indices_status)
+                                                                command=self.convert_datetime_range_to_epoch_range)
         self.datetime_to_epoch_button.grid(row=3, column=0, pady=10, padx=20)
 
         # Theme Option Menu
@@ -204,6 +211,22 @@ class GUIMenu:
         elif new_appearance_mode == "System Default":
             value = "System"
         customtkinter.set_appearance_mode(value)
+        return
+
+    def convert_datetime_range_to_epoch_range(self):
+        print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
+              "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
+        start_ts = input("Start Timestamp: ")
+        if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
+            return
+        end_ts = input("End Timestamp: ")
+        if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
+            return
+        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts,
+                                                                         timezone=self.main_timezone)
+        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts, timezone=self.main_timezone)
+
+        print("Epoch Range: {} - {}".format(start_ts_epoch, end_ts_epoch))
         return
 
     def set_main_timestamp_field_name(self, main_timestamp_field_name):

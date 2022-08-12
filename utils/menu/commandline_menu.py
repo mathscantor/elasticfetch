@@ -19,7 +19,7 @@ class CommandLineMenu:
         }
         self.input_validation = input_validation
         self.parser = parser
-        self.index_name = ""
+        self.index_name = "N/A"
         self.main_timestamp_field_name = "@timestamp"
         self.main_timestamp_field_format = "datetime"
         self.main_timezone = "+00:00"
@@ -36,7 +36,7 @@ class CommandLineMenu:
     def show_menu(self):
 
         print(self.header)
-        if self.index_name == "":
+        if self.index_name == "N/A":
             print("Current index selected:\033[93m N/A (Please set an index before fetching any data!)\033[0m")
         else:
             print("Current index selected:\033[93m {}\033[0m".format(self.index_name))

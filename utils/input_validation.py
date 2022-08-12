@@ -133,7 +133,7 @@ class InputValidation:
             return False
 
     def is_index_name_set(self, index_name):
-        if index_name != "":
+        if index_name != "N/A":
             return True
         else:
             messenger(2, "No index currently selected. Please set your index first!")
