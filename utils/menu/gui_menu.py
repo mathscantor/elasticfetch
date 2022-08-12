@@ -1,12 +1,15 @@
 import customtkinter
 import tkinter
 from utils.menu.gui_ts_converter import GUITSConverter
+from utils.menu.gui_show_indices_status import GUIShowIndicesStatus
+from utils.menu.gui_show_available_field_names import GUIShowAvailableFields
 import os
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
 
 class GUIMenu:
 
@@ -163,7 +166,8 @@ class GUIMenu:
         self.current_index_optionmenu.set(self.current_index)
         self.main_timestamp_field_name_label = customtkinter.CTkLabel(master=self.frame_info,
                                                                       text="Timestamp Field:",
-                                                                      text_font=("Arial", 11))  # font name and size in px
+                                                                      text_font=(
+                                                                      "Arial", 11))  # font name and size in px
 
         self.main_timestamp_field_name_label.grid(row=1, column=2, pady=5, padx=0)
         self.main_timestamp_field_name_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
@@ -175,9 +179,9 @@ class GUIMenu:
 
         # Selecting timestamp format
         self.main_timestamp_field_format_label = customtkinter.CTkLabel(master=self.frame_info,
-                                                                      text="Timestamp Format:",
-                                                                      text_font=(
-                                                                      "Arial", 11))  # font name and size in px
+                                                                        text="Timestamp Format:",
+                                                                        text_font=(
+                                                                            "Arial", 11))  # font name and size in px
         self.main_timestamp_field_format_label.grid(row=2, column=2, pady=5, padx=0)
         self.main_timestamp_field_format_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
                                                                                   values=self.input_validation.valid_timestamp_format_list,
@@ -254,8 +258,9 @@ class GUIMenu:
             self.current_index = index_choice
             response = self.request_sender.get_available_fields(index_name=self.current_index)
             if response is not None:
-                self.parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.current_index,
-                                                                                                  fields_json=response)
+                self.parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(
+                    index_name=self.current_index,
+                    fields_json=response)
                 self.get_valid_timestamp_name_list()
                 self.get_available_field_list()
                 self.show_available_field_names_button.configure(state=customtkinter.ACTIVE)
@@ -269,159 +274,21 @@ class GUIMenu:
         return
 
     def show_indices_status(self):
-        temp_app_window = customtkinter.CTk()
-        temp_app_window.protocol("WM_DELETE_WINDOW", func=lambda: self.close_app_window(temp_app_window))
-
-        temp_app_window.title("elasticfetch - Indices Status")
-        temp_app_window.geometry("780x520")
-
-        temp_app_window.grid_rowconfigure(0, weight=1)
-        temp_app_window.grid_rowconfigure(1, weight=4)
-        temp_app_window.grid_columnconfigure(0, weight=1)
-
-        # root window is the parent window
-        fram = tkinter.Frame(temp_app_window)
-        fram.grid(row=0, column=0, sticky="we")
-
-        # adding label to search box
-        tkinter.Label(fram, text='Text to find:').grid(row=0, column=0)
-
-        # adding of single line text box
-        search_term = tkinter.Entry(fram)
-
-        # positioning of text box
-        search_term.grid(row=0, column=1)
-
-        # setting focus
-        search_term.focus_set()
-
-        # adding of search button
-        butt = tkinter.Button(fram, text='Find')
-        butt.grid(row=0, column=2)
-        butt.config(command=lambda: self.find_in_textbox(textbox=tk_textbox, search_term=search_term))
-
-        # create scrollable textbox
-        tk_textbox = tkinter.Text(temp_app_window, highlightthickness=0)
-        tk_textbox.grid(row=1, column=0, sticky="nsew")
-        tk_textbox.insert(tkinter.INSERT, self.indices_status)
-
-        # create CTk scrollbar
-        ctk_textbox_scrollbar = customtkinter.CTkScrollbar(temp_app_window, command=tk_textbox.yview)
-        ctk_textbox_scrollbar.grid(row=1, column=1, sticky="ns")
-
-        # connect textbox scroll event to CTk scrollbar
-        tk_textbox.configure(yscrollcommand=ctk_textbox_scrollbar.set)
-
-        self.app_windows.append(temp_app_window)
-        temp_app_window.mainloop()
+        gui_show_indices_status = GUIShowIndicesStatus(indices_status=self.indices_status)
+        gui_show_indices_status.mainloop()
         return
 
-    def find_in_textbox(self, textbox, search_term):
-        # remove tag 'found' from index 1 to END
-        textbox.tag_remove('found', '1.0', tkinter.END)
-
-        # returns to widget currently in focus
-        s = search_term.get()
-        if s:
-            idx = '1.0'
-            while 1:
-                # searches for desired string from index 1
-                idx = textbox.search(s, idx, nocase=1,
-                                     stopindex=tkinter.END)
-                if not idx: break
-
-                # last index sum of current index and
-                # length of text
-                lastidx = '%s+%dc' % (idx, len(s))
-
-                # overwrite 'Found' at idx
-                textbox.tag_add('found', idx, lastidx)
-                idx = lastidx
-
-            # mark located string as red
-            textbox.tag_config('found', foreground='red')
-        search_term.focus_set()
-
     def show_available_field_names(self):
-        temp_app_window = customtkinter.CTk()
-        temp_app_window.protocol("WM_DELETE_WINDOW", func=lambda: self.close_app_window(temp_app_window))
-
-        temp_app_window.title("elasticfetch - Available Fields for {}".format(self.current_index))
-        temp_app_window.geometry("780x520")
-
-        temp_app_window.grid_rowconfigure(0, weight=1)
-        temp_app_window.grid_rowconfigure(1, weight=4)
-        temp_app_window.grid_columnconfigure(0, weight=1)
-
-        # root window is the parent window
-        fram = tkinter.Frame(temp_app_window)
-        fram.grid(row=0, column=0, sticky="we")
-
-        # adding label to search box
-        tkinter.Label(fram, text='Text to find:').grid(row=0, column=0)
-
-        # adding of single line text box
-        search_term = tkinter.Entry(fram)
-
-        # positioning of text box
-        search_term.grid(row=0, column=1)
-
-        # setting focus
-        search_term.focus_set()
-
-        # adding of search button
-        butt = tkinter.Button(fram, text='Find')
-        butt.grid(row=0, column=2)
-        butt.config(command=lambda: self.find_in_textbox(textbox=tk_textbox, search_term=search_term))
-
-        # create scrollable textbox
-
-        tk_textbox = tkinter.Text(temp_app_window, highlightthickness=0)
-        tk_textbox.grid(row=1, column=0, sticky="nsew")
-
-        available_fields_pretty = "{:<30} {:<20} {:<30}\n".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS')
-        available_fields_pretty += "{:<30} {:<20} {:<30}\n".format('----------------', '----', '------------------')
-
-        for top_parent_field in self.parent_field_to_type_dict.keys():
-            has_printed_parent = False
-            for field_type in self.parent_field_to_type_dict[top_parent_field].keys():
-                if not has_printed_parent:
-                    available_fields_pretty += "{:<30} {:<20} {:<30}\n".format(top_parent_field, field_type,
-                                                        ', '.join(self.parent_field_to_type_dict[top_parent_field][field_type]))
-                    has_printed_parent = True
-                else:
-                    available_fields_pretty += "{:<30} {:<20} {:<30}\n".format('', field_type,
-                                                        ', '.join(self.parent_field_to_type_dict[top_parent_field][field_type]))
-                available_fields_pretty += "\n"
-
-        tk_textbox.insert(tkinter.INSERT, available_fields_pretty)
-
-        # create CTk scrollbar
-        ctk_textbox_scrollbar = customtkinter.CTkScrollbar(temp_app_window, command=tk_textbox.yview)
-        ctk_textbox_scrollbar.grid(row=1, column=1, sticky="ns")
-
-        # connect textbox scroll event to CTk scrollbar
-        tk_textbox.configure(yscrollcommand=ctk_textbox_scrollbar.set)
-
-        self.app_windows.append(temp_app_window)
-        temp_app_window.mainloop()
+        gui_show_available_fields = GUIShowAvailableFields(current_index=self.current_index,
+                                                           parent_field_to_type_dict=self.parent_field_to_type_dict)
+        gui_show_available_fields.mainloop()
+        return
 
     def display_ts_converter_window(self):
         gui_ts_converter = GUITSConverter()
         gui_ts_converter.mainloop()
         return
 
-    def close_app_window(self, app_window: customtkinter.CTk):
-        self.app_windows.remove(app_window)
-        app_window.destroy()
-        return
-
-    '''
-    Closes every app window if the primary app window is closed.
-    This provides a quick and easy way to clean up objects.
-    '''
-
     def on_closing_primary_app_window(self):
-        # TODO: Add a warning when user tries to close parent app_window
-        for app_window in self.app_windows:
-            app_window.destroy()
+        self.primary_app_window.destroy()
+        return
