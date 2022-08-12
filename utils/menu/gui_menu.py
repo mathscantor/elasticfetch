@@ -1,9 +1,12 @@
 import customtkinter
 import tkinter
+from utils.menu.gui_ts_converter import GUITSConverter
+import os
+
+PATH = os.path.dirname(os.path.realpath(__file__))
 
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
-
 
 class GUIMenu:
 
@@ -129,8 +132,8 @@ class GUIMenu:
 
         # DateTime to Epoch
         self.datetime_to_epoch_button = customtkinter.CTkButton(master=self.frame_left,
-                                                                text="DateTime To Epoch",
-                                                                command=self.convert_datetime_range_to_epoch_range)
+                                                                text="TS Format Converter",
+                                                                command=self.display_ts_converter_window)
         self.datetime_to_epoch_button.grid(row=3, column=0, pady=10, padx=20)
 
         # Theme Option Menu
@@ -211,22 +214,6 @@ class GUIMenu:
         elif new_appearance_mode == "System Default":
             value = "System"
         customtkinter.set_appearance_mode(value)
-        return
-
-    def convert_datetime_range_to_epoch_range(self):
-        print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
-              "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
-        start_ts = input("Start Timestamp: ")
-        if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
-            return
-        end_ts = input("End Timestamp: ")
-        if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
-            return
-        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts,
-                                                                         timezone=self.main_timezone)
-        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts, timezone=self.main_timezone)
-
-        print("Epoch Range: {} - {}".format(start_ts_epoch, end_ts_epoch))
         return
 
     def set_main_timestamp_field_name(self, main_timestamp_field_name):
@@ -418,6 +405,11 @@ class GUIMenu:
 
         self.app_windows.append(temp_app_window)
         temp_app_window.mainloop()
+
+    def display_ts_converter_window(self):
+        gui_ts_converter = GUITSConverter()
+        gui_ts_converter.mainloop()
+        return
 
     def close_app_window(self, app_window: customtkinter.CTk):
         self.app_windows.remove(app_window)
