@@ -451,7 +451,6 @@ class GUIMenu:
             filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
             filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
 
-        print("AAA: ", self.main_timestamp_field_name)
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.current_index,
                                                                                     num_logs=num_logs,
                                                                                     main_timestamp_field_name=self.main_timestamp_field_name,

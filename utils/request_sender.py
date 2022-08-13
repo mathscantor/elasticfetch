@@ -234,8 +234,7 @@ class RequestSender:
             else:
                 if not is_first_loop:
                     data["query"]["bool"]["must_not"] = last_ids
-            print(json.dumps(data, indent=4))
-            exit()
+            #print(json.dumps(data, indent=4))
             try:
                 response = requests.get(url=url,
                                         headers=self.headers,
