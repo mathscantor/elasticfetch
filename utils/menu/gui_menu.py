@@ -277,12 +277,17 @@ class GUIMenu:
                                                        height=32,
                                                        placeholder_text="eg. event.code is_gte 4000; event.category is_not authentication; ...")
         self.filter_list_entry.grid(row=7, column=3, columnspan=3, pady=5, padx=0, sticky="we")
-        self.fetch_data_button = customtkinter.CTkButton(master=self.frame_info,
+        self.frame_info_error_label = customtkinter.CTkLabel(master=self.frame_info,
+                                                             text_color="red",
+                                                             text="",
+                                                             text_font=("Arial", 10))
+        self.frame_info_error_label.grid(row=8, column=2, columnspan=2, pady=0)
+        self.fetch_data_button = customtkinter.CTkButton(master=self.frame_right,
                                                          text="Fetch Data",
                                                          fg_color="grey",
                                                          state=customtkinter.DISABLED,
                                                          command=self.fetch_elastic_data_between_ts1_ts2)
-        self.fetch_data_button.grid(row=8, column=4, pady=20, sticky="we")
+        self.fetch_data_button.grid(row=5, column=0, columnspan=2, pady=5, sticky="s")
 
         # show window
         self.primary_app_window.mainloop()
@@ -412,25 +417,26 @@ class GUIMenu:
 
         if self.main_timestamp_format == "datetime":
             if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
+                self.frame_info_error_label.configure(text="Start Time: Incorrect Format!")
                 return
             if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
+                self.frame_info_error_label.configure(text="End Time: Incorrect Format!")
                 return
         elif self.main_timestamp_format == "epoch":
             if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
+                self.frame_info_error_label.configure(text="Start Time: Incorrect Format!")
                 return
             if not self.input_validation.is_datetime_epoch_valid(timestamp=end_ts):
+                self.frame_info_error_label.configure(text="End Time: Incorrect Format!")
                 return
 
         if not self.input_validation.is_numeric_valid(user_input=num_logs):
+            self.frame_info_error_label.configure(text="Number of Logs: Invalid Numeric Expression!")
             return
         num_logs = int(num_logs)
         fields_list = [x.strip() for x in fields.split(',')]
-        if len(fields_list) == 0:
-            # Placeholder error text
-            print("Empty List!")
-            return
-
-        if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
+        if len(fields_list) == 1 and fields_list[0] == "":
+            self.frame_info_error_label.configure(text="Fields: Empty! Error!")
             return
 
         if filter_raw != "":

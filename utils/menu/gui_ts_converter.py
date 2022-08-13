@@ -14,7 +14,7 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.converter = converter
         self.input_validation = input_validation
         self.timezone = "+00:00"
-        self.geometry("640x300")
+        self.geometry("680x300")
         self.title("elasticfetch - Timestamp Converter")
         self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
@@ -107,19 +107,19 @@ class GUITSConverter(customtkinter.CTkToplevel):
         end_ts_datetime = self.datetime_end_ts_entry.get().strip()
 
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts_datetime):
-            self.frame_left_error_label.configure(text="Start: Incorrect format!")
+            self.frame_left_error_label.configure(text="Start Time: Incorrect format!")
             self.clear_epoch_entries()
             return
 
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts_datetime):
-            self.frame_left_error_label.configure(text="End: Incorrect format!")
+            self.frame_left_error_label.configure(text="End Time: Incorrect format!")
             self.clear_epoch_entries()
             return
 
         if not self.input_validation.is_endts_gte_startts(timestamp_format="datetime",
                                                           start_ts=start_ts_datetime,
                                                           end_ts=end_ts_datetime):
-            self.frame_left_error_label.configure(text="End <Time! Error!")
+            self.frame_left_error_label.configure(text="End Time < Start Time! Error!")
             self.clear_epoch_entries()
             return
 
@@ -141,19 +141,19 @@ class GUITSConverter(customtkinter.CTkToplevel):
         end_ts_epoch = self.epoch_end_ts_entry.get().strip()
 
         if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts_epoch):
-            self.frame_right_error_label.configure(text="Start: Incorrect format!")
+            self.frame_right_error_label.configure(text="Start Time: Incorrect format!")
             self.clear_datetime_entries()
             return
 
         if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts_epoch):
-            self.frame_right_error_label.configure(text="End: Incorrect Format!")
+            self.frame_right_error_label.configure(text="End Time: Incorrect Format!")
             self.clear_datetime_entries()
             return
 
         if not self.input_validation.is_endts_gte_startts(timestamp_format="epoch",
                                                           start_ts=start_ts_epoch,
                                                           end_ts=end_ts_epoch):
-            self.frame_right_error_label.configure(text="End < Start! Error!")
+            self.frame_right_error_label.configure(text="End Time < Start Time! Error!")
             self.clear_datetime_entries()
             return
 
