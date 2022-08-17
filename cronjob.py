@@ -32,8 +32,8 @@ def main():
         return
     data_json_list = request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=index_name,
                                                                            num_logs=num_logs,
-                                                                           main_timestamp_field_name=main_timestamp_field_name,
-                                                                           main_timestamp_field_format=main_timestamp_format,
+                                                                           main_timestamp_name=main_timestamp_field_name,
+                                                                           main_timestamp_format=main_timestamp_format,
                                                                            main_timezone=main_timezone,
                                                                            start_ts=start_ts,
                                                                            end_ts=end_ts,

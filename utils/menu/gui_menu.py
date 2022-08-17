@@ -1,14 +1,18 @@
-import customtkinter
 import tkinter
+
+import customtkinter
+from utils.menu.gui_save_fetched_data import GUISavedFetchedData
 from utils.menu.gui_ts_converter import GUITSConverter
 from utils.menu.gui_show_indices_status import GUIShowIndicesStatus
 from utils.menu.gui_show_available_field_names import GUIShowAvailableFields
+from tkinter import ttk
 import os
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
 customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+
 
 class GUIMenu:
 
@@ -44,14 +48,14 @@ class GUIMenu:
         self.parent_field_to_type_dict = {}
 
         # Time related assets
-        self.main_timestamp_field_name_label = None
-        self.main_timestamp_field_name_optionmenu = None
-        self.main_timestamp_field_format_label = None
-        self.main_timestamp_field_format_optionmenu = None
+        self.main_timestamp_name_label = None
+        self.main_timestamp_name_optionmenu = None
+        self.main_timestamp_format_label = None
+        self.main_timestamp_format_optionmenu = None
         self.main_timezone_label = None
         self.main_timezone_optionmenu = None
         self.valid_timestamp_name_list = ["placeholder"]
-        self.main_timestamp_field_name = "N/A"
+        self.main_timestamp_name = "N/A"
         self.main_timestamp_format = "datetime"
         self.main_timezone = "+00:00"  # Default UTC
         self.datetime_to_epoch_button = None
@@ -74,14 +78,16 @@ class GUIMenu:
         self.available_themes = ["Light Theme", "Dark Theme", "System Default"]
         self.init_primary_app_window()
         self.init_frames()
-        #self.init_indices() # Comment out for testing
+        self.init_indices()  # Comment out for testing
 
     '''
     Easy way to initilalize the main window
     '''
+
     def init_primary_app_window(self):
         self.primary_app_window.title("elasticfetch - Main")
-        self.primary_app_window.geometry("1120x520")
+        self.primary_app_window.geometry("1120x600")
+        self.primary_app_window.resizable(False, False)
 
         # configure grid layout (2x1)
         self.primary_app_window.grid_columnconfigure(1, weight=1)
@@ -173,49 +179,51 @@ class GUIMenu:
                                                                     width=200,
                                                                     command=self.set_current_index,
                                                                     dynamic_resizing=False)
-        # Show available fields button
-        self.show_available_field_names_button = customtkinter.CTkButton(master=self.frame_info,
-                                                                         state=customtkinter.DISABLED,
-                                                                         width=60,
-                                                                         text="Show All Fields",
-                                                                         fg_color="grey",
-                                                                         command=self.show_available_field_names)
-        self.show_available_field_names_button.grid(row=0, column=6, pady=10, padx=20)
 
-        # Selecting main timestamp field name
         self.current_index_optionmenu.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         self.current_index_optionmenu.set(self.current_index)
-        self.main_timestamp_field_name_label = customtkinter.CTkLabel(master=self.frame_info,
-                                                                      text="Timestamp Field:",
-                                                                      text_font=("Arial", 11))
 
-        self.main_timestamp_field_name_label.grid(row=1, column=2, pady=5, padx=0)
-        self.main_timestamp_field_name_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
-                                                                                values=self.valid_timestamp_name_list,
-                                                                                state=customtkinter.DISABLED,
-                                                                                width=200,
-                                                                                dynamic_resizing=False,
-                                                                                button_color="grey",
-                                                                                fg_color="grey",
-                                                                                command=self.set_main_timestamp_field_name)
-        self.main_timestamp_field_name_optionmenu.set(self.main_timestamp_field_name)
-        self.main_timestamp_field_name_optionmenu.grid(row=1, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+        # Show available fields button
+        self.show_available_names_button = customtkinter.CTkButton(master=self.frame_info,
+                                                                   state=customtkinter.DISABLED,
+                                                                   width=60,
+                                                                   text="Show All Fields",
+                                                                   fg_color="grey",
+                                                                   command=self.show_available_field_names)
+        self.show_available_names_button.grid(row=0, column=6, pady=10, padx=20)
+
+        # Selecting main timestamp field name
+        self.main_timestamp_name_label = customtkinter.CTkLabel(master=self.frame_info,
+                                                                text="Timestamp Field:",
+                                                                text_font=("Arial", 11))
+
+        self.main_timestamp_name_label.grid(row=1, column=2, pady=5, padx=0)
+        self.main_timestamp_name_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
+                                                                          values=self.valid_timestamp_name_list,
+                                                                          state=customtkinter.DISABLED,
+                                                                          width=200,
+                                                                          dynamic_resizing=False,
+                                                                          button_color="grey",
+                                                                          fg_color="grey",
+                                                                          command=self.set_main_timestamp_field_name)
+        self.main_timestamp_name_optionmenu.set(self.main_timestamp_name)
+        self.main_timestamp_name_optionmenu.grid(row=1, column=3, columnspan=3, pady=5, padx=0, sticky="we")
 
         # Selecting timestamp format
-        self.main_timestamp_field_format_label = customtkinter.CTkLabel(master=self.frame_info,
-                                                                        text="Timestamp Format:",
-                                                                        text_font=("Arial", 11))
-        self.main_timestamp_field_format_label.grid(row=2, column=2, pady=5, padx=0)
-        self.main_timestamp_field_format_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
-                                                                                  values=self.input_validation.valid_timestamp_format_list,
-                                                                                  state=customtkinter.DISABLED,
-                                                                                  width=200,
-                                                                                  dynamic_resizing=False,
-                                                                                  button_color="grey",
-                                                                                  fg_color="grey",
-                                                                                  command=self.set_main_timestamp_format)
-        self.main_timestamp_field_format_optionmenu.set(self.main_timestamp_format)
-        self.main_timestamp_field_format_optionmenu.grid(row=2, column=3, pady=5, padx=0)
+        self.main_timestamp_format_label = customtkinter.CTkLabel(master=self.frame_info,
+                                                                  text="Timestamp Format:",
+                                                                  text_font=("Arial", 11))
+        self.main_timestamp_format_label.grid(row=2, column=2, pady=5, padx=0)
+        self.main_timestamp_format_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
+                                                                            values=self.input_validation.valid_timestamp_format_list,
+                                                                            state=customtkinter.DISABLED,
+                                                                            width=200,
+                                                                            dynamic_resizing=False,
+                                                                            button_color="grey",
+                                                                            fg_color="grey",
+                                                                            command=self.set_main_timestamp_format)
+        self.main_timestamp_format_optionmenu.set(self.main_timestamp_format)
+        self.main_timestamp_format_optionmenu.grid(row=2, column=3, pady=5, padx=0)
 
         # Selecting Timezone
         self.main_timezone_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -274,8 +282,8 @@ class GUIMenu:
                                                         text_font=("Arial", 11))
         self.filter_list_label.grid(row=7, column=2, pady=5, padx=0)
         self.filter_list_entry = customtkinter.CTkEntry(master=self.frame_info,
-                                                       height=32,
-                                                       placeholder_text="eg. event.code is_gte 4000; event.category is_not authentication; ...")
+                                                        height=32,
+                                                        placeholder_text="eg. event.code is_gte 4000; event.category is_not authentication; ...")
         self.filter_list_entry.grid(row=7, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         self.frame_info_error_label = customtkinter.CTkLabel(master=self.frame_info,
                                                              text_color="red",
@@ -288,6 +296,15 @@ class GUIMenu:
                                                          state=customtkinter.DISABLED,
                                                          command=self.fetch_elastic_data_between_ts1_ts2)
         self.fetch_data_button.grid(row=5, column=0, columnspan=2, pady=5, sticky="s")
+
+        self.progress_bar = ttk.Progressbar(master=self.frame_right,
+                                            mode="determinate",
+                                            orient=tkinter.HORIZONTAL)
+        self.progress_bar.grid(row=6, column=0, padx=20, pady=20, columnspan=3, sticky="we")
+        self.progress_bar_label = customtkinter.CTkLabel(master=self.frame_right,
+                                                         text="",
+                                                         text_font=("Arial", 10))
+        self.progress_bar_label.grid(row=7, column=0, padx=20, pady=20, sticky="w")
 
         # show window
         self.primary_app_window.mainloop()
@@ -308,8 +325,8 @@ class GUIMenu:
         return
 
     def set_main_timestamp_field_name(self, main_timestamp_field_name):
-        self.main_timestamp_field_name = main_timestamp_field_name
-        print("Main Timestamp Name: {}".format(self.main_timestamp_field_name))
+        self.main_timestamp_name = main_timestamp_field_name
+        print("Main Timestamp Name: {}".format(self.main_timestamp_name))
         return
 
     def set_main_timestamp_format(self, main_timestamp_format):
@@ -347,7 +364,7 @@ class GUIMenu:
         return
 
     def set_current_index(self, index_choice):
-        '''
+
         if index_choice != "N/A":
             del self.parent_field_to_type_dict
             self.current_index = index_choice
@@ -358,25 +375,27 @@ class GUIMenu:
                     fields_json=response)
                 self.get_valid_timestamp_name_list()
                 self.get_available_field_list()
-            self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
-                                                             fg_color="#395E9C")
-            self.main_timestamp_field_name_optionmenu.configure(values=self.valid_timestamp_name_list,
-                                                                state=customtkinter.NORMAL,
-                                                                button_color="#144870",
-                                                                fg_color="#395E9C"
-                                                                )
-            self.main_timestamp_field_format_optionmenu.configure(state=customtkinter.NORMAL,
-                                                                  button_color="#144870",
-                                                                  fg_color="#395E9C")
+            self.show_available_names_button.configure(state=customtkinter.NORMAL,
+                                                       fg_color="#395E9C")
+            self.main_timestamp_name_optionmenu.configure(values=self.valid_timestamp_name_list,
+                                                          state=customtkinter.NORMAL,
+                                                          button_color="#144870",
+                                                          fg_color="#395E9C"
+                                                          )
+            self.main_timestamp_format_optionmenu.configure(state=customtkinter.NORMAL,
+                                                            button_color="#144870",
+                                                            fg_color="#395E9C")
             self.main_timezone_optionmenu.configure(state=customtkinter.NORMAL,
                                                     button_color="#144870",
                                                     fg_color="#395E9C")
+            self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                             fg_color="#395E9C")
         else:
-            self.parent_field_to_type_dict = {}'''
+            self.parent_field_to_type_dict = {}
 
         # For testing purposes
 
-        if index_choice != "N/A":
+        '''if index_choice != "N/A":
             self.current_index = index_choice
             self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
                                                              fg_color="#395E9C")
@@ -392,7 +411,7 @@ class GUIMenu:
                                                     button_color="#144870",
                                                     fg_color="#395E9C")
             self.fetch_data_button.configure(state=customtkinter.NORMAL,
-                                             fg_color="#395E9C")
+                                             fg_color="#395E9C")'''
 
         return
 
@@ -408,7 +427,11 @@ class GUIMenu:
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
-
+        self.frame_info_error_label.set_text("")
+        self.progress_bar["value"] = 0
+        self.fetch_data_button.configure(state=customtkinter.DISABLED,
+                                         fg_color="grey")
+        self.primary_app_window.update()
         start_ts = self.start_timestamp_entry.get().strip()
         end_ts = self.end_timestamp_entry.get().strip()
         num_logs = self.num_logs_entry.get().strip()
@@ -418,29 +441,43 @@ class GUIMenu:
         if self.main_timestamp_format == "datetime":
             if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
                 self.frame_info_error_label.configure(text="Start Time: Incorrect Format!")
+                self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                                 fg_color="#395E9C")
                 return
             if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
                 self.frame_info_error_label.configure(text="End Time: Incorrect Format!")
+                self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                                 fg_color="#395E9C")
                 return
         elif self.main_timestamp_format == "epoch":
             if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
                 self.frame_info_error_label.configure(text="Start Time: Incorrect Format!")
+                self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                                 fg_color="#395E9C")
                 return
             if not self.input_validation.is_datetime_epoch_valid(timestamp=end_ts):
                 self.frame_info_error_label.configure(text="End Time: Incorrect Format!")
+                self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                                 fg_color="#395E9C")
                 return
 
         if not self.input_validation.is_numeric_valid(user_input=num_logs):
             self.frame_info_error_label.configure(text="Number of Logs: Invalid Numeric Expression!")
+            self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                             fg_color="#395E9C")
             return
         num_logs = int(num_logs)
         fields_list = [x.strip() for x in fields.split(',')]
         if len(fields_list) == 1 and fields_list[0] == "":
             self.frame_info_error_label.configure(text="Fields: Empty! Error!")
+            self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                             fg_color="#395E9C")
             return
 
         if filter_raw != "":
             if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
+                self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                                 fg_color="#395E9C")
                 return
 
         keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
@@ -459,29 +496,25 @@ class GUIMenu:
 
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.current_index,
                                                                                     num_logs=num_logs,
-                                                                                    main_timestamp_field_name=self.main_timestamp_field_name,
-                                                                                    main_timestamp_field_format=self.main_timestamp_format,
+                                                                                    main_timestamp_name=self.main_timestamp_name,
+                                                                                    main_timestamp_format=self.main_timestamp_format,
                                                                                     main_timezone=self.main_timezone,
                                                                                     start_ts=start_ts,
                                                                                     end_ts=end_ts,
                                                                                     fields_list=fields_list,
                                                                                     query_bool_must_list=query_bool_must_list,
-                                                                                    query_bool_must_not_list=query_bool_must_not_list)
+                                                                                    query_bool_must_not_list=query_bool_must_not_list,
+                                                                                    app_window=self.primary_app_window,
+                                                                                    progress_bar=self.progress_bar,
+                                                                                    progress_bar_label=self.progress_bar_label)
+        self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                         fg_color="#395E9C")
 
-        if len(data_json_list) == 0:
-            return
-        while True:
-            filename = input("File name to save as (.json, .csv): ")
-            is_valid_file_extension = self.input_validation.is_file_extension_valid(filename=filename)
-            if is_valid_file_extension:
-                break
-        file_path = "datasets/" + filename
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        if file_path.lower().endswith(".csv"):
-            self.converter.convert_json_data_to_csv(data_json_list=data_json_list, fields_list=fields_list,
-                                                    file_path=file_path)
-        elif file_path.lower().endswith(".json"):
-            self.converter.convert_json_data_to_json(data_json_list=data_json_list, file_path=file_path)
+        gui_save_fetched_data = GUISavedFetchedData(data_json_list=data_json_list,
+                                                    converter=self.converter,
+                                                    input_validation=self.input_validation)
+        gui_save_fetched_data.mainloop()
+
         return
 
     def display_ts_converter_window(self):

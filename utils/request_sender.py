@@ -1,6 +1,7 @@
 import requests
 from utils.messenger import messenger
 import json
+import customtkinter
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tqdm import tqdm
 import sys
@@ -155,21 +156,25 @@ class RequestSender:
     def get_fetch_elastic_data_between_ts1_ts2(self,
                                                index_name: str,
                                                num_logs: int,
-                                               main_timestamp_field_name: str,
-                                               main_timestamp_field_format: str,
+                                               main_timestamp_name: str,
+                                               main_timestamp_format: str,
                                                main_timezone: str,
                                                start_ts: str,
                                                end_ts: str,
                                                fields_list: list,
                                                query_bool_must_list: list,
-                                               query_bool_must_not_list: list) -> list:
+                                               query_bool_must_not_list: list,
+                                               app_window: customtkinter.CTk = None,
+                                               progress_bar: customtkinter.CTkProgressBar = None,
+                                               progress_bar_label: customtkinter.CTkLabel = None) -> list:
         url = "{}://{}:{}/{}/_search?pretty".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
         data_json_list = []
         is_first_loop = True
         last_ids = []
         messenger(3, "Fetching elastic data...")
         pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stderr)
-
+        total_results_size = 0
+        original_num_logs = num_logs
         while num_logs > 0:
             if num_logs >= 10000:
                 size = 10000
@@ -177,7 +182,7 @@ class RequestSender:
                 size = num_logs
             num_logs -= size
 
-            if main_timestamp_field_format == "datetime":
+            if main_timestamp_format == "datetime":
                 data = \
                 {
                     "size": size,
@@ -186,7 +191,7 @@ class RequestSender:
                         "bool": {
                             "filter": {
                                 "range": {
-                                    main_timestamp_field_name: {
+                                    main_timestamp_name: {
                                         "time_zone": main_timezone,
                                         "gte": start_ts,
                                         "lte": end_ts
@@ -196,12 +201,12 @@ class RequestSender:
                         }
                     },
                     "sort": [
-                        {main_timestamp_field_name: {"order": "asc", "format": "strict_date_optional_time_nanos"}}
+                        {main_timestamp_name: {"order": "asc", "format": "strict_date_optional_time_nanos"}}
                     ]
                 }
 
             # epoch time is according to UTC 0
-            elif main_timestamp_field_format == "epoch":
+            elif main_timestamp_format == "epoch":
                 data = \
                     {
                         "size": size,
@@ -210,7 +215,7 @@ class RequestSender:
                             "bool": {
                                 "filter": {
                                     "range": {
-                                        main_timestamp_field_name: {
+                                        main_timestamp_name: {
                                             "time_zone": "+00:00",
                                             "gte": start_ts,
                                             "lte": end_ts
@@ -221,7 +226,7 @@ class RequestSender:
                         },
                         "sort": [
                             # BUG: KEEP GETTING NO HITS epoch seconds
-                            {main_timestamp_field_name: {"order": "asc"}}
+                            {main_timestamp_name: {"order": "asc"}}
                         ]
                     }
             if len(query_bool_must_list) > 0:
@@ -249,6 +254,14 @@ class RequestSender:
                         messenger(2, "There are no hits! Please try again with a different time range!")
                         return data_json_list
                     pbar.update(results_size)
+                    total_results_size += results_size
+
+                    # Mainly for UI
+                    if app_window is not None and progress_bar_label is not None and progress_bar is not None:
+                        progress_bar["value"] = (total_results_size/float(original_num_logs))*100
+                        progress_bar_label.set_text("Current Progress: {}/{}".format(total_results_size, original_num_logs))
+                        app_window.update()
+
                     data_json_list.append(data_json)
                     start_ts = data_json["hits"]["hits"][results_size - 1]["sort"][0]
                     last_ids.clear()
@@ -267,16 +280,15 @@ class RequestSender:
 
             except requests.RequestException:
                 messenger(2, "Cannot resolve request to {}".format(url))
+                return None
             except requests.ConnectTimeout:
                 messenger(2, "Connection timeout to {}".format(url))
+                return None
             except requests.ConnectionError:
                 messenger(2, "Cannot connect to {}".format(url))
+                return None
 
-        total_size = 0
-        for result in data_json_list:
-            total_size += len(result["hits"]["hits"])
-
-        messenger(0, "Successfully fetched {} data entries!".format(total_size))
+        messenger(0, "Successfully fetched {} data entries!".format(total_results_size))
         return data_json_list
 
     def get_indices_status(self):

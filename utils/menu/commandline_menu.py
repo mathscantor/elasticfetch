@@ -20,8 +20,8 @@ class CommandLineMenu:
         self.input_validation = input_validation
         self.parser = parser
         self.index_name = "N/A"
-        self.main_timestamp_field_name = "@timestamp"
-        self.main_timestamp_field_format = "datetime"
+        self.main_timestamp_name = "@timestamp"
+        self.main_timestamp_format = "datetime"
         self.main_timezone = "+00:00"
         self.header = "===============================================================\n" \
                       "        _              _    _         __       _         _     \n" \
@@ -40,8 +40,8 @@ class CommandLineMenu:
             print("Current index selected:\033[93m N/A (Please set an index before fetching any data!)\033[0m")
         else:
             print("Current index selected:\033[93m {}\033[0m".format(self.index_name))
-        print("Main Timestamp Field: \033[93m {}\033[0m".format(self.main_timestamp_field_name))
-        print("Main Timestamp Format: \033[93m {}\033[0m".format(self.main_timestamp_field_format))
+        print("Main Timestamp Field: \033[93m {}\033[0m".format(self.main_timestamp_name))
+        print("Main Timestamp Format: \033[93m {}\033[0m".format(self.main_timestamp_format))
         print("Main Timezone: \033[93m {}\033[0m\n".format(self.main_timezone))
 
         for key in self.menu_options.keys():
@@ -138,8 +138,8 @@ class CommandLineMenu:
         if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
             return
 
-        self.main_timestamp_field_name = chosen_timestamp_name
-        self.main_timestamp_field_format = chosen_timestamp_type
+        self.main_timestamp_name = chosen_timestamp_name
+        self.main_timestamp_format = chosen_timestamp_type
         self.main_timezone = chosen_timezone
         return
 
@@ -188,22 +188,22 @@ class CommandLineMenu:
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
-        if self.main_timestamp_field_format == "datetime":
+        if self.main_timestamp_format == "datetime":
             print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
                   "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
-        elif self.main_timestamp_field_format == "epoch":
+        elif self.main_timestamp_format == "epoch":
             print("timestamp format: <10 / 13 digit string>\n"
                   "eg. 1420070400 or 1420070400001")
 
         start_ts = input("Start Timestamp: ")
-        if self.main_timestamp_field_format == "datetime":
+        if self.main_timestamp_format == "datetime":
             if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
                 return
             end_ts = input("End Timestamp: ")
             if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
                 return
 
-        elif self.main_timestamp_field_format == "epoch":
+        elif self.main_timestamp_format == "epoch":
             if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
                 return
             end_ts = input("End Timestamp: ")
@@ -216,7 +216,7 @@ class CommandLineMenu:
             if len(end_ts) == 10:
                 end_ts += "000"
 
-        if not self.input_validation.is_endts_gte_startts(timestamp_format=self.main_timestamp_field_format,
+        if not self.input_validation.is_endts_gte_startts(timestamp_format=self.main_timestamp_format,
                                                           start_ts=start_ts,
                                                           end_ts=end_ts):
             return
@@ -261,14 +261,15 @@ class CommandLineMenu:
 
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
                                                                                     num_logs=num_logs,
-                                                                                    main_timestamp_field_name=self.main_timestamp_field_name,
-                                                                                    main_timestamp_field_format=self.main_timestamp_field_format,
+                                                                                    main_timestamp_name=self.main_timestamp_name,
+                                                                                    main_timestamp_format=self.main_timestamp_format,
                                                                                     main_timezone=self.main_timezone,
                                                                                     start_ts=start_ts,
                                                                                     end_ts=end_ts,
                                                                                     fields_list=fields_list,
                                                                                     query_bool_must_list=query_bool_must_list,
-                                                                                    query_bool_must_not_list=query_bool_must_not_list)
+                                                                                    query_bool_must_not_list=query_bool_must_not_list,
+                                                                                    progress_bar=None)
 
         if len(data_json_list) == 0:
             return
