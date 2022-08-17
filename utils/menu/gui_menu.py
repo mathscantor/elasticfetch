@@ -86,7 +86,7 @@ class GUIMenu:
 
     def init_primary_app_window(self):
         self.primary_app_window.title("elasticfetch - Main")
-        self.primary_app_window.geometry("1120x600")
+        self.primary_app_window.geometry("1120x640")
         self.primary_app_window.resizable(False, False)
 
         # configure grid layout (2x1)
@@ -295,16 +295,16 @@ class GUIMenu:
                                                          fg_color="grey",
                                                          state=customtkinter.DISABLED,
                                                          command=self.fetch_elastic_data_between_ts1_ts2)
-        self.fetch_data_button.grid(row=5, column=0, columnspan=2, pady=5, sticky="s")
+        self.fetch_data_button.grid(row=6, column=0, columnspan=2, pady=5, sticky="s")
 
         self.progress_bar = ttk.Progressbar(master=self.frame_right,
                                             mode="determinate",
                                             orient=tkinter.HORIZONTAL)
-        self.progress_bar.grid(row=6, column=0, padx=20, pady=20, columnspan=3, sticky="we")
+        self.progress_bar.grid(row=7, column=0, padx=20, pady=20, columnspan=3, sticky="we")
         self.progress_bar_label = customtkinter.CTkLabel(master=self.frame_right,
                                                          text="",
                                                          text_font=("Arial", 10))
-        self.progress_bar_label.grid(row=7, column=0, padx=20, pady=20, sticky="w")
+        self.progress_bar_label.grid(row=8, column=0, padx=20, pady=20, sticky="w")
 
         # show window
         self.primary_app_window.mainloop()
