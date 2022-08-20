@@ -1,10 +1,9 @@
 import tkinter
-
 import customtkinter
-from utils.menu.gui_save_fetched_data import GUISavedFetchedData
-from utils.menu.gui_ts_converter import GUITSConverter
-from utils.menu.gui_show_indices_status import GUIShowIndicesStatus
-from utils.menu.gui_show_available_field_names import GUIShowAvailableFields
+from menu.gui.save_fetched_data import GUISaveFetchedData
+from menu.gui.ts_converter import GUITSConverter
+from menu.gui.show_indices_status import GUIShowIndicesStatus
+from menu.gui.show_available_field_names import GUIShowAvailableFields
 from tkinter import ttk
 import os
 
@@ -40,9 +39,11 @@ class GUIMenu:
         # Index related Assets
         self.show_indices_status_button = None
         self.current_index_label = None
-        self.current_index_optionmenu = None
+        self.current_index_combobox = None
         self.indices_status = "placeholder"
         self.current_index = "N/A"
+        self.selected_index = tkinter.StringVar()
+        self.selected_index.set(value="N/A")
         self.index_list = ["placeholder"]
         self.available_field_list = ["placeholder"]
         self.parent_field_to_type_dict = {}
@@ -78,6 +79,19 @@ class GUIMenu:
         self.available_themes = ["Light Theme", "Dark Theme", "System Default"]
         self.init_primary_app_window()
         self.init_frames()
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
+        self.style.configure("green.Horizontal.TProgressbar",
+                             foreground='green',
+                             background='green')
+        self.style.configure("TCombobox",
+                             fieldbackground='#395E9C',
+                             background="#395E9C",
+                             foreground='#E5E5E5',
+                             lightcolor="grey",
+                             darkcolor="grey")  # changes colour of combobox itself (foreground is the text colour, background is the background colour of the arrow to drop down)
+        self.frame_info.option_add("*TCombobox*Listbox*Background", "#333333")  # changes background of drop down menu of combobox
+        self.frame_info.option_add('*TCombobox*Listbox*Foreground', '#E5E5E5')  # changes colour of text of options in combobox
         self.init_indices()  # Comment out for testing
 
     '''
@@ -164,6 +178,7 @@ class GUIMenu:
         # Theme Option Menu
         self.theme_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_left,
                                                             values=self.available_themes,
+                                                            text_font=("Arial", 10),
                                                             dynamic_resizing=False,
                                                             command=self.change_appearance_mode)
         self.theme_optionmenu.grid(row=10, column=0, sticky="s")
@@ -174,23 +189,23 @@ class GUIMenu:
                                                           text="Selected Index:",
                                                           text_font=("Arial", 11))  # font name and size in px
         self.current_index_label.grid(row=0, column=2, pady=20, padx=0)
-        self.current_index_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
-                                                                    values=self.index_list,
-                                                                    width=200,
-                                                                    command=self.set_current_index,
-                                                                    dynamic_resizing=False)
+        self.current_index_combobox = ttk.Combobox(master=self.frame_info,
+                                                   values=self.index_list,
+                                                   font=("Arial", 11),
+                                                   textvariable=self.selected_index)
+        self.current_index_combobox.bind('<<ComboboxSelected>>', self.set_current_index)
 
-        self.current_index_optionmenu.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
-        self.current_index_optionmenu.set(self.current_index)
+        self.current_index_combobox.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+        self.current_index_combobox.set(self.current_index)
 
         # Show available fields button
-        self.show_available_names_button = customtkinter.CTkButton(master=self.frame_info,
-                                                                   state=customtkinter.DISABLED,
-                                                                   width=60,
-                                                                   text="Show All Fields",
-                                                                   fg_color="grey",
-                                                                   command=self.show_available_field_names)
-        self.show_available_names_button.grid(row=0, column=6, pady=10, padx=20)
+        self.show_available_field_names_button = customtkinter.CTkButton(master=self.frame_info,
+                                                                         state=customtkinter.DISABLED,
+                                                                         width=60,
+                                                                         text="Show All Fields",
+                                                                         fg_color="grey",
+                                                                         command=self.show_available_field_names)
+        self.show_available_field_names_button.grid(row=0, column=6, pady=10, padx=20)
 
         # Selecting main timestamp field name
         self.main_timestamp_name_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -202,10 +217,11 @@ class GUIMenu:
                                                                           values=self.valid_timestamp_name_list,
                                                                           state=customtkinter.DISABLED,
                                                                           width=200,
+                                                                          text_font=("Arial", 10),
                                                                           dynamic_resizing=False,
                                                                           button_color="grey",
                                                                           fg_color="grey",
-                                                                          command=self.set_main_timestamp_field_name)
+                                                                          command=self.set_main_timestamp_name)
         self.main_timestamp_name_optionmenu.set(self.main_timestamp_name)
         self.main_timestamp_name_optionmenu.grid(row=1, column=3, columnspan=3, pady=5, padx=0, sticky="we")
 
@@ -218,6 +234,7 @@ class GUIMenu:
                                                                             values=self.input_validation.valid_timestamp_format_list,
                                                                             state=customtkinter.DISABLED,
                                                                             width=200,
+                                                                            text_font=("Arial", 10),
                                                                             dynamic_resizing=False,
                                                                             button_color="grey",
                                                                             fg_color="grey",
@@ -234,6 +251,7 @@ class GUIMenu:
                                                                     values=self.input_validation.valid_timezone_list,
                                                                     state=customtkinter.DISABLED,
                                                                     width=200,
+                                                                    text_font=("Arial", 10),
                                                                     dynamic_resizing=False,
                                                                     button_color="grey",
                                                                     fg_color="grey",
@@ -249,6 +267,7 @@ class GUIMenu:
         self.start_timestamp_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                             width=200,
                                                             height=32,
+                                                            text_font=("Arial", 10),
                                                             placeholder_text="eg. 2022-05-01T00:00:00")
         self.start_timestamp_entry.grid(row=4, column=3, pady=5, padx=0)
         self.end_timestamp_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -258,6 +277,7 @@ class GUIMenu:
         self.end_timestamp_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                           width=200,
                                                           height=32,
+                                                          text_font=("Arial", 10),
                                                           placeholder_text="eg. 2022-05-20T00:00:00")
         self.end_timestamp_entry.grid(row=4, column=5, pady=5, padx=0)
         self.num_logs_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -267,6 +287,7 @@ class GUIMenu:
         self.num_logs_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                      width=200,
                                                      height=32,
+                                                     text_font=("Arial", 10),
                                                      placeholder_text="eg. 100000")
         self.num_logs_entry.grid(row=5, column=3, pady=5, padx=0)
         self.fields_list_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -275,6 +296,7 @@ class GUIMenu:
         self.fields_list_label.grid(row=6, column=2, pady=5, padx=0)
         self.fields_list_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                         height=32,
+                                                        text_font=("Arial", 10),
                                                         placeholder_text="eg. @timestamp, event.code, event.category...")
         self.fields_list_entry.grid(row=6, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         self.filter_list_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -283,6 +305,7 @@ class GUIMenu:
         self.filter_list_label.grid(row=7, column=2, pady=5, padx=0)
         self.filter_list_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                         height=32,
+                                                        text_font=("Arial", 10),
                                                         placeholder_text="eg. event.code is_gte 4000; event.category is_not authentication; ...")
         self.filter_list_entry.grid(row=7, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         self.frame_info_error_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -299,11 +322,12 @@ class GUIMenu:
 
         self.progress_bar = ttk.Progressbar(master=self.frame_right,
                                             mode="determinate",
+                                            style="green.Horizontal.TProgressbar",
                                             orient=tkinter.HORIZONTAL)
         self.progress_bar.grid(row=7, column=0, padx=20, pady=20, columnspan=3, sticky="we")
         self.progress_bar_label = customtkinter.CTkLabel(master=self.frame_right,
                                                          text="",
-                                                         text_font=("Arial", 10))
+                                                         text_font=("Consolas", 12))
         self.progress_bar_label.grid(row=8, column=0, padx=20, pady=20, sticky="w")
 
         # show window
@@ -324,9 +348,8 @@ class GUIMenu:
         customtkinter.set_appearance_mode(value)
         return
 
-    def set_main_timestamp_field_name(self, main_timestamp_field_name):
+    def set_main_timestamp_name(self, main_timestamp_field_name):
         self.main_timestamp_name = main_timestamp_field_name
-        print("Main Timestamp Name: {}".format(self.main_timestamp_name))
         return
 
     def set_main_timestamp_format(self, main_timestamp_format):
@@ -339,7 +362,6 @@ class GUIMenu:
             elif self.main_timestamp_format == "epoch":
                 self.start_timestamp_entry.configure(placeholder_text="eg. 1651363200000")
                 self.end_timestamp_entry.configure(placeholder_text="eg. 1653004800000")
-        print("Main Timestamp Format: {}".format(self.main_timestamp_format))
         return
 
     def set_main_timezone(self, main_timezone):
@@ -363,11 +385,11 @@ class GUIMenu:
                     self.valid_timestamp_name_list += self.parent_field_to_type_dict[top_parent_field][field_type]
         return
 
-    def set_current_index(self, index_choice):
-
-        if index_choice != "N/A":
-            del self.parent_field_to_type_dict
-            self.current_index = index_choice
+    def set_current_index(self, event):
+        self.show_available_field_names_button.configure(state=customtkinter.DISABLED,
+                                                         fg_color="grey")
+        if self.selected_index.get() != "N/A":
+            self.current_index = self.selected_index.get()
             response = self.request_sender.get_available_fields(index_name=self.current_index)
             if response is not None:
                 self.parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(
@@ -375,8 +397,8 @@ class GUIMenu:
                     fields_json=response)
                 self.get_valid_timestamp_name_list()
                 self.get_available_field_list()
-            self.show_available_names_button.configure(state=customtkinter.NORMAL,
-                                                       fg_color="#395E9C")
+            self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
+                                                             fg_color="#395E9C")
             self.main_timestamp_name_optionmenu.configure(values=self.valid_timestamp_name_list,
                                                           state=customtkinter.NORMAL,
                                                           button_color="#144870",
@@ -455,7 +477,7 @@ class GUIMenu:
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
-            if not self.input_validation.is_datetime_epoch_valid(timestamp=end_ts):
+            if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
                 self.frame_info_error_label.configure(text="End Time: Incorrect Format!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
@@ -510,9 +532,13 @@ class GUIMenu:
         self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                          fg_color="#395E9C")
 
-        gui_save_fetched_data = GUISavedFetchedData(data_json_list=data_json_list,
-                                                    converter=self.converter,
-                                                    input_validation=self.input_validation)
+        if len(data_json_list) == 0:
+            self.frame_info_error_label.set_text("There are no hits!")
+            return
+        gui_save_fetched_data = GUISaveFetchedData(data_json_list=data_json_list,
+                                                   fields_list=fields_list,
+                                                   converter=self.converter,
+                                                   input_validation=self.input_validation)
         gui_save_fetched_data.mainloop()
 
         return

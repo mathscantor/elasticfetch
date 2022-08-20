@@ -175,6 +175,12 @@ class RequestSender:
         pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stderr)
         total_results_size = 0
         original_num_logs = num_logs
+
+        # Mainly for UI
+        if app_window is not None and progress_bar_label is not None and progress_bar is not None:
+            progress_bar["value"] = (total_results_size / float(original_num_logs)) * 100
+            progress_bar_label.set_text("Current Progress: {}/{}".format(total_results_size, original_num_logs))
+            app_window.update()
         while num_logs > 0:
             if num_logs >= 10000:
                 size = 10000
@@ -256,7 +262,7 @@ class RequestSender:
                     pbar.update(results_size)
                     total_results_size += results_size
 
-                    # Mainly for UI
+                    # For UI
                     if app_window is not None and progress_bar_label is not None and progress_bar is not None:
                         progress_bar["value"] = (total_results_size/float(original_num_logs))*100
                         progress_bar_label.set_text("Current Progress: {}/{}".format(total_results_size, original_num_logs))

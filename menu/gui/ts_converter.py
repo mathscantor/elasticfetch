@@ -1,7 +1,6 @@
 import customtkinter
 from PIL import Image, ImageTk
 import os
-import datetime
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
