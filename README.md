@@ -243,6 +243,7 @@ Epoch Range: 1651334400000 - 1652976000000
 Current index selected: winlogbeat-8.0.1
 Main Timestamp Field:  @timestamp
 Main Timestamp Type:  datetime
+Main Timezone: +08:00
 
 1 -- Show indices status
 2 -- Set current index
