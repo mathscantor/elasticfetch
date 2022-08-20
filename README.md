@@ -167,7 +167,7 @@ In addition, I have given the liberty to the user to choose between timestamp ty
    </td>
   </tr>
   <tr>
-   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S.%f>Z
+   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S.%f>
    </td>
    <td>milliseconds
    </td>
