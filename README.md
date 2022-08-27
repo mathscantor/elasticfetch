@@ -6,16 +6,22 @@ Currently, this tool is not reliant on the `scroll API` and in the event where e
 This tool aims to facilitate work flow of threat hunting and data analysis in the event where you need to query huge amount of data without killing the server.
 ## Required Python Packages
 ```sh
+# Required pacakges for Command Line Interface (CLI)
 pip3 install requests
 pip3 install tqdm
+
+# (OPTIONAL) -- Required for GUI
+pip3 install customtkinter
+pip3 install tk
 ```
 
 ## Current Features
 1. Show index health status
 2. Setting Index to fetch from
-3. Set main timestamp (This field will be used to sort your data in chronological order)
+3. Set main timestamp name, format and timezone (This field will be used to sort your data in chronological order)
 4. Showing available field names related to your index (**Not Hardcoded**)
-5. Fetching data between two timestamps
+5. Converting datetime to epoch / epoch to datetime format
+6. Fetching data between two timestamps
 
 ## How to use
 ### Setting parameters in configuration file
@@ -28,7 +34,7 @@ Edit **elasticfetch.ini** and set the following variables to your values : <br>
 - graphical (True / False) 
 
 
-### Running elasticfetch
+## Running elasticfetch (CLI)
 ```sh
 python3 elasticfetch.py
 ```
@@ -53,7 +59,7 @@ Main Timezone:  +00:00
 2 -- Set current index
 3 -- Set main timestamp name, format and timezone
 4 -- Show available field names
-5 -- Convert datetime range to epoch range
+5 -- Convert Timestamp Format
 6 -- Fetch data between two timestamps
 7 -- Exit
 ```
@@ -233,11 +239,26 @@ This takes into account of your current timezone when converting to epoch time.
 ```text
 Enter your choice: 5
 
+1 -- Convert datetime to epoch
+2 -- Convert epoch to datetime
+```
+Converting datetime to epoch
+```text
 timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>
 eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000
 Start Timestamp: 2022-05-01T00:00:00            ← (Your input)
 End Timestamp: 2022-05-20T00:00:00              ← (Your input)
+Timezone: +08:00                                ← (Your input)
 Epoch Range: 1651334400000 - 1652976000000
+```
+Converting epoch to datetime
+```text
+timestamp format: <10 / 13 digit string>
+eg. 1420070400 or 1420070400001
+Start Timestamp: 1651334400000                  ← (Your input)
+End Timestamp: 1652976000000                    ← (Your input)
+Timezone: +08:00                                ← (Your input)
+Datetime Range: 2022-05-01T00:00:00.000 - 2022-05-20T00:00:00.000
 ```
 
 ### Option 6 - Fetching data from a chosen index.
@@ -249,10 +270,11 @@ Main Timezone: +08:00
 
 1 -- Show indices status
 2 -- Set current index
-3 -- Set main timestamp
+3 -- Set main timestamp name, format and timezone
 4 -- Show available field names
-5 -- Fetch data between two timestamps
-6 -- Exit
+5 -- Convert Timestamp Format
+6 -- Fetch data between two timestamps
+7 -- Exit
 Enter your choice: 5                                                                                ← (Your input)
 
 timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>
@@ -309,4 +331,9 @@ Current Supported Filter Keywords:
 At the end, it will prompt you for a file name to dump the data in (Currently only support .json, .csv). <br />
 All saved files will be found under the **datasets** folder
 
+### Running elasticfetch (GUI)
+```sh
+python3 elasticfetch.py
+```
+<img src="readme_images/main_menu_gui.png">Figure 1. GUI Main Menu</img>
 
