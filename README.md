@@ -19,12 +19,14 @@ pip3 install tqdm
 
 ## How to use
 ### Setting parameters in configuration file
-Edit **elasticfetch.ini** and set the following variables to your own values : <br>
+Edit **elasticfetch.ini** and set the following variables to your values : <br>
 - Protocol (`https` or `http`)
 - IP address (`XXX.XXX.XXX.XXX` or `domain name`)
 - port (Usually `9200`)
 - username (Must have *enough privilege* to use APIs)
 - password 
+- graphical (True / False) 
+
 
 ### Running elasticfetch
 ```sh

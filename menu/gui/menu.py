@@ -33,6 +33,11 @@ class GUIMenu:
         self.frame_left = None
         self.frame_right = None
         self.frame_info = None
+        self.frame_info_error_label = None
+        self.filter_list_label = None
+        self.progress_bar = None
+        self.progress_bar_label = None
+        self.fetch_data_button = None
         self.theme_optionmenu = None
         self.label_options = None
 

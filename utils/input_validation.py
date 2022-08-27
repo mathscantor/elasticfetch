@@ -160,7 +160,7 @@ class InputValidation:
     def is_timezone_valid(self,
                           chosen_timezone: str):
         if chosen_timezone not in self.valid_timezone_list:
-            messenger(2, "'{}' is not a valid timezone! Please us only {}".format(chosen_timezone, '/'.join(self.valid_timezone_list)))
+            messenger(2, "'{}' is not a valid timezone! Please use only {}".format(chosen_timezone, '/'.join(self.valid_timezone_list)))
             return False
         else:
             return True

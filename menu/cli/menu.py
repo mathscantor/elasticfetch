@@ -13,9 +13,13 @@ class CommandLineMenu:
             2: 'Set current index',
             3: 'Set main timestamp name, format and timezone',
             4: 'Show available field names',
-            5: 'Convert datetime range to epoch range',
+            5: 'Convert Timestamp Format',
             6: 'Fetch data between two timestamps',
             7: 'Exit',
+        }
+        self.convert_timestamp_menu_options = {
+            1: 'Convert datetime to epoch',
+            2: 'Convert epoch to datetime'
         }
         self.input_validation = input_validation
         self.parser = parser
@@ -65,7 +69,7 @@ class CommandLineMenu:
             if self.input_validation.is_index_name_set(self.index_name):
                 self.show_available_fields()
         elif menu_option == 5:
-            self.convert_datetime_range_to_epoch_range()
+            self.convert_timestamp_format()
         elif menu_option == 6:
             if self.input_validation.is_index_name_set(self.index_name):
                 self.fetch_elastic_data_between_ts1_ts2()
@@ -171,6 +175,22 @@ class CommandLineMenu:
 
         return
 
+    def convert_timestamp_format(self):
+        for key in self.convert_timestamp_menu_options.keys():
+            print(key, '--', self.convert_timestamp_menu_options[key])
+        convert_timestamp_menu_option = input('Enter your choice: ')
+        if not self.input_validation.is_numeric_valid(convert_timestamp_menu_option):
+            return
+        convert_timestamp_menu_option = int(convert_timestamp_menu_option)
+        if not self.input_validation.is_option_in_available(convert_timestamp_menu_option,
+                                                            self.convert_timestamp_menu_options):
+            return
+        if convert_timestamp_menu_option == 1:
+            self.convert_datetime_range_to_epoch_range()
+        elif convert_timestamp_menu_option == 2:
+            self.convert_epoch_range_to_datetime_range()
+        return
+
     def convert_datetime_range_to_epoch_range(self):
         print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
               "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
@@ -180,11 +200,31 @@ class CommandLineMenu:
         end_ts = input("End Timestamp: ")
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
             return
-        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts, timezone=self.main_timezone)
-        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts, timezone=self.main_timezone)
+        chosen_timezone = input("Timezone: ")
+        if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
+            return
+        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts, timezone=chosen_timezone)
+        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts, timezone=chosen_timezone)
 
         print("Epoch Range: {} - {}".format(start_ts_epoch, end_ts_epoch))
+        return
 
+    def convert_epoch_range_to_datetime_range(self):
+        print("timestamp format: <10 / 13 digit string>\n"
+              "eg. 1420070400 or 1420070400001")
+        start_ts = input("Start Timestamp: ")
+        if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
+            return
+        end_ts = input("End Timestamp: ")
+        if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
+            return
+        chosen_timezone = input("Timezone: ")
+        if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
+            return
+        start_ts_datetime = self.converter.convert_epoch_millis_to_datetime(epoch=start_ts, timezone=chosen_timezone)
+        end_ts_datetime = self.converter.convert_epoch_millis_to_datetime(epoch=end_ts, timezone=chosen_timezone)
+
+        print("Datetime Range: {} - {}".format(start_ts_datetime, end_ts_datetime))
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):

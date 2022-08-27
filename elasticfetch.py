@@ -21,9 +21,9 @@ def validate_config_inputs():
 
 def main():
 
-    validate_config_inputs()
+    '''validate_config_inputs()
     if config_dict["elastic.protocol"] == "https" and not request_sender.get_authentication_status_bool():
-        exit(1)
+        exit(1)'''
 
     if not config_dict["interface.graphical"]:
         menu = CommandLineMenu(request_sender=request_sender,
