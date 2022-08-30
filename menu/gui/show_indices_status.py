@@ -3,15 +3,13 @@ import tkinter
 from PIL import Image, ImageTk
 import os
 
-PATH = os.path.dirname(os.path.realpath(__file__))
-
 
 class GUIShowIndicesStatus(customtkinter.CTkToplevel):
     def __init__(self, indices_status):
         super().__init__()
 
         self.title("elasticfetch - Indices Status")
-        self.geometry("1120x400")
+        self.geometry("1120x480")
         self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=4)
@@ -55,9 +53,8 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
 
         # create scrollable textbox
         self.textbox = tkinter.Text(self,
-                                  highlightthickness=0,
-                                  wrap="none",
-                                  font=("Arial", 11))
+                                    highlightthickness=0,
+                                    wrap="none")
         self.textbox.grid(row=1, column=0, sticky="nsew")
         self.textbox.insert(tkinter.INSERT, indices_status)
 

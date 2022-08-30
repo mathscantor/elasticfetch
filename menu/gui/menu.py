@@ -55,15 +55,21 @@ class GUIMenu:
 
         # Time related assets
         self.main_timestamp_name_label = None
-        self.main_timestamp_name_optionmenu = None
+        self.main_timestamp_name_combobox = None
         self.main_timestamp_format_label = None
-        self.main_timestamp_format_optionmenu = None
+        self.main_timestamp_format_combobox = None
         self.main_timezone_label = None
-        self.main_timezone_optionmenu = None
+        self.main_timezone_combobox = None
         self.valid_timestamp_name_list = ["placeholder"]
         self.main_timestamp_name = "N/A"
+        self.selected_main_timestamp_name = tkinter.StringVar()
+        self.selected_main_timestamp_name.set(value="N/A")
         self.main_timestamp_format = "datetime"
+        self.selected_main_timestamp_format = tkinter.StringVar()
+        self.selected_main_timestamp_format.set(value="datetime")
         self.main_timezone = "+00:00"  # Default UTC
+        self.selected_main_timezone = tkinter.StringVar()
+        self.selected_main_timezone.set(value="+00:00")
         self.datetime_to_epoch_button = None
 
         # Data Fetch assets
@@ -218,51 +224,38 @@ class GUIMenu:
                                                                 text_font=("Arial", 11))
 
         self.main_timestamp_name_label.grid(row=1, column=2, pady=5, padx=0)
-        self.main_timestamp_name_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
-                                                                          values=self.valid_timestamp_name_list,
-                                                                          state=customtkinter.DISABLED,
-                                                                          width=200,
-                                                                          text_font=("Arial", 10),
-                                                                          dynamic_resizing=False,
-                                                                          button_color="grey",
-                                                                          fg_color="grey",
-                                                                          command=self.set_main_timestamp_name)
-        self.main_timestamp_name_optionmenu.set(self.main_timestamp_name)
-        self.main_timestamp_name_optionmenu.grid(row=1, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+        self.main_timestamp_name_combobox = ttk.Combobox(master=self.frame_info,
+                                                         values=self.valid_timestamp_name_list,
+                                                         state=tkinter.DISABLED,
+                                                         font=("Arial", 10),
+                                                         textvariable=self.selected_main_timestamp_name)
+
+        self.main_timestamp_name_combobox.bind('<<ComboboxSelected>>', self.set_main_timestamp_name)
+        self.main_timestamp_name_combobox.grid(row=1, column=3, columnspan=3, pady=5, padx=0, sticky="we")
 
         # Selecting timestamp format
         self.main_timestamp_format_label = customtkinter.CTkLabel(master=self.frame_info,
                                                                   text="Timestamp Format:",
                                                                   text_font=("Arial", 11))
         self.main_timestamp_format_label.grid(row=2, column=2, pady=5, padx=0)
-        self.main_timestamp_format_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
-                                                                            values=self.input_validation.valid_timestamp_format_list,
-                                                                            state=customtkinter.DISABLED,
-                                                                            width=200,
-                                                                            text_font=("Arial", 10),
-                                                                            dynamic_resizing=False,
-                                                                            button_color="grey",
-                                                                            fg_color="grey",
-                                                                            command=self.set_main_timestamp_format)
-        self.main_timestamp_format_optionmenu.set(self.main_timestamp_format)
-        self.main_timestamp_format_optionmenu.grid(row=2, column=3, pady=5, padx=0)
+        self.main_timestamp_format_combobox = ttk.Combobox(master=self.frame_info,
+                                                           values=self.input_validation.valid_timestamp_format_list,
+                                                           font=("Arial", 10),
+                                                           textvariable=self.selected_main_timestamp_format)
+        self.main_timestamp_format_combobox.bind('<<ComboboxSelected>>', self.set_main_timestamp_format)
+        self.main_timestamp_format_combobox.grid(row=2, column=3, pady=5, padx=0)
 
         # Selecting Timezone
         self.main_timezone_label = customtkinter.CTkLabel(master=self.frame_info,
                                                           text="Timezone:",
                                                           text_font=("Arial", 11))  # font name and size in px
         self.main_timezone_label.grid(row=3, column=2, pady=5, padx=0)
-        self.main_timezone_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_info,
-                                                                    values=self.input_validation.valid_timezone_list,
-                                                                    state=customtkinter.DISABLED,
-                                                                    width=200,
-                                                                    text_font=("Arial", 10),
-                                                                    dynamic_resizing=False,
-                                                                    button_color="grey",
-                                                                    fg_color="grey",
-                                                                    command=self.set_main_timezone)
-        self.main_timezone_optionmenu.set(self.main_timezone)
-        self.main_timezone_optionmenu.grid(row=3, column=3, pady=5, padx=0)
+        self.main_timezone_combobox = ttk.Combobox(master=self.frame_info,
+                                                   values=self.input_validation.valid_timezone_list,
+                                                   font=("Arial", 10),
+                                                   textvariable=self.selected_main_timezone)
+        self.main_timezone_combobox.bind('<<ComboboxSelected>>', self.set_main_timezone)
+        self.main_timezone_combobox.grid(row=3, column=3, pady=5, padx=0)
 
         # Fetch Data Section
         self.start_timestamp_label = customtkinter.CTkLabel(master=self.frame_info,
@@ -353,25 +346,28 @@ class GUIMenu:
         customtkinter.set_appearance_mode(value)
         return
 
-    def set_main_timestamp_name(self, main_timestamp_field_name):
-        self.main_timestamp_name = main_timestamp_field_name
+    def set_main_timestamp_name(self, event):
+        self.main_timestamp_name = self.selected_main_timestamp_name.get()
         return
 
-    def set_main_timestamp_format(self, main_timestamp_format):
-        self.main_timestamp_format = main_timestamp_format
+    def set_main_timestamp_format(self, event):
+        self.main_timestamp_format = self.selected_main_timestamp_format.get()
         # change the placeholder of start time and end time accordingly.
         if self.start_timestamp_entry is not None and self.end_timestamp_entry is not None:
             if self.main_timestamp_format == "datetime":
                 self.start_timestamp_entry.configure(placeholder_text="eg. 2022-05-01T00:00:00")
                 self.end_timestamp_entry.configure(placeholder_text="eg. 2022-05-20T00:00:00")
+                self.main_timezone_combobox.configure(state=tkinter.NORMAL)
             elif self.main_timestamp_format == "epoch":
                 self.start_timestamp_entry.configure(placeholder_text="eg. 1651363200000")
                 self.end_timestamp_entry.configure(placeholder_text="eg. 1653004800000")
+                self.main_timezone_combobox.set(value="+00:00")
+                self.main_timezone = "+00:00"
+                self.main_timezone_combobox.configure(state=tkinter.DISABLED)
         return
 
-    def set_main_timezone(self, main_timezone):
-        self.main_timezone = main_timezone
-        print("Main Timezone: {}".format(self.main_timezone))
+    def set_main_timezone(self, event):
+        self.main_timezone = self.selected_main_timezone.get()
         return
 
     def get_available_field_list(self):
@@ -404,42 +400,12 @@ class GUIMenu:
                 self.get_available_field_list()
             self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
                                                              fg_color="#395E9C")
-            self.main_timestamp_name_optionmenu.configure(values=self.valid_timestamp_name_list,
-                                                          state=customtkinter.NORMAL,
-                                                          button_color="#144870",
-                                                          fg_color="#395E9C"
-                                                          )
-            self.main_timestamp_format_optionmenu.configure(state=customtkinter.NORMAL,
-                                                            button_color="#144870",
-                                                            fg_color="#395E9C")
-            self.main_timezone_optionmenu.configure(state=customtkinter.NORMAL,
-                                                    button_color="#144870",
-                                                    fg_color="#395E9C")
+            self.main_timestamp_name_combobox.configure(values=self.valid_timestamp_name_list,
+                                                        state=tkinter.NORMAL)
             self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                              fg_color="#395E9C")
         else:
             self.parent_field_to_type_dict = {}
-
-        # For testing purposes
-
-        '''if index_choice != "N/A":
-            self.current_index = index_choice
-            self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
-                                                             fg_color="#395E9C")
-            self.main_timestamp_field_name_optionmenu.configure(values=self.valid_timestamp_name_list,
-                                                                state=customtkinter.NORMAL,
-                                                                button_color="#144870",
-                                                                fg_color="#395E9C"
-                                                                )
-            self.main_timestamp_field_format_optionmenu.configure(state=customtkinter.NORMAL,
-                                                                  button_color="#144870",
-                                                                  fg_color="#395E9C")
-            self.main_timezone_optionmenu.configure(state=customtkinter.NORMAL,
-                                                    button_color="#144870",
-                                                    fg_color="#395E9C")
-            self.fetch_data_button.configure(state=customtkinter.NORMAL,
-                                             fg_color="#395E9C")'''
-
         return
 
     def show_indices_status(self):

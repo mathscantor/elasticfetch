@@ -20,29 +20,35 @@ class RequestSender:
         self.password = password
 
     def get_authentication_status_bool(self):
-        url = "{}://{}:{}/_security/_authenticate?pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
-        messenger(3, "Checking Authentication Credentials...")
-        try:
-            response = requests.get(url=url,
-                                    verify=False,
-                                    auth=(self.username, self.password))
+        if self.protocol == "https":
+            url = "{}://{}:{}/_security/_authenticate?pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
+            messenger(3, "Checking Authentication Credentials...")
+            try:
+                response = requests.get(url=url,
+                                        verify=False,
+                                        auth=(self.username, self.password))
 
-            if response.status_code == 200:
-                messenger(0, "Successfully Authenticated with Credentials.")
-                return True
-            elif response.status_code == 401:
-                messenger(2, "Authentication Error.")
-            else:
-                messenger(2, "Unable to Authenticate. General Error.")
-            return False
-        except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}. Please ensure your elasticsearch's server "
-                         "firewall is configured properly!".format(url))
-        except requests.ConnectTimeout:
-            messenger(2, "Connection timeout to {}".format(url))
-        except requests.ConnectionError:
-            messenger(2, "Cannot connect to {}".format(url))
-        return
+                if response.status_code == 200:
+                    messenger(0, "Successfully Authenticated with Credentials.")
+                    return True
+                elif response.status_code == 401:
+                    messenger(2, "Authentication Error.")
+                else:
+                    messenger(2, "Unable to Authenticate. General Error.")
+                return False
+            except requests.RequestException:
+                messenger(2, "Cannot resolve request to {}. Please ensure your elasticsearch's server "
+                             "firewall is configured properly!".format(url))
+            except requests.ConnectTimeout:
+                messenger(2, "Connection timeout to {}".format(url))
+            except requests.ConnectionError:
+                messenger(2, "Cannot connect to {}".format(url))
+
+        elif self.protocol == "http":
+            messenger(3, "Skipping Authentication as http protocol does not require credentials!")
+            return True
+
+        return False
 
 
     '''
@@ -179,7 +185,9 @@ class RequestSender:
         # Mainly for UI
         if app_window is not None and progress_bar_label is not None and progress_bar is not None:
             progress_bar["value"] = (total_results_size / float(original_num_logs)) * 100
-            progress_bar_label.set_text("Current Progress: {}/{}".format(total_results_size, original_num_logs))
+            progress_bar_label.set_text("Current Progress: {}/{} --- {}%".format(total_results_size,
+                                                                                 original_num_logs,
+                                                                                 progress_bar["value"]))
             app_window.update()
         while num_logs > 0:
             if num_logs >= 10000:
@@ -265,7 +273,9 @@ class RequestSender:
                     # For UI
                     if app_window is not None and progress_bar_label is not None and progress_bar is not None:
                         progress_bar["value"] = (total_results_size/float(original_num_logs))*100
-                        progress_bar_label.set_text("Current Progress: {}/{}".format(total_results_size, original_num_logs))
+                        progress_bar_label.set_text("Current Progress: {}/{} --- {}%".format(total_results_size,
+                                                                                             original_num_logs,
+                                                                                             progress_bar["value"]))
                         app_window.update()
 
                     data_json_list.append(data_json)

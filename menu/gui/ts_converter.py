@@ -33,8 +33,8 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.frame_right.grid_columnconfigure(0, weight=1)
         self.frame_right.grid_columnconfigure(1, weight=1)
 
-        self.left_arrow_image = self.load_image("/readme_images/icons8-left-arrow-50.png", 20)
-        self.right_arrow_image = self.load_image("/readme_images/icons8-right-arrow-50.png", 20)
+        self.left_arrow_image = self.load_image("/images/icons8-left-arrow-50.png", 20)
+        self.right_arrow_image = self.load_image("/images/icons8-right-arrow-50.png", 20)
 
         self.datetime_label = customtkinter.CTkLabel(master=self.frame_left, text="DateTime Format", text_font=("Arial", 13))
         self.datetime_label.grid(row=0, column=0, pady=10, padx=40)

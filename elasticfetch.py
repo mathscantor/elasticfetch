@@ -22,7 +22,7 @@ def validate_config_inputs():
 def main():
 
     validate_config_inputs()
-    if config_dict["elastic.protocol"] == "https" and not request_sender.get_authentication_status_bool():
+    if not request_sender.get_authentication_status_bool():
         exit(1)
 
     if not config_dict["interface.graphical"]:
@@ -38,7 +38,6 @@ def main():
                        input_validation=input_validation,
                        parser=parser)
         menu.show_menu()
-
 
 
 if __name__ == "__main__":
