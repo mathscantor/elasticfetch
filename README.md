@@ -340,8 +340,8 @@ python3 elasticfetch.py
   src="./images/main_menu_gui.png"
   alt="Main Menu GUI">
   <figcaption style="text-align: center;">Figure 1. Main Menu GUI</figcaption>
-</figure>
-Just like the CLI, the GUI provides the same utilities.
+</figure><br>
+Just like the CLI, the GUI provides the same utilities. <br>
 
 Fill in the appropriate fields and click on the "Fetch Data" Button.
 <figure align="center">
@@ -349,7 +349,7 @@ Fill in the appropriate fields and click on the "Fetch Data" Button.
   src="./images/fetching_data.png"
   alt="Fetching Data GUI">
   <figcaption style="text-align: center;">Figure 2. Fetching Data GUI</figcaption>
-</figure>
+</figure> <br>
 
 Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
 <figure align="center">
@@ -357,7 +357,7 @@ Once you have finished fetching the data, there will be a pop-up window, prompti
   src="./images/saving_data.png"
   alt="Saving Data GUI">
   <figcaption style="text-align: center;">Figure 3. Saving Data GUI</figcaption>
-</figure>
+</figure><br>
 
 Other Quality-Of-Life features include looking up the available field names, whilst being able to cycle through your search terms.
 <figure align="center">
@@ -365,7 +365,7 @@ Other Quality-Of-Life features include looking up the available field names, whi
   src="./images/show_available_fields.png"
   alt="Show Available Fields GUI">
   <figcaption style="text-align: center;">Figure 4. Show Available Fields GUI</figcaption>
-</figure>
+</figure><br>
 
 In addition, if there is a need to use epoch format for fetching data, there is also the timestamp format converter readily available at your disposal!
 <figure align="center">
@@ -373,4 +373,4 @@ In addition, if there is a need to use epoch format for fetching data, there is 
   src="./images/timestamp_format_converter.png"
   alt="Timestamp Format Converter GUI">
   <figcaption style="text-align: center;">Figure 5. Timestamp Format Converter GUI</figcaption>
-</figure>
+</figure><br>
