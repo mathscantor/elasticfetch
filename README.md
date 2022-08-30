@@ -1,4 +1,11 @@
-<img src="images/icon.png" width=30% height=30%><br>
+<figure align="center">
+  <img
+  src="./images/icon.png"
+  width="25%"
+  height="25%"
+  alt="Timestamp Format Converter GUI">
+</figure>
+
 # elasticfetch - overview
 Elasticfetch is a simple tool to export huge amounts of data from elasticsearch. <br>
 
