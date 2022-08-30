@@ -367,7 +367,7 @@ Other Quality-Of-Life features include looking up the available field names, whi
   <figcaption style="text-align: center;">Figure 4. Show Available Fields GUI</figcaption>
 </figure><br><br>
 
-In addition, if there is a need to use epoch format for fetching data, there is also the timestamp format converter readily available at your disposal!
+In addition, if there is a need to convert datetime to epoch or vice-versa, there is also the timestamp format converter readily available at your disposal!
 <figure align="center">
   <img
   src="./images/timestamp_format_converter.png"
