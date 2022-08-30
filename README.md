@@ -335,5 +335,9 @@ All saved files will be found under the **datasets** folder
 ```sh
 python3 elasticfetch.py
 ```
-<img src="readme_images/main_menu_gui.png">Figure 1. GUI Main Menu</img>
+<figure align="center">
+<img src="readme_images/main_menu_gui.png" alt="Main Menu GUI">
+<figcaption style="text-align: center">Figure 1. Main Menu GUI</figcaption>
+</figure>
+Just like the CLI, the GUI provides the same utilities.
 
