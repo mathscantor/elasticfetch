@@ -1,4 +1,4 @@
-<img src="images/icon.png" width=50% height=50%><br>
+<img src="images/icon.png" width=30% height=30%><br>
 # elasticfetch - overview
 Elasticfetch is a simple tool to export huge amounts of data from elasticsearch. <br>
 
