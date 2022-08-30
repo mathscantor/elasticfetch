@@ -1,3 +1,4 @@
+<img src="images/icon.png" width=50% height=50%><br>
 # elasticfetch - overview
 Elasticfetch is a simple tool to export huge amounts of data from elasticsearch. <br>
 
@@ -335,13 +336,13 @@ All saved files will be found under the **datasets** folder
 ```sh
 python3 elasticfetch.py
 ```
+Just like the CLI, the GUI provides the same utilities.
 <figure align="center">
   <img
   src="./images/main_menu_gui.png"
   alt="Main Menu GUI">
   <figcaption style="text-align: center;">Figure 1. Main Menu GUI</figcaption>
 </figure><br>
-Just like the CLI, the GUI provides the same utilities. <br><br>
 
 Fill in the appropriate fields and click on the "Fetch Data" Button.
 <figure align="center">
