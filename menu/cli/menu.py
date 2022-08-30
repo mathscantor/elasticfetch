@@ -308,8 +308,7 @@ class CommandLineMenu:
                                                                                     end_ts=end_ts,
                                                                                     fields_list=fields_list,
                                                                                     query_bool_must_list=query_bool_must_list,
-                                                                                    query_bool_must_not_list=query_bool_must_not_list,
-                                                                                    progress_bar=None)
+                                                                                    query_bool_must_not_list=query_bool_must_not_list)
 
         if len(data_json_list) == 0:
             return
