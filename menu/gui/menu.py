@@ -5,6 +5,7 @@ from menu.gui.ts_converter import GUITSConverter
 from menu.gui.show_indices_status import GUIShowIndicesStatus
 from menu.gui.show_available_field_names import GUIShowAvailableFields
 from tkinter import ttk
+from PIL import Image, ImageTk
 import os
 
 PATH = os.path.dirname(os.path.realpath(__file__))
@@ -40,6 +41,7 @@ class GUIMenu:
         self.fetch_data_button = None
         self.theme_optionmenu = None
         self.label_options = None
+        self.icon_photo = None
 
         # Index related Assets
         self.show_indices_status_button = None
@@ -113,6 +115,9 @@ class GUIMenu:
         self.primary_app_window.title("elasticfetch - Main")
         self.primary_app_window.geometry("1120x640")
         self.primary_app_window.resizable(False, False)
+
+        self.icon_photo = self.load_image(path="/images/icon.png", image_size=60)
+        self.primary_app_window.wm_iconphoto(False, self.icon_photo)
 
         # configure grid layout (2x1)
         self.primary_app_window.grid_columnconfigure(1, weight=1)
@@ -312,8 +317,10 @@ class GUIMenu:
                                                              text_font=("Arial", 10))
         self.frame_info_error_label.grid(row=8, column=2, columnspan=2, pady=0)
         self.fetch_data_button = customtkinter.CTkButton(master=self.frame_right,
-                                                         text="Fetch Data",
+                                                         text="Fetch Data  ",
+                                                         image=self.icon_photo,
                                                          fg_color="grey",
+                                                         text_font=("Arial", 11),
                                                          state=customtkinter.DISABLED,
                                                          command=self.fetch_elastic_data_between_ts1_ts2)
         self.fetch_data_button.grid(row=6, column=0, columnspan=2, pady=5, sticky="s")
@@ -523,3 +530,7 @@ class GUIMenu:
     def on_closing_primary_app_window(self):
         self.primary_app_window.destroy()
         return
+
+    def load_image(self, path, image_size):
+        """ load rectangular image with path relative to PATH """
+        return ImageTk.PhotoImage(Image.open(PATH + path).resize((image_size, int(image_size*0.75))))

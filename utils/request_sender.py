@@ -185,7 +185,7 @@ class RequestSender:
         # Mainly for UI
         if app_window is not None and progress_bar_label is not None and progress_bar is not None:
             progress_bar["value"] = (total_results_size / float(original_num_logs)) * 100
-            progress_bar_label.set_text("Current Progress: {}/{} --- {}%".format(total_results_size,
+            progress_bar_label.set_text("Current Progress: {}/{} --- {:.2f}%".format(total_results_size,
                                                                                  original_num_logs,
                                                                                  progress_bar["value"]))
             app_window.update()
@@ -273,7 +273,7 @@ class RequestSender:
                     # For UI
                     if app_window is not None and progress_bar_label is not None and progress_bar is not None:
                         progress_bar["value"] = (total_results_size/float(original_num_logs))*100
-                        progress_bar_label.set_text("Current Progress: {}/{} --- {}%".format(total_results_size,
+                        progress_bar_label.set_text("Current Progress: {}/{} --- {:.2f}%".format(total_results_size,
                                                                                              original_num_logs,
                                                                                              progress_bar["value"]))
                         app_window.update()
