@@ -342,3 +342,35 @@ python3 elasticfetch.py
   <figcaption style="text-align: center;">Figure 1. Main Menu GUI</figcaption>
 </figure>
 Just like the CLI, the GUI provides the same utilities.
+
+Fill in the appropriate fields and click on the "Fetch Data" Button.
+<figure align="center">
+  <img
+  src="./images/fetching_data.png"
+  alt="Fetching Data GUI">
+  <figcaption style="text-align: center;">Figure 2. Fetching Data GUI</figcaption>
+</figure>
+
+Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
+<figure align="center">
+  <img
+  src="./images/saving_data.png"
+  alt="Saving Data GUI">
+  <figcaption style="text-align: center;">Figure 3. Saving Data GUI</figcaption>
+</figure>
+
+Other Quality-Of-Life features include looking up the available field names, whilst being able to cycle through your search terms.
+<figure align="center">
+  <img
+  src="./images/show_available_fields.png"
+  alt="Show Available Fields GUI">
+  <figcaption style="text-align: center;">Figure 4. Show Available Fields GUI</figcaption>
+</figure>
+
+In addition, if there is a need to use epoch format for fetching data, there is also the timestamp format converter readily available at your disposal!
+<figure align="center">
+  <img
+  src="./images/timestamp_format_converter.png"
+  alt="Timestamp Format Converter GUI">
+  <figcaption style="text-align: center;">Figure 5. Timestamp Format Converter GUI</figcaption>
+</figure>
