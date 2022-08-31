@@ -476,6 +476,7 @@ class GUIMenu:
 
         if filter_raw != "":
             if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
+                self.frame_info_error_label.configure(text="Filter: Invalid! Please end filters with ';'!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return

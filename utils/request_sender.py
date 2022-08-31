@@ -248,11 +248,10 @@ class RequestSender:
             if len(query_bool_must_not_list) > 0:
                 data["query"]["bool"]["must_not"] = query_bool_must_not_list
                 if not is_first_loop:
-                    data["query"]["bool"]["must_not"] += last_ids
-
+                    data["query"]["bool"]["must_not"] += [{"terms": {"_id": last_ids}}]
             else:
                 if not is_first_loop:
-                    data["query"]["bool"]["must_not"] = last_ids
+                    data["query"]["bool"]["must_not"] = [{"terms": {"_id": last_ids}}]
             #print(json.dumps(data, indent=4))
             try:
                 response = requests.get(url=url,
@@ -283,7 +282,7 @@ class RequestSender:
                     last_ids.clear()
                     for i in range(1, results_size):
                         last_id = data_json["hits"]["hits"][results_size-i]["_id"]
-                        last_ids.append({"term": {"_id": last_id}})
+                        last_ids.append(last_id)
                         if data_json["hits"]["hits"][results_size - i]["sort"][0] != start_ts:
                             break
                     is_first_loop = False
