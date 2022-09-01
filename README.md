@@ -6,16 +6,31 @@
   alt="Timestamp Format Converter GUI">
 </figure>
 
+# Elasticfetch
+___
 - [Overview](#overview)
 - [Required Python Packages](#required-python-packages)
+- [Current Features](#current-features)
+    - [Supported Time Formats](#supported-time-formats)
+    - [Supported Filters](#supported-filters)
 
-# Overview
-Elasticfetch is a simple tool to export huge amounts of data from elasticsearch. <br>
+- [Setting parameters in configuration file](#setting-parameters-in-configuration-file)
+- [Running elasticfetch (CLI)](#running-elasticfetch-cli)
+    - [Option 1 - Show indices status](#option-1---show-indices-status)
+    - [Option 2 - Set current index](#option-2---set-current-index)
+    - [Option 3 - Set main timestamp, format and timezone](#option-3---set-main-timestamp-format-and-timezone)
+    - [Option 4 - Listing all available fields within the current chosen index](#option-4---listing-all-available-fields-within-the-current-chosen-index)
+    - [Option 5 - Converting datetime string to unix epoch](#option-5---converting-datetime-string-to-unix-epoch)
+    - [Option 6 - Fetching data from a chosen index](#option-6---fetching-data-from-a-chosen-index)
+- [Running elasticfetch (GUI)](#running-elasticfetch-gui) 
+## Overview
+Elasticfetch is a simple tool used to export huge amounts of data from elasticsearch. <br>
 
-Currently, this tool is not reliant on the `scroll API` and in the event where elasticsearch decides to discontinue the support for `scroll API`, this tool will remain to function properly. <br>
+Currently, Elasticfetch is not reliant on the `scroll API` and therefore, will continue working on elasticsearch servers older than `version 7.7`. However, it is still recommended that you upgrade your elasticsearch to `version 8.x`
 
-This tool aims to facilitate work flow of threat hunting and data analysis in the event where you need to query huge amount of data without killing the server.
-# Required Python Packages
+Elasticfetch facilitates the work flow for data analysts where the analyst need not request for the server admin to help pull data from elasticsearch.<br>
+It has also been proven to be effective when deployed for threat hunting in multiple cyber military exercises.
+## Required Python Packages
 ```sh
 # Required pacakges for Command Line Interface (CLI)
 pip3 install requests
@@ -26,7 +41,7 @@ pip3 install customtkinter
 pip3 install tk
 ```
 
-# Current Features
+## Current Features
 1. Show index health status
 2. Setting Index to fetch from
 3. Set main timestamp name, format and timezone (This field will be used to sort your data in chronological order)
@@ -34,7 +49,151 @@ pip3 install tk
 5. Converting datetime to epoch / epoch to datetime format
 6. Fetching data between two timestamps
 
-# How to use
+### Supported Time Formats
+<table>
+  <tr>
+   <td><b>Format</b>
+   </td>
+   <td><b>Supported Formats</b>
+   </td>
+   <td><b>Smallest Unit</b>
+   </td>
+   <td><b>Examples</b>
+   </td>
+  </tr>
+  <tr>
+   <td rowspan="2" >datetime
+   </td>
+   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S>
+   </td>
+   <td>seconds
+   </td>
+   <td>2022-05-01T00:00:00
+   </td>
+  </tr>
+  <tr>
+   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S.%f>
+   </td>
+   <td>milliseconds
+   </td>
+   <td>2022-05-01T00:00:00.000
+   </td>
+  </tr>
+  <tr>
+   <td rowspan="2" >epoch
+   </td>
+   <td>10 digit string
+   </td>
+   <td>seconds
+   </td>
+   <td>1420070400
+   </td>
+  </tr>
+  <tr>
+   <td>13 digit string
+   </td>
+   <td>milliseconds
+   </td>
+   <td>1420070400000
+   </td>
+  </tr>
+</table>
+
+### Supported Filters
+Filter Syntax: `FIELD` `FILTER_KEYWORD` `VALUE;`
+
+Current Supported Filter Keywords:
+
+<table>
+    <tr>
+        <td><b>Keyword</b></td>
+        <td><b>Example</b></td>
+        <td><b>Python Equivalent</b></td>
+    </tr>
+    <tr>
+        <td>is_not_gte</td>
+        <td>event.code is_not_gte 5000;</td>
+        <td>event.code &lt; 5000</td>
+    </tr>
+    <tr>
+        <td>is_not_lte</td>
+        <td>event.code is_not_lte 4000;</td>
+        <td>event.code &gt; 4000</td>
+    </tr>
+    <tr>
+        <td>is_not_gt</td>
+        <td>event.code is_not gt 5000;</td>
+        <td>event.code &lt;= 5000</td>
+    </tr>
+    <tr>
+        <td>is_not_lt</td>
+        <td>event.code is_not_lt 4000;</td>
+        <td>event.code &gt;= 4000</td>
+    </tr>
+    <tr>
+        <td>is_not_one_of</td>
+        <td>srcPort is_not_one_of 53,80,443;</td>
+        <td>srcPort not in ['53', '80', '443']</td>
+    </tr>
+    <tr>
+        <td>is_not</td>
+        <td>srcIp is_not 127.0.0.1;</td>
+        <td>srcIp != "127.0.0.1"</td>
+    </tr>
+    <tr>
+        <td>is_gte</td>
+        <td>event.code is_gte 5000;</td>
+        <td>event.code &gt;= 5000</td>
+    </tr>
+    <tr>
+        <td>is_lte</td>
+        <td>event.code is_lte 4000;</td>
+        <td>event.code &lt;= 4000</td>
+    </tr>
+    <tr>
+        <td>is_gt</td>
+        <td>event.code is_gt 5000;</td>
+        <td>event.code &gt; 5000</td>
+    </tr>
+    <tr>
+        <td>is_lt</td>
+        <td>event.code is_lt 4000;</td>
+        <td>event.code &lt; 4000</td>
+    </tr>
+    <tr>
+        <td>is_one_of</td>
+        <td>event.code is_one_of 1,2,3,4,5;</td>
+        <td>event.code in ['1', '2', '3', '4', '5']</td>
+    </tr>
+    <tr>
+        <td>is</td>
+        <td>event.outcome is success;</td>
+        <td>event.outcome == "success"</td>
+    </tr>
+</table>
+
+#### Chaining Filters:
+Example 1: <br>
+```python
+# Python Equivlant
+event.code in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] 
+and event.outcome == "success"
+```
+```python
+# Filters
+event.code is_one_of 1,2,3,4,5,6,7,8,9,10; event.outcome is success;
+```
+
+Example 2: 
+```python
+# Python Equivlant
+srcIp == "105.24.235.13" and dstPort not in ['53', '80', '443']
+```
+```python
+# Filters
+srcIp is 105.24.235.13; dstPort is_not_one_of 53,80,443;
+```
+
 ## Setting parameters in configuration file
 Edit **elasticfetch.ini** and set the following variables to your values : <br>
 - Protocol (`https` or `http`)
@@ -152,66 +311,15 @@ event                          date       event.created, event.ingested
 
 winlog                         date       winlog.event_data.ClientCreationTime, winlog.event_data.DeviceTime, winlog.event_data.NewTime, winlog.event_data.OldTime, winlog.event_data.ProcessCreationTime, winlog.event_data.StartTime, winlog.event_data.StopTime, winlog.user_data.UTCStartTime
 
-Main Timestamp Name: @timestamp
-Main Timestamp Format: epoch
-Main Timezone: +08:00
+Main Timestamp Name: @timestamp        ← (Your input)
+Main Timestamp Format: epoch           ← (Your input)
+Main Timezone: +08:00                  ← (Your input)
 ```
 In this example, option 3 will show you all related fields that are of 'date' type. <br>
 
 The default main timestamp field is @timestamp as elasticsearch uses this field universally for referencing time. <br>
 
 However, I am aware that certain users / organization do rename '@timestamp' to something else. Therefore, I have added this feature to support existing organizations that require this. <br>
-
-In addition, I have given the liberty to the user to choose between timestamp types:
-
-<table>
-  <tr>
-   <td><b>Format</b>
-   </td>
-   <td><b>Supported Formats</b>
-   </td>
-   <td><b>Smallest Unit</b>
-   </td>
-   <td><b>Examples</b>
-   </td>
-  </tr>
-  <tr>
-   <td rowspan="2" >datetime
-   </td>
-   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S>
-   </td>
-   <td>seconds
-   </td>
-   <td>2022-05-01T00:00:00
-   </td>
-  </tr>
-  <tr>
-   <td>&lt;%Y-%m-%d>T&lt;%H:%M:%S.%f>
-   </td>
-   <td>milliseconds
-   </td>
-   <td>2022-05-01T00:00:00.000
-   </td>
-  </tr>
-  <tr>
-   <td rowspan="2" >epoch
-   </td>
-   <td>10 digit string
-   </td>
-   <td>seconds
-   </td>
-   <td>1420070400
-   </td>
-  </tr>
-  <tr>
-   <td>13 digit string
-   </td>
-   <td>milliseconds
-   </td>
-   <td>1420070400000
-   </td>
-  </tr>
-</table>
 
 ### Option 4 - Listing all available fields within the current chosen index
 It is a known grievance that the users have to manually check what fields are available to them. Option 4 allows users to list the whole shebang of fields.
@@ -272,7 +380,7 @@ Timezone: +08:00                                ← (Your input)
 Datetime Range: 2022-05-01T00:00:00.000 - 2022-05-20T00:00:00.000
 ```
 
-### Option 6 - Fetching data from a chosen index.
+### Option 6 - Fetching data from a chosen index
 ```text
 Current index selected: winlogbeat-8.0.1
 Main Timestamp Field:  @timestamp
@@ -321,104 +429,10 @@ File name to save as (.json, .csv): test.csv                                    
 
 ```
 This will prompt you for:
-- start timestamp
-- end timestamp
+- start and end timestamps (See [Supported Time Formats](#supported-time-formats))
 - number of logs you want to fetch in this time period.
-- field names to select (Look at kibana dashboard to know what is available)
-- filtering your queries with the following format: `FIELD` `FILTER_KEYWORD` `VALUE;`
-
-Current Supported Filter Keywords:
-
-
-<table>
-    <tr>
-        <td><b>Keyword</b></td>
-        <td><b>Example</b></td>
-        <td><b>Python Equivalent</b></td>
-    </tr>
-    <tr>
-        <td>is_not_gte</td>
-        <td>event.code is_not_gte 5000;</td>
-        <td>event.code &lt; 5000</td>
-    </tr>
-    <tr>
-        <td>is_not_lte</td>
-        <td>event.code is_not_lte 4000;</td>
-        <td>event.code &gt; 4000</td>
-    </tr>
-    <tr>
-        <td>is_not_gt</td>
-        <td>event.code is_not gt 5000;</td>
-        <td>event.code &lt;= 5000</td>
-    </tr>
-    <tr>
-        <td>is_not_lt</td>
-        <td>event.code is_not_lt 4000;</td>
-        <td>event.code &gt;= 4000</td>
-    </tr>
-    <tr>
-        <td>is_not_one_of</td>
-        <td>srcPort is_not_one_of 53,80,443;</td>
-        <td>srcPort not in ['53', '80', '443']</td>
-    </tr>
-    <tr>
-        <td>is_not</td>
-        <td>srcIp is_not 127.0.0.1;</td>
-        <td>srcIp != "127.0.0.1"</td>
-    </tr>
-    <tr>
-        <td>is_gte</td>
-        <td>event.code is_gte 5000;</td>
-        <td>event.code &gt;= 5000</td>
-    </tr>
-    <tr>
-        <td>is_lte</td>
-        <td>event.code is_lte 4000;</td>
-        <td>event.code &lt;= 4000</td>
-    </tr>
-    <tr>
-        <td>is_gt</td>
-        <td>event.code is_gt 5000;</td>
-        <td>event.code &gt; 5000</td>
-    </tr>
-    <tr>
-        <td>is_lt</td>
-        <td>event.code is_lt 4000;</td>
-        <td>event.code &lt; 4000</td>
-    </tr>
-    <tr>
-        <td>is_one_of</td>
-        <td>event.code is_one_of 1,2,3,4,5;</td>
-        <td>event.code in ['1', '2', '3', '4', '5']</td>
-    </tr>
-    <tr>
-        <td>is</td>
-        <td>event.outcome is success;</td>
-        <td>event.outcome == "success"</td>
-    </tr>
-</table>
-
-#### Chaining Filters:
-Example 1: <br>
-```python
-# Python Equivlant
-event.code in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] 
-and event.outcome == "success"
-```
-```python
-# Filters
-event.code is_one_of 1,2,3,4,5,6,7,8,9,10; event.outcome is success;
-```
-
-Example 2: 
-```python
-# Python Equivlant
-srcIp == "105.24.235.13" and dstPort not in ['53', '80', '443']
-```
-```python
-# Filters
-srcIp is 105.24.235.13; dstPort is_not_one_of 53,80,443;
-```
+- field names
+- filters (See [Supported Filters](#supported-filters))
 
 At the end, it will prompt you for a file name to dump the data in (Currently only support .json, .csv). <br />
 All saved files will be found under the **datasets** folder
@@ -435,13 +449,15 @@ Just like the CLI, the GUI provides the same utilities.
   <figcaption style="text-align: center;">Figure 1. Main Menu GUI</figcaption>
 </figure><br>
 
-Fill in the appropriate fields and click on the "Fetch Data" Button.
-<figure align="center">
+Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
+(See [Supported Filters](#supported-filters)) <br>
+(See [Supported Time Formats](#supported-time-formats))<br>
+<center>
   <img
   src="./images/fetching_data.png"
   alt="Fetching Data GUI">
-  <figcaption style="text-align: center;">Figure 2. Fetching Data GUI</figcaption>
-</figure> <br><br>
+  <center>Figure 2. Fetching Data GUI<center>
+</center> <br><br>
 
 Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
 <figure align="center">
