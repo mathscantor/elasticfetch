@@ -6,7 +6,7 @@
   alt="Timestamp Format Converter GUI">
 </figure>
 
-- [Overview](#elasticfetch---overview)
+- [Overview](#overview)
 - [Required Python Packages](#required-python-packages)
 
 # Overview
