@@ -7,13 +7,11 @@
 </figure>
 
 # Elasticfetch
-___
 - [Overview](#overview)
 - [Required Python Packages](#required-python-packages)
 - [Current Features](#current-features)
     - [Supported Time Formats](#supported-time-formats)
     - [Supported Filters](#supported-filters)
-
 - [Setting parameters in configuration file](#setting-parameters-in-configuration-file)
 - [Running elasticfetch (CLI)](#running-elasticfetch-cli)
     - [Option 1 - Show indices status](#option-1---show-indices-status)
