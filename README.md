@@ -440,43 +440,35 @@ All saved files will be found under the **datasets** folder
 python3 elasticfetch.py
 ```
 Just like the CLI, the GUI provides the same utilities.
-<figure align="center">
-  <img
-  src="./images/main_menu_gui.png"
-  alt="Main Menu GUI">
-  <figcaption style="text-align: center;">Figure 1. Main Menu GUI</figcaption>
-</figure><br>
+<p align="center" style="margin-bottom: 0px !important;">
+  <img src="images/main_menu_gui.png" alt="Main Menu GUI" align="center">
+</p>
+<p align="center" style="margin-top: 0px;">Figure 1. Main Menu GUI</p><br>
 
 Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
 (See [Supported Filters](#supported-filters)) <br>
 (See [Supported Time Formats](#supported-time-formats))<br>
 
 <p align="center" style="margin-bottom: 0px !important;">
-  <img src="images/fetching_data.png" alt="Material Bread logo" align="center">
+  <img src="images/fetching_data.png" alt="Fetching Data GUI" align="center">
 </p>
-<p align="center" style="margin-top: 0px;">Figure 2. Fetching Data GUI</p>
+<p align="center" style="margin-top: 0px;">Figure 2. Fetching Data GUI</p><br>
 
 Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
-<figure align="center">
-  <img
-  src="./images/saving_data.png"
-  alt="Saving Data GUI">
-  <figcaption style="text-align: center;">Figure 3. Saving Data GUI</figcaption>
-</figure><br><br><br>
+<p align="center" style="margin-bottom: 0px !important;">
+  <img src="images/saving_data.png" alt="Saving Data GUI" align="center">
+</p>
+<p align="center" style="margin-top: 0px;">Figure 3. Saving Data GUI</p><br>
 
 Other Quality-Of-Life features include looking up the available field names, whilst being able to cycle through your search terms.
-<figure align="center">
-  <img
-  src="./images/show_available_fields.png"
-  alt="Show Available Fields GUI">
-  <figcaption style="text-align: center;">Figure 4. Show Available Fields GUI</figcaption>
-</figure><br><br>
+<p align="center" style="margin-bottom: 0px !important;">
+  <img src="images/show_available_fields.png" alt="Show Available Fields GUI" align="center">
+</p>
+<p align="center" style="margin-top: 0px;">Figure 4. Show Available Fields GUI</p><br>
 
 In addition, if there is a need to convert datetime to epoch or vice-versa, there is also the timestamp format converter readily available at your disposal!
-<figure align="center">
-  <img
-  src="./images/timestamp_format_converter.png"
-  alt="Timestamp Format Converter GUI">
-  <figcaption style="text-align: center;">Figure 5. Timestamp Format Converter GUI</figcaption>
-</figure><br><br>
+<p align="center" style="margin-bottom: 0px !important;">
+  <img src="images/timestamp_format_converter.png" alt="Timestamp Format Converter GUI" align="center">
+</p>
+<p align="center" style="margin-top: 0px;">Figure 5. Timestamp Format Converter GUI</p><br>
 
