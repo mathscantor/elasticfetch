@@ -276,11 +276,13 @@ class CommandLineMenu:
               "- is_not_lte\n"
               "- is_not_gt\n"
               "- is_not_lt\n"
+              "- is_not_one_of\n"
               "- is_not\n"
               "- is_gte\n"
               "- is_lte\n"
               "- is_gt\n"
               "- is_lt\n"
+              "- is_one_of\n"
               "- is\n")
         print("eg. event.code is_gt 4000; event.code is_lte 5000; event.category is authentication;")
         filter_raw = input("(OPTIONAL - PRESS ENTER TO SKIP) Filter your queries: ")
