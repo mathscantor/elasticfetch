@@ -6,13 +6,16 @@
   alt="Timestamp Format Converter GUI">
 </figure>
 
-# elasticfetch - overview
+- [Overview](#elasticfetch---overview)
+- [Required Python Packages](#required-python-packages)
+
+# Overview
 Elasticfetch is a simple tool to export huge amounts of data from elasticsearch. <br>
 
 Currently, this tool is not reliant on the `scroll API` and in the event where elasticsearch decides to discontinue the support for `scroll API`, this tool will remain to function properly. <br>
 
 This tool aims to facilitate work flow of threat hunting and data analysis in the event where you need to query huge amount of data without killing the server.
-## Required Python Packages
+# Required Python Packages
 ```sh
 # Required pacakges for Command Line Interface (CLI)
 pip3 install requests
@@ -23,7 +26,7 @@ pip3 install customtkinter
 pip3 install tk
 ```
 
-## Current Features
+# Current Features
 1. Show index health status
 2. Setting Index to fetch from
 3. Set main timestamp name, format and timezone (This field will be used to sort your data in chronological order)
@@ -31,15 +34,15 @@ pip3 install tk
 5. Converting datetime to epoch / epoch to datetime format
 6. Fetching data between two timestamps
 
-## How to use
-### Setting parameters in configuration file
+# How to use
+## Setting parameters in configuration file
 Edit **elasticfetch.ini** and set the following variables to your values : <br>
 - Protocol (`https` or `http`)
 - IP address (`XXX.XXX.XXX.XXX` or `domain name`)
 - port (Usually `9200`)
 - username (Must have *enough privilege* to use APIs)
 - password 
-- graphical (True / False) 
+- graphical (`True` / `False`) 
 
 
 ## Running elasticfetch (CLI)
