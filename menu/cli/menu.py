@@ -134,16 +134,19 @@ class CommandLineMenu:
         if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=chosen_timestamp_name,
                                                              valid_timestamp_name_list=valid_timestamp_name_list):
             return
-        chosen_timestamp_type = input("Main Timestamp Format: ").strip()
-        if not self.input_validation.is_timestamp_format_valid(chosen_timestamp_format=chosen_timestamp_type):
+        chosen_timestamp_format = input("Main Timestamp Format: ").strip()
+        if not self.input_validation.is_timestamp_format_valid(chosen_timestamp_format=chosen_timestamp_format):
             return
 
-        chosen_timezone = input("Main Timezone: ").strip()
+        if chosen_timestamp_format == "datetime":
+            chosen_timezone = input("Main Timezone: ").strip()
+        elif chosen_timestamp_format == "epoch":
+            chosen_timezone = "+00:00"
         if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
             return
 
         self.main_timestamp_name = chosen_timestamp_name
-        self.main_timestamp_format = chosen_timestamp_type
+        self.main_timestamp_format = chosen_timestamp_format
         self.main_timezone = chosen_timezone
         return
 
@@ -291,13 +294,15 @@ class CommandLineMenu:
             filter_is_gte_list=keyword_sentences_dict["is_gte"],
             filter_is_lte_list=keyword_sentences_dict["is_lte"],
             filter_is_gt_list=keyword_sentences_dict["is_gt"],
-            filter_is_lt_list=keyword_sentences_dict["is_lt"])
+            filter_is_lt_list=keyword_sentences_dict["is_lt"],
+            filter_is_one_of_list=keyword_sentences_dict["is_one_of"])
         query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(
             filter_is_not_list=keyword_sentences_dict["is_not"],
             filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
             filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
             filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
-            filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
+            filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"],
+            filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
                                                                                     num_logs=num_logs,

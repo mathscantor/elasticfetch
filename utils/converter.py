@@ -79,7 +79,8 @@ class Converter:
                                          filter_is_gte_list: list,
                                          filter_is_lte_list: list,
                                          filter_is_gt_list: list,
-                                         filter_is_lt_list: list) -> list:
+                                         filter_is_lt_list: list,
+                                         filter_is_one_of_list: list) -> list:
         query_bool_must_list = []
         for filter_is in filter_is_list:
             temp_dict = {}
@@ -121,6 +122,13 @@ class Converter:
             temp_dict[key] = value
             query_bool_must_list.append({"range": temp_dict})
 
+        for filter_is_one_of in filter_is_one_of_list:
+            temp_dict = {}
+            tokens = filter_is_one_of.strip().split("is_one_of")
+            key = tokens[0].strip()
+            value = tokens[1].strip().split(",")
+            temp_dict[key] = value
+            query_bool_must_list.append({"terms": temp_dict})
         return query_bool_must_list
 
     def convert_all_is_not_list_to_must_not_list(self,
@@ -128,7 +136,8 @@ class Converter:
                                                  filter_is_not_gte_list: list,
                                                  filter_is_not_lte_list: list,
                                                  filter_is_not_gt_list: list,
-                                                 filter_is_not_lt_list: list) -> list:
+                                                 filter_is_not_lt_list: list,
+                                                 filter_is_not_one_of_list: list) -> list:
         query_bool_must_not_list = []
         for filter_is_not in filter_is_not_list:
             temp_dict = {}
@@ -169,6 +178,14 @@ class Converter:
             value = {"lt": tokens[1].strip()}
             temp_dict[key] = value
             query_bool_must_not_list.append({"range": temp_dict})
+
+        for filter_is_not_one_of in filter_is_not_one_of_list:
+            temp_dict = {}
+            tokens = filter_is_not_one_of.strip().split("is_not_one_of")
+            key = tokens[0].strip()
+            value = tokens[1].strip().split(",")
+            temp_dict[key] = value
+            query_bool_must_not_list.append({"terms": temp_dict})
 
         return query_bool_must_not_list
 

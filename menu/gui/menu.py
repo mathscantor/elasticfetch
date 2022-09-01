@@ -323,13 +323,13 @@ class GUIMenu:
                                                          text_font=("Arial", 11),
                                                          state=customtkinter.DISABLED,
                                                          command=self.fetch_elastic_data_between_ts1_ts2)
-        self.fetch_data_button.grid(row=6, column=0, columnspan=2, pady=5, sticky="s")
+        self.fetch_data_button.grid(row=6, column=0, columnspan=2, pady=0, sticky="s")
 
         self.progress_bar = ttk.Progressbar(master=self.frame_right,
                                             mode="determinate",
                                             style="green.Horizontal.TProgressbar",
                                             orient=tkinter.HORIZONTAL)
-        self.progress_bar.grid(row=7, column=0, padx=20, pady=20, columnspan=3, sticky="we")
+        self.progress_bar.grid(row=7, column=0, padx=20, pady=0, columnspan=3, sticky="we")
         self.progress_bar_label = customtkinter.CTkLabel(master=self.frame_right,
                                                          text="",
                                                          text_font=("Consolas", 12))
@@ -438,6 +438,13 @@ class GUIMenu:
         fields = self.fields_list_entry.get().strip()
         filter_raw = self.filter_list_entry.get().strip()
 
+        if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=self.main_timestamp_name_combobox.get(),
+                                                             valid_timestamp_name_list=self.valid_timestamp_name_list):
+            self.frame_info_error_label.configure(text="'Timestamp Field: {}' is not a valid!".format(self.main_timestamp_name_combobox.get()))
+            self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                             fg_color="#395E9C")
+            return
+
         if self.main_timestamp_format == "datetime":
             if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
                 self.frame_info_error_label.configure(text="Start Time: Incorrect Format!")
@@ -469,14 +476,15 @@ class GUIMenu:
         num_logs = int(num_logs)
         fields_list = [x.strip() for x in fields.split(',')]
         if len(fields_list) == 1 and fields_list[0] == "":
-            self.frame_info_error_label.configure(text="Fields: Empty! Error!")
+            self.frame_info_error_label.configure(text="Fields: Cannot be empty!")
             self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                              fg_color="#395E9C")
             return
 
         if filter_raw != "":
             if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
-                self.frame_info_error_label.configure(text="Filter: Invalid! Please end filters with ';'!")
+                self.frame_info_error_label.configure(text="Filters: Trailing Spaces / Invalid Keywords not allowed!\n"
+                                                           "Check that each filter ends with ';'")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
@@ -487,13 +495,15 @@ class GUIMenu:
             filter_is_gte_list=keyword_sentences_dict["is_gte"],
             filter_is_lte_list=keyword_sentences_dict["is_lte"],
             filter_is_gt_list=keyword_sentences_dict["is_gt"],
-            filter_is_lt_list=keyword_sentences_dict["is_lt"])
+            filter_is_lt_list=keyword_sentences_dict["is_lt"],
+            filter_is_one_of_list=keyword_sentences_dict["is_one_of"])
         query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(
             filter_is_not_list=keyword_sentences_dict["is_not"],
             filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
             filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
             filter_is_not_gt_list=keyword_sentences_dict["is_not_gt"],
-            filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"])
+            filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"],
+            filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
         data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.current_index,
                                                                                     num_logs=num_logs,

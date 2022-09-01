@@ -22,7 +22,9 @@ class InputValidation:
         self.datetime_format_seconds = '%Y-%m-%dT%H:%M:%S'
         self.datetime_format_milliseconds = '%Y-%m-%dT%H:%M:%S.%f'
         self.filter_raw_regex = re.compile(
-            r"^(([-_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not|is_gte|is_lte|is_gt|is_lt|is) [-_.a-zA-Z\d]+;(\s+|))+)$")
+            r"^(([-_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not_one_of|is_not|is_gte|is_lte|is_gt|is_lt|is_one_of|is) [,-_.a-zA-Z\d]+;(\s+|))+)$")
+        self.valid_filter_keywords = ["is_not_gte", "is_not_lte", "is_not_gt", "is_not_lt", "is_not_one_of", "is_not",
+                                      "is_gte", "is_lte", "is_gt", "is_lt", "is_one_of", "is"]
         self.valid_file_extensions = ('.json', '.csv')
         self.valid_timestamp_format_list = ['datetime', 'epoch']
         self.valid_timezone_list = ["+00:00", "+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00",
@@ -109,20 +111,26 @@ class InputValidation:
             return False
 
     def is_filter_valid(self, filter_raw):
+
         match = self.filter_raw_regex.search(filter_raw)
         if match:
             return True
         else:
-            messenger(2, "Invalid filter command/commands detected. Please end your filters with ';'!\nPlease also check that your filter keywords are:\n"
+            messenger(2, "Invalid filter command/commands detected!\n"
+                         "Please ensure you end your filters with ';'!\n"
+                         "Please ensure there are no trailing spaces for each filter!\n"
+                         "Please also check that your filter keywords are:\n"
                          "- is_not_gte\n"
                          "- is_not_lte\n"
                          "- is_not_gt\n"
                          "- is_not_lt\n"
+                         "- is_not_one_of\n"
                          "- is_not\n"
                          "- is_gte\n"
                          "- is_lte\n"
                          "- is_gt\n"
                          "- is_lt\n"
+                         "- is_one_of\n"
                          "- is\n")
             return False
 
