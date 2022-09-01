@@ -1,10 +1,6 @@
-<figure align="center">
-  <img
-  src="./images/icon.png"
-  width="25%"
-  height="25%"
-  alt="Timestamp Format Converter GUI">
-</figure>
+<p align="center" style="margin-bottom: 0px !important;">
+  <img src="images/icon.png" width="25%" height="25%" alt="elasticfetch icon" align="center">
+</p>
 
 # Elasticfetch
 - [Overview](#overview)
