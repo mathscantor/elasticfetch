@@ -455,7 +455,8 @@ Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
   src="./images/fetching_data.png"
   alt="Fetching Data GUI">
 </p>
-<div style="text-align:center">Figure 2. Fetching Data GUI</div>
+<p style="text-align:center">This line will be centered.<br>
+And so will this line.</p>
 <br><br>
 
 Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
