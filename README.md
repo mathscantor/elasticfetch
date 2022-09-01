@@ -450,12 +450,13 @@ Just like the CLI, the GUI provides the same utilities.
 Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
 (See [Supported Filters](#supported-filters)) <br>
 (See [Supported Time Formats](#supported-time-formats))<br>
-<center>
+<p align="center">
   <img
   src="./images/fetching_data.png"
   alt="Fetching Data GUI">
-  <center>Figure 2. Fetching Data GUI<center>
-</center> <br><br>
+</p>
+<center>Figure 2. Fetching Data GUI</center>
+<br><br>
 
 Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
 <figure align="center">
