@@ -450,14 +450,11 @@ Just like the CLI, the GUI provides the same utilities.
 Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
 (See [Supported Filters](#supported-filters)) <br>
 (See [Supported Time Formats](#supported-time-formats))<br>
-<p align="center">
-  <img
-  src="./images/fetching_data.png"
-  alt="Fetching Data GUI">
+
+<p align="center" style="margin-bottom: 0px !important;">
+  <img width="200" src="images/fetching_data.png" alt="Material Bread logo" align="center">
 </p>
-<p style="text-align:center">This line will be centered.<br>
-And so will this line.</p>
-<br><br>
+<p align="center" style="margin-top: 0px;">Figure 2. Fetching Data GUI</p>
 
 Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
 <figure align="center">
