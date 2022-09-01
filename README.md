@@ -163,13 +163,13 @@ In addition, I have given the liberty to the user to choose between timestamp ty
 
 <table>
   <tr>
-   <td>Format
+   <td><b>Format</b>
    </td>
-   <td>Supported Formats
+   <td><b>Supported Formats</b>
    </td>
-   <td>Smallest Unit
+   <td><b>Smallest Unit</b>
    </td>
-   <td>Examples
+   <td><b>Examples</b>
    </td>
   </tr>
   <tr>
@@ -298,11 +298,13 @@ Supported Filter Keywords:
 - is_not_lte
 - is_not_gt
 - is_not_lt
+- is_not_one_of
 - is_not
 - is_gte
 - is_lte
 - is_gt
 - is_lt
+- is_one_of
 - is
 
 eg. event.code is_gt 4000; event.code is_lte 5000; event.category is authentication;                ← (Your input)
@@ -315,26 +317,105 @@ File name to save as (.json, .csv): test.csv                                    
  [SUCCESS] Successfully saved data to datasets/test.csv
 
 ```
-
-
 This will prompt you for:
 - start timestamp
 - end timestamp
 - number of logs you want to fetch in this time period.
 - field names to select (Look at kibana dashboard to know what is available)
-- filtering your queries by specifying (FIELD FILTER_KEYWORD VALUE;)
+- filtering your queries with the following format: `FIELD` `FILTER_KEYWORD` `VALUE;`
 
 Current Supported Filter Keywords:
-- is_not_gte
-- is_not_lte
-- is_not_gt
-- is_not_lt
-- is_not
-- is_gte
-- is_lte
-- is_gt
-- is_lt
-- is
+
+
+<table>
+    <tr>
+        <td><b>Keyword</b></td>
+        <td><b>Example</b></td>
+        <td><b>Python Equivalent</b></td>
+    </tr>
+    <tr>
+        <td>is_not_gte</td>
+        <td>event.code is_not_gte 5000;</td>
+        <td>event.code &lt; 5000</td>
+    </tr>
+    <tr>
+        <td>is_not_lte</td>
+        <td>event.code is_not_lte 4000;</td>
+        <td>event.code &gt; 4000</td>
+    </tr>
+    <tr>
+        <td>is_not_gt</td>
+        <td>event.code is_not gt 5000;</td>
+        <td>event.code &lt;= 5000</td>
+    </tr>
+    <tr>
+        <td>is_not_lt</td>
+        <td>event.code is_not_lt 4000;</td>
+        <td>event.code &gt;= 4000</td>
+    </tr>
+    <tr>
+        <td>is_not_one_of</td>
+        <td>srcPort is_not_one_of 53,80,443;</td>
+        <td>srcPort not in ['53', '80', '443']</td>
+    </tr>
+    <tr>
+        <td>is_not</td>
+        <td>srcIp is_not 127.0.0.1;</td>
+        <td>srcIp != "127.0.0.1"</td>
+    </tr>
+    <tr>
+        <td>is_gte</td>
+        <td>event.code is_gte 5000;</td>
+        <td>event.code &gt;= 5000</td>
+    </tr>
+    <tr>
+        <td>is_lte</td>
+        <td>event.code is_lte 4000;</td>
+        <td>event.code &lt;= 4000</td>
+    </tr>
+    <tr>
+        <td>is_gt</td>
+        <td>event.code is_gt 5000;</td>
+        <td>event.code &gt; 5000</td>
+    </tr>
+    <tr>
+        <td>is_lt</td>
+        <td>event.code is_lt 4000;</td>
+        <td>event.code &lt; 4000</td>
+    </tr>
+    <tr>
+        <td>is_one_of</td>
+        <td>event.code is_one_of 1,2,3,4,5;</td>
+        <td>event.code in ['1', '2', '3', '4', '5']</td>
+    </tr>
+    <tr>
+        <td>is</td>
+        <td>event.outcome is success;</td>
+        <td>event.outcome == "success"</td>
+    </tr>
+</table>
+
+#### Chaining Filters:
+Example 1: <br>
+```python
+# Python Equivlant
+event.code in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] 
+and event.outcome == "success"
+```
+```python
+# Filters
+event.code is_one_of 1,2,3,4,5,6,7,8,9,10; event.outcome is success;
+```
+
+Example 2: 
+```python
+# Python Equivlant
+srcIp == "105.24.235.13" and dstPort not in ['53', '80', '443']
+```
+```python
+# Filters
+srcIp is 105.24.235.13; dstPort is_not_one_of 53,80,443;
+```
 
 At the end, it will prompt you for a file name to dump the data in (Currently only support .json, .csv). <br />
 All saved files will be found under the **datasets** folder
@@ -382,3 +463,4 @@ In addition, if there is a need to convert datetime to epoch or vice-versa, ther
   alt="Timestamp Format Converter GUI">
   <figcaption style="text-align: center;">Figure 5. Timestamp Format Converter GUI</figcaption>
 </figure><br><br>
+
