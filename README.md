@@ -452,7 +452,7 @@ Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
 (See [Supported Time Formats](#supported-time-formats))<br>
 
 <p align="center" style="margin-bottom: 0px !important;">
-  <img width="200" src="images/fetching_data.png" alt="Material Bread logo" align="center">
+  <img src="images/fetching_data.png" alt="Material Bread logo" align="center">
 </p>
 <p align="center" style="margin-top: 0px;">Figure 2. Fetching Data GUI</p>
 
