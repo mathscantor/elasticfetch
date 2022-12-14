@@ -306,7 +306,7 @@ event                          date       event.created, event.ingested
 winlog                         date       winlog.event_data.ClientCreationTime, winlog.event_data.DeviceTime, winlog.event_data.NewTime, winlog.event_data.OldTime, winlog.event_data.ProcessCreationTime, winlog.event_data.StartTime, winlog.event_data.StopTime, winlog.user_data.UTCStartTime
 
 Main Timestamp Name: @timestamp        ← (Your input)
-Main Timestamp Format: epoch           ← (Your input)
+Main Timestamp Format: datetime        ← (Your input)
 Main Timezone: +08:00                  ← (Your input)
 ```
 In this example, option 3 will show you all related fields that are of 'date' type. <br>
