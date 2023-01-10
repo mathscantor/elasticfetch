@@ -26,13 +26,10 @@ Elasticfetch facilitates the work flow for data analysts where the analyst need 
 It has also been proven to be effective when deployed for threat hunting in multiple cyber military exercises.
 ## Required Python Packages
 ```sh
-# Required pacakges for Command Line Interface (CLI)
 pip3 install requests
 pip3 install tqdm
-
-# (OPTIONAL) -- Required for GUI
-pip3 install customtkinter
 pip3 install tk
+pip3 install customtkinter==4.6.3
 ```
 
 ## Current Features
