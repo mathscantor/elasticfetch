@@ -30,6 +30,14 @@ pip3 install requests
 pip3 install tqdm
 pip3 install tk
 pip3 install customtkinter==4.6.3
+
+# For Linux users, you need this additional packages
+
+# Ubuntu or other distros with Apt:
+sudo apt-get install python3-tk
+
+# For Fedora:
+sudo dnf install python3-tkinter
 ```
 
 ## Current Features
