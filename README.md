@@ -30,6 +30,7 @@ pip3 install requests
 pip3 install tqdm
 pip3 install tk
 pip3 install customtkinter==4.6.3
+pip3 install pillow
 
 # For Linux users, you need this additional packages
 
