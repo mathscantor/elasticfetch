@@ -1,0 +1,12 @@
+FUTURE ENHANCEMENT FOR DEC 2023 (In order of priority)
+1. Sepearte dependency on tkinter if the user only wants to use the CLI version.
+
+2. Write and pull simultaneously
+   --> Spawn thread to wait on new batches of JSON data coming into the list
+   --> If there exists a batch of data, write to file and pop the head for better efficiency and better memory management
+
+3. Add an option to pull from multiple indexes, including wildcard * or regex matching
+
+4. GUI Improvements:
+   --> Make UI scale with dynamic sizing
+   
