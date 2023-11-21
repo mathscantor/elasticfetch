@@ -1,17 +1,21 @@
-import tkinter
-import customtkinter
-from menu.gui.save_fetched_data import GUISaveFetchedData
-from menu.gui.ts_converter import GUITSConverter
-from menu.gui.show_indices_status import GUIShowIndicesStatus
-from menu.gui.show_available_field_names import GUIShowAvailableFields
-from tkinter import ttk
-from PIL import Image, ImageTk
-import os
+from utils.config_reader import ConfigReader
+config_reader = ConfigReader()
+config_dict = config_reader.read_config_file()
+if config_dict["interface.graphical"]:
+    import tkinter
+    import customtkinter
+    from menu.gui.save_fetched_data import GUISaveFetchedData
+    from menu.gui.ts_converter import GUITSConverter
+    from menu.gui.show_indices_status import GUIShowIndicesStatus
+    from menu.gui.show_available_field_names import GUIShowAvailableFields
+    from tkinter import ttk
+    from PIL import Image, ImageTk
+    import os
 
-PATH = os.path.dirname(os.path.realpath(__file__))
+    PATH = os.path.dirname(os.path.realpath(__file__))
 
-customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
-customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
+    customtkinter.set_appearance_mode("Dark")  # Modes: "System" (standard), "Dark", "Light"
+    customtkinter.set_default_color_theme("dark-blue")  # Themes: "blue" (standard), "green", "dark-blue"
 
 
 class GUIMenu:

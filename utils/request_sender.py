@@ -1,11 +1,16 @@
 import requests
+from utils.config_reader import ConfigReader
 from utils.messenger import messenger
 import json
-import customtkinter
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tqdm import tqdm
 import sys
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
+config_reader = ConfigReader()
+config_dict = config_reader.read_config_file()
+if config_dict["interface.graphical"]:
+    import customtkinter
 
 
 class RequestSender:
@@ -49,76 +54,6 @@ class RequestSender:
             return True
 
         return False
-
-
-    '''
-    A point in time must be opened explicitly before being used in search requests. 
-    The keep_alive parameter tells Elasticsearch how long it should keep a point in time alive, e.g. ?keep_alive=60m
-    '''
-    def post_fetch_pit_id(self, index_name):
-        url = "{}://{}:{}/{}/_pit?keep_alive=60m&pretty".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
-        messenger(3, "Fetching PIT id...")
-        try:
-            response = requests.post(url=url,
-                                     headers=self.headers,
-                                     verify=False,
-                                     auth=(self.username, self.password))
-            if response.status_code == 200:
-                pit_id = response.json()["id"]
-                messenger(0, "Successfully fetched PIT id. This id will be used for fetching elasticsearch data.\n"
-                             "PIT id: {}".format(pit_id))
-                return pit_id
-            elif response.status_code == 400:
-                messenger(2, "Unable to fetch PIT id. Bad Request in headers/data.")
-            elif response.status_code == 401:
-                messenger(2, "Unable to fetch PIT id. Authentication Error.")
-            else:
-                messenger(2, "Unable to fetch PIT id. General Error.")
-            # In case fetch pid fails, reset back to default
-            self.put_max_result_window(size=10000)
-            return None
-        except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}".format(url))
-        except requests.ConnectTimeout:
-            messenger(2, "Connection timeout to {}".format(url))
-        except requests.ConnectionError:
-            messenger(2, "Cannot connect to {}".format(url))
-        return
-
-
-    '''
-    Point-in-time is automatically closed when its keep_alive has been elapsed. However keeping point-in-times 
-    has a cost, as discussed in the previous section. Point-in-times should be closed 
-    as soon as they are no longer used in search requests.
-    '''
-    def delete_pit_id(self,
-                      pit_id: str):
-        data = {"id": pit_id}
-        url = "{}://{}:{}/_pit?pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
-        messenger(3, "Deleting PIT id {}...".format(pit_id))
-        try:
-            response = requests.delete(url=url,
-                                       headers=self.headers,
-                                       data=json.dumps(data),
-                                       verify=False,
-                                       auth=(self.username, self.password))
-            if response.status_code == 200:
-                messenger(0, "Successfully deleted PIT id.")
-                return
-            elif response.status_code == 400:
-                messenger(2, "Unable to delete PIT id. Bad Request in headers/data.")
-            elif response.status_code == 401:
-                messenger(2, "Unable to delete PIT id. Authentication Error.")
-            else:
-                messenger(2, "Unable to delete PIT id. General Error.")
-            return
-        except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}".format(url))
-        except requests.ConnectTimeout:
-            messenger(2, "Connection timeout to {}".format(url))
-        except requests.ConnectionError:
-            messenger(2, "Cannot connect to {}".format(url))
-        return
 
     '''
     The maximum value of from + size for searches to this index. Defaults to 10000. 
@@ -170,9 +105,10 @@ class RequestSender:
                                                fields_list: list,
                                                query_bool_must_list: list,
                                                query_bool_must_not_list: list,
-                                               app_window: customtkinter.CTk = None,
-                                               progress_bar: customtkinter.CTkProgressBar = None,
-                                               progress_bar_label: customtkinter.CTkLabel = None) -> list:
+                                               # customtkinter related
+                                               app_window=None,
+                                               progress_bar=None,
+                                               progress_bar_label=None) -> list:
         url = "{}://{}:{}/{}/_search?pretty".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
         data_json_list = []
         is_first_loop = True
