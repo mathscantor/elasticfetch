@@ -1,11 +1,23 @@
 import os
+import threading
+from utils.request_sender import RequestSender
+from utils.converter import Converter
+from utils.input_validation import InputValidation
+from utils.parser import Parser
+from utils.data_writer import DataWriter
+import time
 
 
 class CommandLineMenu:
 
-    def __init__(self, request_sender, converter, input_validation, parser):
+    def __init__(self,
+                 request_sender: RequestSender,
+                 converter: Converter,
+                 input_validation: InputValidation,
+                 parser: Parser):
         self.description = "Provides users different options when feteching elastic data"
-        self.request_sender = request_sender
+        self.__request_sender = request_sender
+        self.__data_writer = DataWriter()
         self.converter = converter
         self.input_validation = input_validation
         self.menu_options = {
@@ -36,6 +48,7 @@ class CommandLineMenu:
                       "  \___||_| \__,_||___/ \__||_| \___||_|  \___| \__|\___||_| |_|\n\n" \
                       "    Developed by: Gerald Lim Wee Koon (github: mathscantor)    \n" \
                       "===============================================================\n"
+        return
 
     def show_menu(self):
 
@@ -78,12 +91,12 @@ class CommandLineMenu:
         return
 
     def show_indices_status(self):
-        indices_status = self.request_sender.get_indices_status()
+        indices_status = self.__request_sender.get_indices_status()
         print(indices_status)
         return
 
     def set_current_index(self):
-        indices_status = self.request_sender.get_indices_status()
+        indices_status = self.__request_sender.get_indices_status()
         temp_list = indices_status.split("\n")[1:-1]
         index_dict = {}
         i = 1
@@ -105,7 +118,7 @@ class CommandLineMenu:
 
     def set_main_timestamp(self):
 
-        response = self.request_sender.get_available_fields(index_name=self.index_name)
+        response = self.__request_sender.get_available_fields(index_name=self.index_name)
         if response is not None:
             parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.index_name,
                                                                                          fields_json=response)
@@ -155,7 +168,7 @@ class CommandLineMenu:
     '''
 
     def show_available_fields(self):
-        response = self.request_sender.get_available_fields(index_name=self.index_name)
+        response = self.__request_sender.get_available_fields(index_name=self.index_name)
         if response is not None:
             parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.index_name,
                                                                                          fields_json=response)
@@ -231,6 +244,7 @@ class CommandLineMenu:
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
+
         if self.main_timestamp_format == "datetime":
             print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
                   "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
@@ -306,29 +320,47 @@ class CommandLineMenu:
             filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"],
             filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
-        data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.index_name,
-                                                                                    num_logs=num_logs,
-                                                                                    main_timestamp_name=self.main_timestamp_name,
-                                                                                    main_timestamp_format=self.main_timestamp_format,
-                                                                                    main_timezone=self.main_timezone,
-                                                                                    start_ts=start_ts,
-                                                                                    end_ts=end_ts,
-                                                                                    fields_list=fields_list,
-                                                                                    query_bool_must_list=query_bool_must_list,
-                                                                                    query_bool_must_not_list=query_bool_must_not_list)
-
-        if len(data_json_list) == 0:
+        file_format = str(input("File format(json/csv): ")).strip()
+        if file_format not in ["json", "csv"]:
             return
-        while True:
-            filename = input("File name to save as (.json, .csv): ")
-            is_valid_file_extension = self.input_validation.is_file_extension_valid(filename=filename)
-            if is_valid_file_extension:
-                break
-        file_path = "datasets/" + filename
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        if file_path.lower().endswith(".csv"):
-            self.converter.convert_json_data_to_csv(data_json_list=data_json_list, fields_list=fields_list,
-                                                    file_path=file_path)
-        elif file_path.lower().endswith(".json"):
-            self.converter.convert_json_data_to_json(data_json_list=data_json_list, file_path=file_path)
+
+        data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
+                                             kwargs={
+                                                "index_name": self.index_name,
+                                                "num_logs": num_logs,
+                                                "main_timestamp_name": self.main_timestamp_name,
+                                                "main_timestamp_format": self.main_timestamp_format,
+                                                "main_timezone": self.main_timezone,
+                                                "start_ts": start_ts,
+                                                "end_ts": end_ts,
+                                                "fields_list": fields_list,
+                                                "query_bool_must_list": query_bool_must_list,
+                                                "query_bool_must_not_list": query_bool_must_not_list
+                                            })
+
+        if file_format == "csv":
+            data_write_csv_thread = threading.Thread(target=self.__data_writer.write_to_csv,
+                                                     kwargs={
+                                                         "request_sender": self.__request_sender,
+                                                         "fields_list": fields_list
+                                                     })
+            data_write_csv_thread.start()
+            time.sleep(1)
+            data_fetch_thread.start()
+
+            data_write_csv_thread.join()
+            data_fetch_thread.join()
+
+        elif file_format == "json":
+            data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_json,
+                                                      kwargs={
+                                                          "request_sender": self.__request_sender,
+                                                      })
+            data_write_json_thread.start()
+            time.sleep(1)
+            data_fetch_thread.start()
+
+            data_write_json_thread.join()
+            data_fetch_thread.join()
+
         return

@@ -3,8 +3,10 @@ from utils.config_reader import ConfigReader
 from utils.messenger import messenger
 import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import sys
+from typing import *
+import threading
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 config_reader = ConfigReader()
@@ -16,22 +18,27 @@ if config_dict["interface.graphical"]:
 class RequestSender:
 
     def __init__(self, protocol, elastic_ip, elastic_port, username, password):
-        self.description = "Sends POST/GET request to elasticsearch server"
-        self.headers = {"Content-Type": "application/json"}
-        self.protocol = protocol
-        self.elastic_ip = elastic_ip
-        self.elastic_port = elastic_port
-        self.username = username
-        self.password = password
+        self.__headers = {"Content-Type": "application/json"}
+        self.__protocol = protocol
+        self.__elastic_ip = elastic_ip
+        self.__elastic_port = elastic_port
+        self.__username = username
+        self.__password = password
+
+        # Data related
+        self.data_json_list = []
+        self.__fetch_lock = threading.Lock()
+        self.__has_finished_fetching = False
+        return
 
     def get_authentication_status_bool(self):
-        if self.protocol == "https":
-            url = "{}://{}:{}/_security/_authenticate?pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
+        if self.__protocol == "https":
+            url = "{}://{}:{}/_security/_authenticate?pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port)
             messenger(3, "Checking Authentication Credentials...")
             try:
                 response = requests.get(url=url,
                                         verify=False,
-                                        auth=(self.username, self.password))
+                                        auth=(self.__username, self.__password))
 
                 if response.status_code == 200:
                     messenger(0, "Successfully Authenticated with Credentials.")
@@ -49,7 +56,7 @@ class RequestSender:
             except requests.ConnectionError:
                 messenger(2, "Cannot connect to {}".format(url))
 
-        elif self.protocol == "http":
+        elif self.__protocol == "http":
             messenger(3, "Skipping Authentication as http protocol does not require credentials!")
             return True
 
@@ -62,14 +69,14 @@ class RequestSender:
     def put_max_result_window(self,
                               size: int):
         data = {"index.max_result_window": size}
-        url = "{}://{}:{}/_settings".format(self.protocol, self.elastic_ip, self.elastic_port)
+        url = "{}://{}:{}/_settings".format(self.__protocol, self.__elastic_ip, self.__elastic_port)
         messenger(3, "Changing max_results_window size to {}".format(size))
         try:
             response = requests.put(url=url,
-                                    headers=self.headers,
+                                    headers=self.__headers,
                                     data=json.dumps(data),
                                     verify=False,
-                                    auth=(self.username, self.password))
+                                    auth=(self.__username, self.__password))
             if response.status_code == 200:
                 if size == 10000:
                     messenger(0, "Successfully changed max_result_window size to {} (default)".format(size))
@@ -109,12 +116,13 @@ class RequestSender:
                                                app_window=None,
                                                progress_bar=None,
                                                progress_bar_label=None) -> list:
-        url = "{}://{}:{}/{}/_search?pretty".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
-        data_json_list = []
+        url = "{}://{}:{}/{}/_search?pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         is_first_loop = True
         last_ids = []
         messenger(3, "Fetching elastic data...")
-        pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stderr)
+
+        pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stdout)
+
         total_results_size = 0
         original_num_logs = num_logs
 
@@ -122,8 +130,8 @@ class RequestSender:
         if app_window is not None and progress_bar_label is not None and progress_bar is not None:
             progress_bar["value"] = (total_results_size / float(original_num_logs)) * 100
             progress_bar_label.set_text("Current Progress: {}/{} --- {:.2f}%".format(total_results_size,
-                                                                                 original_num_logs,
-                                                                                 progress_bar["value"]))
+                                                                                     original_num_logs,
+                                                                                     progress_bar["value"]))
             app_window.update()
         while num_logs > 0:
             if num_logs >= 10000:
@@ -175,7 +183,6 @@ class RequestSender:
                             }
                         },
                         "sort": [
-                            # BUG: KEEP GETTING NO HITS epoch seconds
                             {main_timestamp_name: {"order": "asc"}}
                         ]
                     }
@@ -191,17 +198,18 @@ class RequestSender:
             #print(json.dumps(data, indent=4))
             try:
                 response = requests.get(url=url,
-                                        headers=self.headers,
+                                        headers=self.__headers,
                                         data=json.dumps(data),
                                         verify=False,
-                                        auth=(self.username, self.password))
+                                        auth=(self.__username, self.__password))
                 data_json = response.json()
                 if response.status_code == 200:
                     results_size = len(data_json["hits"]["hits"])
                     if results_size == 0:
-                        # Return an empty data_json_list
                         messenger(2, "There are no hits! Please try again with a different time range!")
-                        return data_json_list
+                        self.__has_finished_fetching = True
+                        return
+
                     pbar.update(results_size)
                     total_results_size += results_size
 
@@ -213,7 +221,9 @@ class RequestSender:
                                                                                              progress_bar["value"]))
                         app_window.update()
 
-                    data_json_list.append(data_json)
+                    with self.fetch_lock:
+                        self.data_json_list.append(data_json)
+
                     start_ts = data_json["hits"]["hits"][results_size - 1]["sort"][0]
                     last_ids.clear()
                     for i in range(1, results_size):
@@ -239,15 +249,16 @@ class RequestSender:
                 messenger(2, "Cannot connect to {}".format(url))
                 return None
 
-        messenger(0, "Successfully fetched {} data entries!".format(total_results_size))
-        return data_json_list
+        #messenger(0, "Successfully fetched {} data entries!".format(total_results_size))
+        self.__has_finished_fetching = True
+        return
 
     def get_indices_status(self):
-        url = "{}://{}:{}/_cat/indices/*?v=true&s=index&pretty".format(self.protocol, self.elastic_ip, self.elastic_port)
+        url = "{}://{}:{}/_cat/indices/*?v=true&s=index&pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port)
         try:
             response = requests.get(url=url,
                                     verify=False,
-                                    auth=(self.username, self.password))
+                                    auth=(self.__username, self.__password))
 
             return response.text
         except requests.RequestException:
@@ -259,11 +270,11 @@ class RequestSender:
         return
 
     def get_available_fields(self, index_name):
-        url = "{}://{}:{}/{}/_mapping/field/*".format(self.protocol, self.elastic_ip, self.elastic_port, index_name)
+        url = "{}://{}:{}/{}/_mapping/field/*".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         try:
             response = requests.get(url=url,
                                     verify=False,
-                                    auth=(self.username, self.password))
+                                    auth=(self.__username, self.__password))
             if response is not None:
                 messenger(0, "Showing available fields...\n\n")
                 return response.json()
@@ -276,3 +287,15 @@ class RequestSender:
         except requests.ConnectionError:
             messenger(2, "Cannot connect to {}".format(url))
         return
+
+    # @property
+    # def data_json_list(self) -> List[Dict]:
+    #     return self.data_json_list
+
+    @property
+    def has_finished_fetching(self) -> bool:
+        return self.__has_finished_fetching
+
+    @property
+    def fetch_lock(self):
+        return self.__fetch_lock
