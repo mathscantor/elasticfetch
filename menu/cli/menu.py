@@ -321,7 +321,7 @@ class CommandLineMenu:
             filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
         file_format = str(input("File format(json/csv): ")).strip()
-        if file_format not in ["json", "csv"]:
+        if not self.input_validation.is_file_format_valid(file_format=file_format):
             return
 
         data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
@@ -345,7 +345,6 @@ class CommandLineMenu:
                                                          "fields_list": fields_list
                                                      })
             data_write_csv_thread.start()
-            time.sleep(1)
             data_fetch_thread.start()
 
             data_write_csv_thread.join()
@@ -357,10 +356,8 @@ class CommandLineMenu:
                                                           "request_sender": self.__request_sender,
                                                       })
             data_write_json_thread.start()
-            time.sleep(1)
             data_fetch_thread.start()
 
             data_write_json_thread.join()
             data_fetch_thread.join()
-
         return

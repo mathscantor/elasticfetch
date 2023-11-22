@@ -26,7 +26,8 @@ class RequestSender:
         self.__password = password
 
         # Data related
-        self.data_json_list = []
+        self.__data_json_list = []
+        self.__total_results_size = 0
         self.__fetch_lock = threading.Lock()
         self.__has_finished_fetching = False
         return
@@ -111,11 +112,7 @@ class RequestSender:
                                                end_ts: str,
                                                fields_list: list,
                                                query_bool_must_list: list,
-                                               query_bool_must_not_list: list,
-                                               # customtkinter related
-                                               app_window=None,
-                                               progress_bar=None,
-                                               progress_bar_label=None) -> list:
+                                               query_bool_must_not_list: list) -> None:
         url = "{}://{}:{}/{}/_search?pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         is_first_loop = True
         last_ids = []
@@ -123,16 +120,9 @@ class RequestSender:
 
         pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stdout)
 
-        total_results_size = 0
-        original_num_logs = num_logs
-
-        # Mainly for UI
-        if app_window is not None and progress_bar_label is not None and progress_bar is not None:
-            progress_bar["value"] = (total_results_size / float(original_num_logs)) * 100
-            progress_bar_label.set_text("Current Progress: {}/{} --- {:.2f}%".format(total_results_size,
-                                                                                     original_num_logs,
-                                                                                     progress_bar["value"]))
-            app_window.update()
+        self.__total_results_size = 0
+        self.__data_json_list = []
+        self.__has_finished_fetching = False
         while num_logs > 0:
             if num_logs >= 10000:
                 size = 10000
@@ -206,23 +196,16 @@ class RequestSender:
                 if response.status_code == 200:
                     results_size = len(data_json["hits"]["hits"])
                     if results_size == 0:
+                        pbar.close()
                         messenger(2, "There are no hits! Please try again with a different time range!")
                         self.__has_finished_fetching = True
                         return
 
                     pbar.update(results_size)
-                    total_results_size += results_size
-
-                    # For UI
-                    if app_window is not None and progress_bar_label is not None and progress_bar is not None:
-                        progress_bar["value"] = (total_results_size/float(original_num_logs))*100
-                        progress_bar_label.set_text("Current Progress: {}/{} --- {:.2f}%".format(total_results_size,
-                                                                                             original_num_logs,
-                                                                                             progress_bar["value"]))
-                        app_window.update()
+                    self.__total_results_size += results_size
 
                     with self.fetch_lock:
-                        self.data_json_list.append(data_json)
+                        self.__data_json_list.append(data_json)
 
                     start_ts = data_json["hits"]["hits"][results_size - 1]["sort"][0]
                     last_ids.clear()
@@ -249,7 +232,8 @@ class RequestSender:
                 messenger(2, "Cannot connect to {}".format(url))
                 return None
 
-        #messenger(0, "Successfully fetched {} data entries!".format(total_results_size))
+        pbar.close()
+        messenger(0, "Successfully fetched {} data!".format(self.__total_results_size))
         self.__has_finished_fetching = True
         return
 
@@ -288,13 +272,25 @@ class RequestSender:
             messenger(2, "Cannot connect to {}".format(url))
         return
 
-    # @property
-    # def data_json_list(self) -> List[Dict]:
-    #     return self.data_json_list
+    def pop_from_data_json_list(self) -> Dict:
+        return self.__data_json_list.pop(0)
+
+    @property
+    def total_results_size(self) -> int:
+        return self.__total_results_size
+
+    @property
+    def data_json_list(self) -> List[Dict]:
+        return self.__data_json_list
 
     @property
     def has_finished_fetching(self) -> bool:
         return self.__has_finished_fetching
+
+    @has_finished_fetching.setter
+    def has_finished_fetching(self, value: bool) -> None:
+        self.__has_finished_fetching = value
+        return
 
     @property
     def fetch_lock(self):

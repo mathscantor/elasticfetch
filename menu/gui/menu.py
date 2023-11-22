@@ -1,4 +1,12 @@
+import threading
+import time
+import os
+from utils.data_writer import DataWriter
+from utils.converter import Converter
 from utils.config_reader import ConfigReader
+from utils.request_sender import RequestSender
+from utils.input_validation import InputValidation
+from utils.parser import Parser
 config_reader = ConfigReader()
 config_dict = config_reader.read_config_file()
 if config_dict["interface.graphical"]:
@@ -10,7 +18,6 @@ if config_dict["interface.graphical"]:
     from menu.gui.show_available_field_names import GUIShowAvailableFields
     from tkinter import ttk
     from PIL import Image, ImageTk
-    import os
 
     PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -21,16 +28,17 @@ if config_dict["interface.graphical"]:
 class GUIMenu:
 
     def __init__(self,
-                 request_sender,
-                 converter,
-                 input_validation,
-                 parser):
+                 request_sender: RequestSender,
+                 converter: Converter,
+                 input_validation: InputValidation,
+                 parser: Parser):
 
         # Backend related
         self.request_sender = request_sender
         self.converter = converter
         self.input_validation = input_validation
         self.parser = parser
+        self.__data_writer = DataWriter()
 
         # Frontend related
         self.primary_app_window = customtkinter.CTk()
@@ -43,6 +51,8 @@ class GUIMenu:
         self.progress_bar = None
         self.progress_bar_label = None
         self.fetch_data_button = None
+        self.label_mode = None
+        self.show_available_field_names_button = None
         self.theme_optionmenu = None
         self.label_options = None
         self.icon_photo = None
@@ -89,8 +99,11 @@ class GUIMenu:
         self.num_logs_entry = None
         self.fields_list_label = None
         self.fields_list_entry = None
+        self.filter_list_label = None
         self.filter_list_entry = None
-        self.filter_list_entry = None
+        self.file_format_label = None
+        self.file_format_entry = None
+        self.saved_filepath_label = None
 
         self.primary_app_window.protocol("WM_DELETE_WINDOW", self.on_closing_primary_app_window)
         self.available_themes = ["Light Theme", "Dark Theme", "System Default"]
@@ -112,9 +125,8 @@ class GUIMenu:
         self.init_indices()  # Comment out for testing
 
     '''
-    Easy way to initilalize the main window
+    Easy way to initialize the main window
     '''
-
     def init_primary_app_window(self):
         self.primary_app_window.title("elasticfetch - Main")
         self.primary_app_window.geometry("1120x640")
@@ -315,11 +327,23 @@ class GUIMenu:
                                                         text_font=("Arial", 10),
                                                         placeholder_text="eg. event.code is_gte 4000; event.category is_not authentication; ...")
         self.filter_list_entry.grid(row=7, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+
+        self.file_format_label = customtkinter.CTkLabel(master=self.frame_info,
+                                                        text="File Format:",
+                                                        text_font=("Arial", 11))
+        self.file_format_label.grid(row=8, column=2, pady=5, padx=0)
+        self.file_format_entry = customtkinter.CTkEntry(master=self.frame_info,
+                                                        height=32,
+                                                        text_font=("Arial", 10),
+                                                        placeholder_text="eg. json or csv")
+        self.file_format_entry.grid(row=8, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+
         self.frame_info_error_label = customtkinter.CTkLabel(master=self.frame_info,
                                                              text_color="red",
                                                              text="",
                                                              text_font=("Arial", 10))
-        self.frame_info_error_label.grid(row=8, column=2, columnspan=2, pady=0)
+        self.frame_info_error_label.grid(row=9, column=2, columnspan=2, pady=0)
+
         self.fetch_data_button = customtkinter.CTkButton(master=self.frame_right,
                                                          text="Fetch Data  ",
                                                          image=self.icon_photo,
@@ -327,17 +351,21 @@ class GUIMenu:
                                                          text_font=("Arial", 11),
                                                          state=customtkinter.DISABLED,
                                                          command=self.fetch_elastic_data_between_ts1_ts2)
-        self.fetch_data_button.grid(row=6, column=0, columnspan=2, pady=0, sticky="s")
+        self.fetch_data_button.grid(row=3, column=0, columnspan=2, pady=0, sticky="s")
 
         self.progress_bar = ttk.Progressbar(master=self.frame_right,
                                             mode="determinate",
                                             style="green.Horizontal.TProgressbar",
                                             orient=tkinter.HORIZONTAL)
-        self.progress_bar.grid(row=7, column=0, padx=20, pady=0, columnspan=3, sticky="we")
+        self.progress_bar.grid(row=8, column=0, padx=20, pady=0, columnspan=3, sticky="we")
         self.progress_bar_label = customtkinter.CTkLabel(master=self.frame_right,
                                                          text="",
                                                          text_font=("Consolas", 12))
-        self.progress_bar_label.grid(row=8, column=0, padx=20, pady=20, sticky="w")
+        self.progress_bar_label.grid(row=9, column=0, padx=20, pady=20, sticky="w")
+        self.saved_filepath_label = customtkinter.CTkLabel(master=self.frame_right,
+                                                           text="",
+                                                           text_font=("Consolas", 12))
+        self.saved_filepath_label.grid(row=9, column=1, padx=20, pady=20, sticky="w")
 
         # show window
         self.primary_app_window.mainloop()
@@ -432,7 +460,6 @@ class GUIMenu:
 
     def fetch_elastic_data_between_ts1_ts2(self):
         self.frame_info_error_label.set_text("")
-        self.progress_bar["value"] = 0
         self.fetch_data_button.configure(state=customtkinter.DISABLED,
                                          fg_color="grey")
         self.primary_app_window.update()
@@ -441,6 +468,7 @@ class GUIMenu:
         num_logs = self.num_logs_entry.get().strip()
         fields = self.fields_list_entry.get().strip()
         filter_raw = self.filter_list_entry.get().strip()
+        file_format = self.file_format_entry.get().strip()
 
         if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=self.main_timestamp_name_combobox.get(),
                                                              valid_timestamp_name_list=self.valid_timestamp_name_list):
@@ -487,8 +515,7 @@ class GUIMenu:
 
         if filter_raw != "":
             if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
-                self.frame_info_error_label.configure(text="Filters: Trailing Spaces / Invalid Keywords not allowed!\n"
-                                                           "Check that each filter ends with ';'")
+                self.frame_info_error_label.configure(text="Filters: Invalid Format!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
@@ -509,31 +536,84 @@ class GUIMenu:
             filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"],
             filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
-        data_json_list = self.request_sender.get_fetch_elastic_data_between_ts1_ts2(index_name=self.current_index,
-                                                                                    num_logs=num_logs,
-                                                                                    main_timestamp_name=self.main_timestamp_name,
-                                                                                    main_timestamp_format=self.main_timestamp_format,
-                                                                                    main_timezone=self.main_timezone,
-                                                                                    start_ts=start_ts,
-                                                                                    end_ts=end_ts,
-                                                                                    fields_list=fields_list,
-                                                                                    query_bool_must_list=query_bool_must_list,
-                                                                                    query_bool_must_not_list=query_bool_must_not_list,
-                                                                                    app_window=self.primary_app_window,
-                                                                                    progress_bar=self.progress_bar,
-                                                                                    progress_bar_label=self.progress_bar_label)
+        if not self.input_validation.is_file_format_valid(file_format=file_format):
+            self.frame_info_error_label.configure(text="File Format: Invalid format!")
+            self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                             fg_color="#395E9C")
+            return
+
+        data_fetch_thread = threading.Thread(target=self.request_sender.get_fetch_elastic_data_between_ts1_ts2,
+                                             kwargs={
+                                                "index_name": self.current_index,
+                                                "num_logs": num_logs,
+                                                "main_timestamp_name": self.main_timestamp_name,
+                                                "main_timestamp_format": self.main_timestamp_format,
+                                                "main_timezone": self.main_timezone,
+                                                "start_ts": start_ts,
+                                                "end_ts": end_ts,
+                                                "fields_list": fields_list,
+                                                "query_bool_must_list": query_bool_must_list,
+                                                "query_bool_must_not_list": query_bool_must_not_list,
+                                            })
+
+        self.progress_bar["value"] = 0
+        self.progress_bar_label.set_text("Current Progress: {}/{} --- {:.2f}%".format(0,
+                                                                                      num_logs,
+                                                                                      self.progress_bar["value"]))
+        self.primary_app_window.update()
+
+        if file_format == "csv":
+            data_write_csv_thread = threading.Thread(target=self.__data_writer.write_to_csv,
+                                                     kwargs={
+                                                         "request_sender": self.request_sender,
+                                                         "fields_list": fields_list
+                                                     })
+            data_write_csv_thread.start()
+            data_fetch_thread.start()
+
+            self.saved_filepath_label.set_text("Saving data to {}".format(self.__data_writer.csv_filepath))
+            while not self.request_sender.has_finished_fetching:
+                self.progress_bar["value"] = (self.request_sender.total_results_size / float(num_logs)) * 100
+                self.progress_bar_label.set_text(
+                    "Current Progress: {}/{} --- {:.2f}%".format(self.request_sender.total_results_size,
+                                                                 num_logs,
+                                                                 self.progress_bar["value"]))
+                self.primary_app_window.update()
+
+            data_write_csv_thread.join()
+            data_fetch_thread.join()
+
+            self.progress_bar_label.set_text("")
+            self.saved_filepath_label.set_text("Successfully saved data to {}".format(self.__data_writer.csv_filepath))
+            self.primary_app_window.update()
+
+        elif file_format == "json":
+            data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_json,
+                                                      kwargs={
+                                                          "request_sender": self.request_sender,
+                                                      })
+            data_write_json_thread.start()
+            data_fetch_thread.start()
+
+            self.saved_filepath_label.set_text("Saving data to {}".format(self.__data_writer.json_filepath))
+            while not self.request_sender.has_finished_fetching:
+                self.progress_bar["value"] = (self.request_sender.total_results_size / float(num_logs)) * 100
+                self.progress_bar_label.set_text(
+                    "Current Progress: {}/{} --- {:.2f}%".format(self.request_sender.total_results_size,
+                                                                 num_logs,
+                                                                 self.progress_bar["value"]))
+
+                self.primary_app_window.update()
+
+            data_write_json_thread.join()
+            data_fetch_thread.join()
+
+            self.progress_bar_label.set_text("")
+            self.saved_filepath_label.set_text("Successfully saved data to {}".format(self.__data_writer.json_filepath))
+            self.primary_app_window.update()
+
         self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                          fg_color="#395E9C")
-
-        if len(data_json_list) == 0:
-            self.frame_info_error_label.set_text("There are no hits!")
-            return
-        gui_save_fetched_data = GUISaveFetchedData(data_json_list=data_json_list,
-                                                   fields_list=fields_list,
-                                                   converter=self.converter,
-                                                   input_validation=self.input_validation)
-        gui_save_fetched_data.mainloop()
-
         return
 
     def display_ts_converter_window(self):

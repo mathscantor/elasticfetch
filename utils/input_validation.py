@@ -26,6 +26,7 @@ class InputValidation:
         self.valid_filter_keywords = ["is_not_gte", "is_not_lte", "is_not_gt", "is_not_lt", "is_not_one_of", "is_not",
                                       "is_gte", "is_lte", "is_gt", "is_lt", "is_one_of", "is"]
         self.valid_file_extensions = ('.json', '.csv')
+        self.valid_file_format = ['json', 'csv']
         self.valid_timestamp_format_list = ['datetime', 'epoch']
         self.valid_timezone_list = ["+00:00", "+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00",
                                     "-01:00", "-02:00", "-03:00", "-04:00", "-05:00", "-06:00", "-07:00", "-08:00", "-09:00" , "-10:00", "-11:00", "-12:00"]
@@ -138,7 +139,14 @@ class InputValidation:
         if filename.lower().endswith(self.valid_file_extensions):
             return True
         else:
-            messenger(2, "Invalid File Extension. Current supported extensions: .json, .csv")
+            messenger(2, "Invalid File Extension. Current supported extensions: {}".format(self.valid_file_extensions))
+            return False
+
+    def is_file_format_valid(self, file_format):
+        if file_format in self.valid_file_format:
+            return True
+        else:
+            messenger(2, "Invalid File Format. Current supported file formats: {}".format(self.valid_file_format))
             return False
 
     def is_index_name_set(self, index_name):
