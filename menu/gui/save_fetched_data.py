@@ -3,6 +3,10 @@ from utils.converter import Converter
 from utils.input_validation import InputValidation
 import os
 
+"""
+REDACTED: Keep it for future reference
+"""
+
 
 class GUISaveFetchedData(customtkinter.CTkToplevel):
     def __init__(self,

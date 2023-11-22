@@ -26,17 +26,19 @@ Elasticfetch facilitates the work flow for data analysts where the analyst need 
 It has also been proven to be effective when deployed for threat hunting in multiple cyber military exercises.
 ## Required Python Packages
 ```sh
+# Necessary Python Packages 
 pip3 install requests
 pip3 install tqdm
+
+# Additional Python Packages (For GUI)
+# If you only plan to use the CLI version, you are not required to install the packages below. 
 pip3 install tk
 pip3 install customtkinter==4.6.3
 pip3 install pillow
 
 # For Linux users, you need this additional packages
-
 # Ubuntu or other distros with Apt:
 sudo apt-get install python3-tk
-
 # For Fedora:
 sudo dnf install python3-tkinter
 ```

@@ -9,11 +9,6 @@ from typing import *
 import threading
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-config_reader = ConfigReader()
-config_dict = config_reader.read_config_file()
-if config_dict["interface.graphical"]:
-    import customtkinter
-
 
 class RequestSender:
 

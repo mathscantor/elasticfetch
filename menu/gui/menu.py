@@ -12,7 +12,7 @@ config_dict = config_reader.read_config_file()
 if config_dict["interface.graphical"]:
     import tkinter
     import customtkinter
-    from menu.gui.save_fetched_data import GUISaveFetchedData
+    # from menu.gui.save_fetched_data import GUISaveFetchedData
     from menu.gui.ts_converter import GUITSConverter
     from menu.gui.show_indices_status import GUIShowIndicesStatus
     from menu.gui.show_available_field_names import GUIShowAvailableFields
