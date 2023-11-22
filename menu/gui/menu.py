@@ -102,7 +102,10 @@ class GUIMenu:
         self.filter_list_label = None
         self.filter_list_entry = None
         self.file_format_label = None
-        self.file_format_entry = None
+        self.file_format_combobox = None
+        self.file_format = "csv" # Default file format
+        self.selected_file_format = tkinter.StringVar()
+        self.selected_file_format.set(value="csv")
         self.saved_filepath_label = None
 
         self.primary_app_window.protocol("WM_DELETE_WINDOW", self.on_closing_primary_app_window)
@@ -332,11 +335,14 @@ class GUIMenu:
                                                         text="File Format:",
                                                         text_font=("Arial", 11))
         self.file_format_label.grid(row=8, column=2, pady=5, padx=0)
-        self.file_format_entry = customtkinter.CTkEntry(master=self.frame_info,
-                                                        height=32,
-                                                        text_font=("Arial", 10),
-                                                        placeholder_text="eg. json or csv")
-        self.file_format_entry.grid(row=8, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+
+        self.file_format_combobox = ttk.Combobox(master=self.frame_info,
+                                                 values=self.input_validation.valid_file_format,
+                                                 font=("Arial", 10),
+                                                 textvariable=self.selected_file_format)
+        self.file_format_combobox.bind('<<ComboboxSelected>>', self.set_file_format)
+
+        self.file_format_combobox.grid(row=8, column=3, columnspan=3, pady=5, padx=0, sticky="we")
 
         self.frame_info_error_label = customtkinter.CTkLabel(master=self.frame_info,
                                                              text_color="red",
@@ -387,6 +393,10 @@ class GUIMenu:
 
     def set_main_timestamp_name(self, event):
         self.main_timestamp_name = self.selected_main_timestamp_name.get()
+        return
+
+    def set_file_format(self, event):
+        self.file_format = self.selected_file_format.get()
         return
 
     def set_main_timestamp_format(self, event):
@@ -468,7 +478,6 @@ class GUIMenu:
         num_logs = self.num_logs_entry.get().strip()
         fields = self.fields_list_entry.get().strip()
         filter_raw = self.filter_list_entry.get().strip()
-        file_format = self.file_format_entry.get().strip()
 
         if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=self.main_timestamp_name_combobox.get(),
                                                              valid_timestamp_name_list=self.valid_timestamp_name_list):
@@ -536,7 +545,7 @@ class GUIMenu:
             filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"],
             filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
-        if not self.input_validation.is_file_format_valid(file_format=file_format):
+        if not self.input_validation.is_file_format_valid(file_format=self.file_format):
             self.frame_info_error_label.configure(text="File Format: Invalid format!")
             self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                              fg_color="#395E9C")
@@ -562,7 +571,7 @@ class GUIMenu:
                                                                                       self.progress_bar["value"]))
         self.primary_app_window.update()
 
-        if file_format == "csv":
+        if self.file_format == "csv":
             data_write_csv_thread = threading.Thread(target=self.__data_writer.write_to_csv,
                                                      kwargs={
                                                          "request_sender": self.request_sender,
@@ -587,7 +596,7 @@ class GUIMenu:
             self.saved_filepath_label.set_text("Successfully saved data to {}".format(self.__data_writer.csv_filepath))
             self.primary_app_window.update()
 
-        elif file_format == "json":
+        elif self.file_format == "json":
             data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_json,
                                                       kwargs={
                                                           "request_sender": self.request_sender,
