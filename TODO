@@ -1,5 +1,7 @@
 FUTURE ENHANCEMENT FOR DEC 2023 (In order of priority)
 
+0. flatten json batches
+
 1. Add an option to pull from multiple indexes, including wildcard * or regex matching
 
 2. GUI Improvements:

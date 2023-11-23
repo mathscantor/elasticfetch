@@ -255,7 +255,7 @@ class RequestSender:
                                     verify=False,
                                     auth=(self.__username, self.__password))
             if response is not None:
-                messenger(0, "Showing available fields...\n\n")
+                messenger(0, "Retrieved available fields for index: {}\n".format(index_name))
                 return response.json()
             else:
                 messenger(2, "No fields are available! Please check whether elasticsearch is parsing properly!")

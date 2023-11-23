@@ -27,7 +27,7 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         self.frame.grid(row=0, column=0, sticky="ew")
 
         # adding label to search box
-        tkinter.Label(self.frame, text='Text to find:').grid(row=0, column=0)
+        tkinter.Label(self.frame, text='Search:', font=customtkinter.CTkFont(family="Arial", size=15)).grid(row=0, column=0)
 
         # adding of single line text box
         search_term = tkinter.Entry(self.frame)
@@ -39,26 +39,30 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         search_term.focus_set()
 
         # adding of search button
-        find_button = tkinter.Button(self.frame, text='Find')
+        find_button = tkinter.Button(self.frame, text='Find', font=customtkinter.CTkFont(family="Arial", size=15))
         find_button.grid(row=0, column=2)
         find_button.config(command=lambda: self.find_in_textbox(search_term=search_term))
 
-        self.total_count_label = tkinter.Label(master=self.frame, height=1)
+        self.total_count_label = tkinter.Label(master=self.frame, height=1,
+                                               font=customtkinter.CTkFont(family="Arial", size=15))
         self.total_count_label.grid(row=0, column=3)
         self.total_count_label.grid_forget()
 
-        self.arrow_down_button = tkinter.Button(self.frame, text="↓", command=self.get_search_result_next)
+        self.arrow_down_button = tkinter.Button(self.frame, text="↓", font=customtkinter.CTkFont(family="Arial", size=15),
+                                                command=self.get_search_result_next)
         self.arrow_down_button.grid(row=0, column=5)
         self.arrow_down_button.grid_forget()
 
-        self.arrow_up_button = tkinter.Button(self.frame, text="↑", command=self.get_search_result_before)
+        self.arrow_up_button = tkinter.Button(self.frame, text="↑", font=customtkinter.CTkFont(family="Arial", size=15),
+                                              command=self.get_search_result_before)
         self.arrow_up_button.grid(row=0, column=5)
         self.arrow_up_button.grid_forget()
 
         # create scrollable textbox
         self.textbox = tkinter.Text(self,
                                     wrap="none",
-                                    highlightthickness=0)
+                                    highlightthickness=0,
+                                    font=customtkinter.CTkFont(family="Arial", size=15))
         self.textbox.grid(row=1, column=0, sticky="nsew")
 
         # Content
@@ -134,6 +138,8 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         self.total_count_label.grid(row=0, column=3)
         if self.total_num_results == 0:
             self.total_count_label.configure(text="No results!")
+            self.arrow_up_button.grid_forget()
+            self.arrow_down_button.grid_forget()
         if self.total_num_results > 0:
             self.total_count_label.configure(text="1 of {}".format(self.total_num_results))
             self.current_result_index = 0

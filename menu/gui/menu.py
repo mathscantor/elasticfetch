@@ -42,7 +42,6 @@ class GUIMenu:
 
         # Frontend related
         self.primary_app_window = customtkinter.CTk()
-        self.app_windows = [self.primary_app_window]
         self.frame_left = None
         self.frame_right = None
         self.frame_info = None
@@ -56,6 +55,7 @@ class GUIMenu:
         self.theme_optionmenu = None
         self.label_options = None
         self.icon_photo = None
+        self.__default_font_size = 14
 
         # Index related Assets
         self.show_indices_status_button = None
@@ -160,9 +160,9 @@ class GUIMenu:
         self.frame_right.grid(row=0, column=1, sticky="nswe", padx=20, pady=20)
 
         # configure grid layout (3x7)
-        self.frame_right.grid_columnconfigure((0, 1), weight=1)
-        self.frame_right.grid_columnconfigure(2, weight=0)
-        self.frame_right.grid_rowconfigure((0, 1, 2, 3), weight=1)
+        self.frame_right.grid_columnconfigure((0, 1, 2), weight=1)
+        self.frame_right.grid_columnconfigure(3, weight=1)
+        self.frame_right.grid_rowconfigure((0, 1, 2, 3, 4, 5, 6), weight=1)
         self.frame_right.grid_rowconfigure(7, weight=1)
 
         # ---------------------INFO FRAME--------------------- #
@@ -192,28 +192,37 @@ class GUIMenu:
 
         self.label_options = customtkinter.CTkLabel(master=self.frame_left,
                                                     text="Options",
-                                                    text_font=("Arial", 15))  # font name and size in px
-        self.label_options.grid(row=1, column=0, pady=10, padx=10)
+                                                    font=customtkinter.CTkFont(family="Arial",
+                                                                               size=self.__default_font_size))
+        self.label_options.grid(row=1, column=0, pady=10, padx=10, sticky="we")
 
-        self.label_mode = customtkinter.CTkLabel(master=self.frame_left, text="Appearance Mode:")
-        self.label_mode.grid(row=9, column=0, pady=0, padx=20, sticky="w")
+        self.label_mode = customtkinter.CTkLabel(master=self.frame_left,
+                                                 text="Appearance Mode:",
+                                                 font=customtkinter.CTkFont(family="Arial",
+                                                                            size=self.__default_font_size))
+        self.label_mode.grid(row=9, column=0, pady=0, padx=20, sticky="we")
 
         # Show Indices Status Button
         self.show_indices_status_button = customtkinter.CTkButton(master=self.frame_left,
                                                                   text="Show Indices Status",
+                                                                  font=customtkinter.CTkFont(family="Arial",
+                                                                                             size=self.__default_font_size),
                                                                   command=self.show_indices_status)
         self.show_indices_status_button.grid(row=2, column=0, pady=10, padx=20)
 
         # DateTime to Epoch
         self.datetime_to_epoch_button = customtkinter.CTkButton(master=self.frame_left,
                                                                 text="TS Format Converter",
+                                                                font=customtkinter.CTkFont(family="Arial",
+                                                                                           size=self.__default_font_size),
                                                                 command=self.display_ts_converter_window)
         self.datetime_to_epoch_button.grid(row=3, column=0, pady=10, padx=20)
 
         # Theme Option Menu
         self.theme_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_left,
                                                             values=self.available_themes,
-                                                            text_font=("Arial", 10),
+                                                            font=customtkinter.CTkFont(family="Arial",
+                                                                                       size=self.__default_font_size),
                                                             dynamic_resizing=False,
                                                             command=self.change_appearance_mode)
         self.theme_optionmenu.grid(row=10, column=0, sticky="s")
@@ -222,11 +231,13 @@ class GUIMenu:
         # Selecting Index
         self.current_index_label = customtkinter.CTkLabel(master=self.frame_info,
                                                           text="Selected Index:",
-                                                          text_font=("Arial", 11))  # font name and size in px
+                                                          font=customtkinter.CTkFont(family="Arial",
+                                                                                     size=self.__default_font_size))  # font name and size in px
         self.current_index_label.grid(row=0, column=2, pady=20, padx=0)
         self.current_index_combobox = ttk.Combobox(master=self.frame_info,
                                                    values=self.index_list,
-                                                   font=("Arial", 11),
+                                                   font=customtkinter.CTkFont(family="Arial",
+                                                                              size=self.__default_font_size),
                                                    textvariable=self.selected_index)
         self.current_index_combobox.bind('<<ComboboxSelected>>', self.set_current_index)
 
@@ -238,6 +249,8 @@ class GUIMenu:
                                                                          state=customtkinter.DISABLED,
                                                                          width=60,
                                                                          text="Show All Fields",
+                                                                         font=customtkinter.CTkFont(family="Arial",
+                                                                                                    size=self.__default_font_size),
                                                                          fg_color="grey",
                                                                          command=self.show_available_field_names)
         self.show_available_field_names_button.grid(row=0, column=6, pady=10, padx=20)
@@ -245,13 +258,15 @@ class GUIMenu:
         # Selecting main timestamp field name
         self.main_timestamp_name_label = customtkinter.CTkLabel(master=self.frame_info,
                                                                 text="Timestamp Field:",
-                                                                text_font=("Arial", 11))
+                                                                font=customtkinter.CTkFont(family="Arial",
+                                                                                           size=self.__default_font_size))
 
         self.main_timestamp_name_label.grid(row=1, column=2, pady=5, padx=0)
         self.main_timestamp_name_combobox = ttk.Combobox(master=self.frame_info,
                                                          values=self.valid_timestamp_name_list,
                                                          state=tkinter.DISABLED,
-                                                         font=("Arial", 10),
+                                                         font=customtkinter.CTkFont(family="Arial",
+                                                                                    size=self.__default_font_size),
                                                          textvariable=self.selected_main_timestamp_name)
 
         self.main_timestamp_name_combobox.bind('<<ComboboxSelected>>', self.set_main_timestamp_name)
@@ -260,11 +275,13 @@ class GUIMenu:
         # Selecting timestamp format
         self.main_timestamp_format_label = customtkinter.CTkLabel(master=self.frame_info,
                                                                   text="Timestamp Format:",
-                                                                  text_font=("Arial", 11))
+                                                                  font=customtkinter.CTkFont(family="Arial",
+                                                                                             size=self.__default_font_size))
         self.main_timestamp_format_label.grid(row=2, column=2, pady=5, padx=0)
         self.main_timestamp_format_combobox = ttk.Combobox(master=self.frame_info,
                                                            values=self.input_validation.valid_timestamp_format_list,
-                                                           font=("Arial", 10),
+                                                           font=customtkinter.CTkFont(family="Arial",
+                                                                                      size=self.__default_font_size),
                                                            textvariable=self.selected_main_timestamp_format)
         self.main_timestamp_format_combobox.bind('<<ComboboxSelected>>', self.set_main_timestamp_format)
         self.main_timestamp_format_combobox.grid(row=2, column=3, pady=5, padx=0)
@@ -272,11 +289,13 @@ class GUIMenu:
         # Selecting Timezone
         self.main_timezone_label = customtkinter.CTkLabel(master=self.frame_info,
                                                           text="Timezone:",
-                                                          text_font=("Arial", 11))  # font name and size in px
+                                                          font=customtkinter.CTkFont(family="Arial",
+                                                                                     size=self.__default_font_size))
         self.main_timezone_label.grid(row=3, column=2, pady=5, padx=0)
         self.main_timezone_combobox = ttk.Combobox(master=self.frame_info,
                                                    values=self.input_validation.valid_timezone_list,
-                                                   font=("Arial", 10),
+                                                   font=customtkinter.CTkFont(family="Arial",
+                                                                              size=self.__default_font_size),
                                                    textvariable=self.selected_main_timezone)
         self.main_timezone_combobox.bind('<<ComboboxSelected>>', self.set_main_timezone)
         self.main_timezone_combobox.grid(row=3, column=3, pady=5, padx=0)
@@ -284,61 +303,71 @@ class GUIMenu:
         # Fetch Data Section
         self.start_timestamp_label = customtkinter.CTkLabel(master=self.frame_info,
                                                             text="Start Timestamp:",
-                                                            text_font=("Arial", 11))
+                                                            font=customtkinter.CTkFont(family="Arial",
+                                                                                       size=self.__default_font_size))
         self.start_timestamp_label.grid(row=4, column=2, pady=5, padx=0)
         self.start_timestamp_entry = customtkinter.CTkEntry(master=self.frame_info,
-                                                            width=200,
+                                                            width=180,
                                                             height=32,
-                                                            text_font=("Arial", 10),
+                                                            font=customtkinter.CTkFont(family="Arial",
+                                                                                       size=self.__default_font_size),
                                                             placeholder_text="eg. 2022-05-01T00:00:00")
         self.start_timestamp_entry.grid(row=4, column=3, pady=5, padx=0)
         self.end_timestamp_label = customtkinter.CTkLabel(master=self.frame_info,
                                                           text="End Timestamp:",
-                                                          text_font=("Arial", 11))
+                                                          font=customtkinter.CTkFont(family="Arial",
+                                                                                     size=self.__default_font_size))
         self.end_timestamp_label.grid(row=4, column=4, pady=5, padx=0)
         self.end_timestamp_entry = customtkinter.CTkEntry(master=self.frame_info,
-                                                          width=200,
+                                                          width=180,
                                                           height=32,
-                                                          text_font=("Arial", 10),
+                                                          font=customtkinter.CTkFont(family="Arial",
+                                                                                     size=self.__default_font_size),
                                                           placeholder_text="eg. 2022-05-20T00:00:00")
         self.end_timestamp_entry.grid(row=4, column=5, pady=5, padx=0)
         self.num_logs_label = customtkinter.CTkLabel(master=self.frame_info,
                                                      text='Number of Logs:',
-                                                     text_font=("Arial", 11))
+                                                     font=customtkinter.CTkFont(family="Arial",
+                                                                                size=self.__default_font_size))
         self.num_logs_label.grid(row=5, column=2, pady=5, padx=0)
         self.num_logs_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                      width=200,
                                                      height=32,
-                                                     text_font=("Arial", 10),
+                                                     font=customtkinter.CTkFont(family="Arial",
+                                                                                size=self.__default_font_size),
                                                      placeholder_text="eg. 100000")
         self.num_logs_entry.grid(row=5, column=3, pady=5, padx=0)
         self.fields_list_label = customtkinter.CTkLabel(master=self.frame_info,
                                                         text='Fields:',
-                                                        text_font=("Arial", 11))
+                                                        font=customtkinter.CTkFont(family="Arial",
+                                                                                   size=self.__default_font_size))
         self.fields_list_label.grid(row=6, column=2, pady=5, padx=0)
         self.fields_list_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                         height=32,
-                                                        text_font=("Arial", 10),
+                                                        font=customtkinter.CTkFont(family="Arial",
+                                                                                   size=self.__default_font_size),
                                                         placeholder_text="eg. @timestamp, event.code, event.category...")
         self.fields_list_entry.grid(row=6, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         self.filter_list_label = customtkinter.CTkLabel(master=self.frame_info,
                                                         text="Filters:",
-                                                        text_font=("Arial", 11))
+                                                        font=customtkinter.CTkFont(family="Arial",
+                                                                                   size=self.__default_font_size))
         self.filter_list_label.grid(row=7, column=2, pady=5, padx=0)
         self.filter_list_entry = customtkinter.CTkEntry(master=self.frame_info,
                                                         height=32,
-                                                        text_font=("Arial", 10),
+                                                        font=customtkinter.CTkFont(family="Arial",
+                                                                                   size=self.__default_font_size),
                                                         placeholder_text="eg. event.code is_gte 4000; event.category is_not authentication; ...")
         self.filter_list_entry.grid(row=7, column=3, columnspan=3, pady=5, padx=0, sticky="we")
 
         self.file_format_label = customtkinter.CTkLabel(master=self.frame_info,
                                                         text="File Format:",
-                                                        text_font=("Arial", 11))
+                                                        font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size))
         self.file_format_label.grid(row=8, column=2, pady=5, padx=0)
 
         self.file_format_combobox = ttk.Combobox(master=self.frame_info,
                                                  values=self.input_validation.valid_file_format,
-                                                 font=("Arial", 10),
+                                                 font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size),
                                                  textvariable=self.selected_file_format)
         self.file_format_combobox.bind('<<ComboboxSelected>>', self.set_file_format)
 
@@ -347,17 +376,17 @@ class GUIMenu:
         self.frame_info_error_label = customtkinter.CTkLabel(master=self.frame_info,
                                                              text_color="red",
                                                              text="",
-                                                             text_font=("Arial", 10))
+                                                             font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size))
         self.frame_info_error_label.grid(row=9, column=2, columnspan=2, pady=0)
 
         self.fetch_data_button = customtkinter.CTkButton(master=self.frame_right,
                                                          text="Fetch Data  ",
                                                          image=self.icon_photo,
                                                          fg_color="grey",
-                                                         text_font=("Arial", 11),
+                                                         font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size),
                                                          state=customtkinter.DISABLED,
                                                          command=self.fetch_elastic_data_between_ts1_ts2)
-        self.fetch_data_button.grid(row=3, column=0, columnspan=2, pady=0, sticky="s")
+        self.fetch_data_button.grid(row=4, column=0, columnspan=2, pady=0, sticky="s")
 
         self.progress_bar = ttk.Progressbar(master=self.frame_right,
                                             mode="determinate",
@@ -366,11 +395,11 @@ class GUIMenu:
         self.progress_bar.grid(row=8, column=0, padx=20, pady=0, columnspan=3, sticky="we")
         self.progress_bar_label = customtkinter.CTkLabel(master=self.frame_right,
                                                          text="",
-                                                         text_font=("Consolas", 12))
+                                                         font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size))
         self.progress_bar_label.grid(row=9, column=0, padx=20, pady=20, sticky="w")
         self.saved_filepath_label = customtkinter.CTkLabel(master=self.frame_right,
                                                            text="",
-                                                           text_font=("Consolas", 12))
+                                                           font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size))
         self.saved_filepath_label.grid(row=9, column=1, padx=20, pady=20, sticky="w")
 
         # show window
@@ -467,7 +496,7 @@ class GUIMenu:
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
-        self.frame_info_error_label.set_text("")
+        self.frame_info_error_label.configure(text="")
         self.fetch_data_button.configure(state=customtkinter.DISABLED,
                                          fg_color="grey")
         self.primary_app_window.update()
@@ -591,7 +620,8 @@ class GUIMenu:
             data_fetch_thread.join()
 
             self.progress_bar_label.set_text("")
-            self.saved_filepath_label.set_text("Successfully saved data to {}".format(self.__data_writer.csv_filepath))
+            self.saved_filepath_label.set_text("Successfully saved {} data to {}".format(self.request_sender.total_results_size,
+                                                                                         self.__data_writer.csv_filepath))
             self.primary_app_window.update()
 
         elif self.file_format == "json":

@@ -36,14 +36,17 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.left_arrow_image = self.load_image("/images/icons8-left-arrow-50.png", 20)
         self.right_arrow_image = self.load_image("/images/icons8-right-arrow-50.png", 20)
 
-        self.datetime_label = customtkinter.CTkLabel(master=self.frame_left, text="DateTime Format", text_font=("Arial", 13))
+        self.datetime_label = customtkinter.CTkLabel(master=self.frame_left, text="DateTime Format",
+                                                     font=customtkinter.CTkFont(family="Arial", size=15))
         self.datetime_label.grid(row=0, column=0, pady=10, padx=40)
-        self.datetime_start_ts_label = customtkinter.CTkLabel(master=self.frame_left, text="Start Timestamp:", text_font=("Arial", 10))
+        self.datetime_start_ts_label = customtkinter.CTkLabel(master=self.frame_left, text="Start Timestamp:",
+                                                              font=customtkinter.CTkFont(family="Arial", size=12))
         self.datetime_start_ts_label.grid(row=1, column=0)
         self.datetime_start_ts_entry = customtkinter.CTkEntry(master=self.frame_left, height=32, placeholder_text="eg. 2022-05-01T00:00:00")
         self.datetime_start_ts_entry.grid(row=2, column=0, columnspan=3, padx=20, pady=0, sticky="ew")
 
-        self.datetime_end_ts_label = customtkinter.CTkLabel(master=self.frame_left, text="End Timestamp:", text_font=("Arial", 10))
+        self.datetime_end_ts_label = customtkinter.CTkLabel(master=self.frame_left, text="End Timestamp:",
+                                                            font=customtkinter.CTkFont(family="Arial", size=12))
         self.datetime_end_ts_label.grid(row=3, column=0)
         self.datetime_end_ts_entry = customtkinter.CTkEntry(master=self.frame_left, height=32, placeholder_text="eg. 2022-05-20T00:00:00")
         self.datetime_end_ts_entry.grid(row=4, column=0, columnspan=3, padx=20, pady=0, sticky="ew")
@@ -51,7 +54,7 @@ class GUITSConverter(customtkinter.CTkToplevel):
         # Selecting Timezone
         self.timezone_label = customtkinter.CTkLabel(master=self.frame_left,
                                                      text="Timezone:",
-                                                     text_font=("Arial", 10))  # font name and size in px
+                                                     font=customtkinter.CTkFont(family="Arial", size=12))
         self.timezone_label.grid(row=5, column=0, pady=0, padx=20)
         self.timezone_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_left,
                                                                values=self.input_validation.valid_timezone_list,
@@ -61,9 +64,9 @@ class GUITSConverter(customtkinter.CTkToplevel):
 
         self.frame_left_error_label = customtkinter.CTkLabel(master=self.frame_left,
                                                              text="",
-                                                             text_font=("Arial", 10),
+                                                             font=customtkinter.CTkFont(family="Arial", size=12),
                                                              text_color="red")
-        self.frame_left_error_label.grid(row=7, column=0, pady=0, padx=20)
+        self.frame_left_error_label.grid(row=7, column=0, pady=0, padx=20, sticky="we")
 
         self.right_arrow_button = customtkinter.CTkButton(master=self.frame_middle, image=self.right_arrow_image, text="", width=40, height=40,
                                                           corner_radius=10, fg_color="#395E9C", hover_color="#144870",
@@ -76,27 +79,27 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.left_arrow_button.grid(row=4, column=0, columnspan=1, padx=5, pady=10, sticky="nsew")
 
         self.epoch_label = customtkinter.CTkLabel(master=self.frame_right, text="Epoch Format",
-                                                  text_font=("Arial", 13))
+                                                  font=customtkinter.CTkFont(family="Arial", size=15))
         self.epoch_label.grid(row=0, column=0, pady=10, padx=50)
         self.epoch_start_ts_label = customtkinter.CTkLabel(master=self.frame_right, text="Start Timestamp:",
-                                                              text_font=("Arial", 10))
+                                                           font=customtkinter.CTkFont(family="Arial", size=12))
         self.epoch_start_ts_label.grid(row=1, column=0)
         self.epoch_start_ts_entry = customtkinter.CTkEntry(master=self.frame_right, height=32,
-                                                              placeholder_text="eg. 1651363200000")
+                                                           placeholder_text="eg. 1651363200000")
         self.epoch_start_ts_entry.grid(row=2, column=0, columnspan=3, padx=20, pady=0, sticky="ew")
 
         self.epoch_end_ts_label = customtkinter.CTkLabel(master=self.frame_right, text="End Timestamp:",
-                                                            text_font=("Arial", 10))
+                                                         font=customtkinter.CTkFont(family="Arial", size=12))
         self.epoch_end_ts_label.grid(row=3, column=0)
         self.epoch_end_ts_entry = customtkinter.CTkEntry(master=self.frame_right, height=32,
-                                                            placeholder_text="eg. 1653004800000")
+                                                         placeholder_text="eg. 1653004800000")
         self.epoch_end_ts_entry.grid(row=4, column=0, columnspan=3, padx=20, pady=0, sticky="ew")
 
         self.frame_right_error_label = customtkinter.CTkLabel(master=self.frame_right,
                                                               text="",
-                                                              text_font=("Arial", 10),
+                                                              font=customtkinter.CTkFont(family="Arial", size=12),
                                                               text_color="red")
-        self.frame_right_error_label.grid(row=5, column=0, pady=55, padx=20)
+        self.frame_right_error_label.grid(row=5, column=0, pady=55, padx=20, sticky="we")
 
     def convert_datetime_to_epoch(self):
         self.frame_left_error_label.configure(text="")
@@ -106,19 +109,21 @@ class GUITSConverter(customtkinter.CTkToplevel):
         end_ts_datetime = self.datetime_end_ts_entry.get().strip()
 
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts_datetime):
-            self.frame_left_error_label.configure(text="Start Time: Incorrect format!")
+            self.frame_left_error_label.configure(text="Start Time:\n"
+                                                       "Incorrect format")
             self.clear_epoch_entries()
             return
 
         if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts_datetime):
-            self.frame_left_error_label.configure(text="End Time: Incorrect format!")
+            self.frame_left_error_label.configure(text="End Time:\n"
+                                                       "Incorrect format")
             self.clear_epoch_entries()
             return
 
         if not self.input_validation.is_endts_gte_startts(timestamp_format="datetime",
                                                           start_ts=start_ts_datetime,
                                                           end_ts=end_ts_datetime):
-            self.frame_left_error_label.configure(text="End Time < Start Time! Error!")
+            self.frame_left_error_label.configure(text="End Time < Start Time")
             self.clear_epoch_entries()
             return
 
@@ -140,19 +145,21 @@ class GUITSConverter(customtkinter.CTkToplevel):
         end_ts_epoch = self.epoch_end_ts_entry.get().strip()
 
         if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts_epoch):
-            self.frame_right_error_label.configure(text="Start Time: Incorrect format!")
+            self.frame_right_error_label.configure(text="Start Time:\n"
+                                                        "Incorrect format")
             self.clear_datetime_entries()
             return
 
         if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts_epoch):
-            self.frame_right_error_label.configure(text="End Time: Incorrect Format!")
+            self.frame_right_error_label.configure(text="End Time:\n"
+                                                        "Incorrect Format")
             self.clear_datetime_entries()
             return
 
         if not self.input_validation.is_endts_gte_startts(timestamp_format="epoch",
                                                           start_ts=start_ts_epoch,
                                                           end_ts=end_ts_epoch):
-            self.frame_right_error_label.configure(text="End Time < Start Time! Error!")
+            self.frame_right_error_label.configure(text="End Time < Start Time")
             self.clear_datetime_entries()
             return
 

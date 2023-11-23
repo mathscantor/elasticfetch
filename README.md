@@ -33,7 +33,7 @@ pip3 install tqdm
 # Additional Python Packages (For GUI)
 # If you only plan to use the CLI version, you are not required to install the packages below. 
 pip3 install tk
-pip3 install customtkinter==4.6.3
+pip3 install customtkinter==5.2.1
 pip3 install pillow
 
 # For Linux users, you need this additional packages
