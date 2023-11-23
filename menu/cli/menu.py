@@ -99,6 +99,8 @@ class CommandLineMenu:
         indices_status = self.__request_sender.get_indices_status()
         temp_list = indices_status.split("\n")[1:-1]
         index_dict = {}
+
+        index_dict[0] = "Custom Index Name (Wildcard * available for use)"
         i = 1
         for entry in temp_list:
             index_name = entry.split()[2]
@@ -114,14 +116,18 @@ class CommandLineMenu:
         index_option = int(index_option)
         if not self.__input_validation.is_option_in_available(option=index_option, options_dict=index_dict):
             return
-        self.__index_name = index_dict[index_option]
+
+        if index_option == 0:
+            self.__index_name = str(input("Enter your custom index name: "))
+        else:
+            self.__index_name = index_dict[index_option]
+        return
 
     def set_main_timestamp(self):
 
         response = self.__request_sender.get_available_fields(index_name=self.__index_name)
         if response is not None:
-            parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(index_name=self.__index_name,
-                                                                                           fields_json=response)
+            parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(fields_json=response)
         print("{:<30} {:<10} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
         print("{:<30} {:<10} {:<30}".format('----------------', '----', '------------------'))
         valid_timestamp_name_list = []
@@ -170,8 +176,7 @@ class CommandLineMenu:
     def show_available_fields(self):
         response = self.__request_sender.get_available_fields(index_name=self.__index_name)
         if response is not None:
-            parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(index_name=self.__index_name,
-                                                                                           fields_json=response)
+            parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(fields_json=response)
             print("{:<30} {:<20} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
             print("{:<30} {:<20} {:<30}".format('----------------', '----', '------------------'))
 

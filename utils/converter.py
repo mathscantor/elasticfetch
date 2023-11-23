@@ -125,30 +125,34 @@ class Converter:
         return query_bool_must_not_list
 
     def convert_field_mapping_keys_pretty(self,
-                                          index_name: str,
                                           fields_json: dict) -> dict:
 
-        field_list = list(fields_json[index_name]["mappings"].keys())
-        field_list.sort()
         top_parent_to_type_dict = {}
 
-        for field in field_list:
-            field_tokens = field.split('.')
-            top_parent_field = field_tokens[0]
-            last_child_field = field_tokens[-1]
-            if len(fields_json[index_name]["mappings"][field]["mapping"]) != 0 and "type" in \
-                    fields_json[index_name]["mappings"][field]["mapping"][last_child_field].keys():
-                last_child_field_type = fields_json[index_name]["mappings"][field]["mapping"][last_child_field]["type"]
-            else:
-                last_child_field_type = "NoType"
+        for index_name in fields_json.keys():
 
-            if top_parent_field not in top_parent_to_type_dict:
-                top_parent_to_type_dict[top_parent_field] = {}
+            if "error" in fields_json.keys():
+                continue
 
-            if last_child_field_type not in top_parent_to_type_dict[top_parent_field]:
-                top_parent_to_type_dict[top_parent_field][last_child_field_type] = [field]
-            else:
-                top_parent_to_type_dict[top_parent_field][last_child_field_type].append(field)
+            field_list = list(fields_json[index_name]["mappings"].keys())
+            field_list.sort()
+            for field in field_list:
+                field_tokens = field.split('.')
+                top_parent_field = field_tokens[0]
+                last_child_field = field_tokens[-1]
+                if len(fields_json[index_name]["mappings"][field]["mapping"]) != 0 and "type" in \
+                        fields_json[index_name]["mappings"][field]["mapping"][last_child_field].keys():
+                    last_child_field_type = fields_json[index_name]["mappings"][field]["mapping"][last_child_field]["type"]
+                else:
+                    last_child_field_type = "NoType"
+
+                if top_parent_field not in top_parent_to_type_dict:
+                    top_parent_to_type_dict[top_parent_field] = {}
+
+                if last_child_field_type not in top_parent_to_type_dict[top_parent_field]:
+                    top_parent_to_type_dict[top_parent_field][last_child_field_type] = [field]
+                else:
+                    top_parent_to_type_dict[top_parent_field][last_child_field_type].append(field)
 
         return top_parent_to_type_dict
 

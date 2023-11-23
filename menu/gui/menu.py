@@ -61,6 +61,8 @@ class GUIMenu:
         self.show_indices_status_button = None
         self.current_index_label = None
         self.current_index_combobox = None
+        self.current_index_entry = None # For custom name and wildcard usage
+        self.index_name_wildcard_switch = None
         self.indices_status = "placeholder"
         self.current_index = "N/A"
         self.selected_index = tkinter.StringVar()
@@ -218,6 +220,15 @@ class GUIMenu:
                                                                 command=self.display_ts_converter_window)
         self.datetime_to_epoch_button.grid(row=3, column=0, pady=10, padx=20)
 
+        # Enable wildcard usage
+        self.index_name_wildcard_switch = customtkinter.CTkSwitch(master=self.frame_left,
+                                                                  text="Index Name Wildcard Toggle",
+                                                                  font=customtkinter.CTkFont(family="Arial",
+                                                                                             size=self.__default_font_size),
+                                                                  command=self.switch_index_input_method
+                                                                  )
+        self.index_name_wildcard_switch.grid(row=4, column=0, pady=10, padx=20)
+
         # Theme Option Menu
         self.theme_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_left,
                                                             values=self.available_themes,
@@ -236,6 +247,7 @@ class GUIMenu:
         self.current_index_label.grid(row=0, column=2, pady=20, padx=0)
         self.current_index_combobox = ttk.Combobox(master=self.frame_info,
                                                    values=self.index_list,
+                                                   state="normal",
                                                    font=customtkinter.CTkFont(family="Arial",
                                                                               size=self.__default_font_size),
                                                    textvariable=self.selected_index)
@@ -243,6 +255,17 @@ class GUIMenu:
 
         self.current_index_combobox.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         self.current_index_combobox.set(self.current_index)
+
+        self.current_index_entry = customtkinter.CTkEntry(master=self.frame_info,
+                                                          width=180,
+                                                          height=32,
+                                                          font=customtkinter.CTkFont(family="Arial",
+                                                                                     size=self.__default_font_size),
+                                                          textvariable=self.selected_index,
+                                                          placeholder_text="eg. *filebeat*")
+        self.current_index_entry.bind('<Return>', self.set_current_index)
+        self.current_index_entry.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+        self.current_index_entry.grid_forget()
 
         # Show available fields button
         self.show_available_field_names_button = customtkinter.CTkButton(master=self.frame_info,
@@ -467,23 +490,21 @@ class GUIMenu:
     def set_current_index(self, event):
         self.show_available_field_names_button.configure(state=customtkinter.DISABLED,
                                                          fg_color="grey")
-        if self.selected_index.get() != "N/A":
-            self.current_index = self.selected_index.get()
-            response = self.__request_sender.get_available_fields(index_name=self.current_index)
-            if response is not None:
-                self.parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(
-                    index_name=self.current_index,
-                    fields_json=response)
-                self.get_valid_timestamp_name_list()
-                self.get_available_field_list()
-            self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
-                                                             fg_color="#395E9C")
-            self.main_timestamp_name_combobox.configure(values=self.valid_timestamp_name_list,
-                                                        state=tkinter.NORMAL)
-            self.fetch_data_button.configure(state=customtkinter.NORMAL,
-                                             fg_color="#395E9C")
-        else:
-            self.parent_field_to_type_dict = {}
+
+        self.parent_field_to_type_dict = {}
+
+        self.current_index = self.selected_index.get()
+        response = self.__request_sender.get_available_fields(index_name=self.current_index)
+        if response is not None:
+            self.parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(fields_json=response)
+            self.get_valid_timestamp_name_list()
+            self.get_available_field_list()
+        self.show_available_field_names_button.configure(state=customtkinter.NORMAL,
+                                                         fg_color="#395E9C")
+        self.main_timestamp_name_combobox.configure(values=self.valid_timestamp_name_list,
+                                                    state=tkinter.NORMAL)
+        self.fetch_data_button.configure(state=customtkinter.NORMAL,
+                                         fg_color="#395E9C")
         return
 
     def show_indices_status(self):
@@ -493,6 +514,16 @@ class GUIMenu:
     def show_available_field_names(self):
         GUIShowAvailableFields(current_index=self.current_index,
                                parent_field_to_type_dict=self.parent_field_to_type_dict).focus()
+        return
+
+    def switch_index_input_method(self):
+        if self.index_name_wildcard_switch.get() == 1:
+            self.current_index_combobox.grid_forget()
+            self.current_index_entry.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
+
+        else:
+            self.current_index_entry.grid_forget()
+            self.current_index_combobox.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
