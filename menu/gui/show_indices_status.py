@@ -10,7 +10,7 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
 
         self.title("elasticfetch - Indices Status")
         self.geometry("1120x480")
-        self.resizable(False, False)
+        # self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=4)
         self.grid_columnconfigure(0, weight=1)

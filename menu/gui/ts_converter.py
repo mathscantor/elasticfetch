@@ -15,7 +15,7 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.timezone = "+00:00"
         self.geometry("680x300")
         self.title("elasticfetch - Timestamp Converter")
-        self.resizable(False, False)
+        # self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure((0,1,2), weight=1, minsize=20)
 

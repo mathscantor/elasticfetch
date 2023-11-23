@@ -14,7 +14,7 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
 
         self.title("elasticfetch - Available Fields for {}".format(current_index))
         self.geometry("800x400")
-        self.resizable(False, False)
+        # self.resizable(False, False)
         self.grid_rowconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=5)
         self.grid_columnconfigure(0, weight=1)

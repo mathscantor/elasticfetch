@@ -458,14 +458,12 @@ class GUIMenu:
         return
 
     def show_indices_status(self):
-        gui_show_indices_status = GUIShowIndicesStatus(indices_status=self.indices_status)
-        gui_show_indices_status.mainloop()
+        GUIShowIndicesStatus(indices_status=self.indices_status)
         return
 
     def show_available_field_names(self):
-        gui_show_available_fields = GUIShowAvailableFields(current_index=self.current_index,
-                                                           parent_field_to_type_dict=self.parent_field_to_type_dict)
-        gui_show_available_fields.mainloop()
+        GUIShowAvailableFields(current_index=self.current_index,
+                               parent_field_to_type_dict=self.parent_field_to_type_dict)
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
@@ -626,9 +624,8 @@ class GUIMenu:
         return
 
     def display_ts_converter_window(self):
-        gui_ts_converter = GUITSConverter(converter=self.converter,
-                                          input_validation=self.input_validation)
-        gui_ts_converter.mainloop()
+        GUITSConverter(converter=self.converter,
+                       input_validation=self.input_validation)
         return
 
     def on_closing_primary_app_window(self):
