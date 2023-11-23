@@ -487,12 +487,12 @@ class GUIMenu:
         return
 
     def show_indices_status(self):
-        GUIShowIndicesStatus(indices_status=self.indices_status)
+        GUIShowIndicesStatus(indices_status=self.indices_status).focus()
         return
 
     def show_available_field_names(self):
         GUIShowAvailableFields(current_index=self.current_index,
-                               parent_field_to_type_dict=self.parent_field_to_type_dict)
+                               parent_field_to_type_dict=self.parent_field_to_type_dict).focus()
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
@@ -655,7 +655,7 @@ class GUIMenu:
 
     def display_ts_converter_window(self):
         GUITSConverter(converter=self.converter,
-                       input_validation=self.input_validation)
+                       input_validation=self.input_validation).focus()
         return
 
     def on_closing_primary_app_window(self):
