@@ -35,6 +35,7 @@ pip3 install tqdm
 pip3 install tk
 pip3 install customtkinter==5.2.1
 pip3 install pillow
+pip3 install packaging
 
 # For Linux users, you need this additional packages
 # Ubuntu or other distros with Apt:
