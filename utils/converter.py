@@ -150,9 +150,10 @@ class Converter:
                     top_parent_to_type_dict[top_parent_field] = {}
 
                 if last_child_field_type not in top_parent_to_type_dict[top_parent_field]:
-                    top_parent_to_type_dict[top_parent_field][last_child_field_type] = [field]
+                    top_parent_to_type_dict[top_parent_field][last_child_field_type] = set()
+                    top_parent_to_type_dict[top_parent_field][last_child_field_type].add(field)
                 else:
-                    top_parent_to_type_dict[top_parent_field][last_child_field_type].append(field)
+                    top_parent_to_type_dict[top_parent_field][last_child_field_type].add(field)
 
         return top_parent_to_type_dict
 
