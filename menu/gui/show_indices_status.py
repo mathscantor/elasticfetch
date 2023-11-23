@@ -1,7 +1,5 @@
 import customtkinter
 import tkinter
-from PIL import Image, ImageTk
-import os
 
 
 class GUIShowIndicesStatus(customtkinter.CTkToplevel):

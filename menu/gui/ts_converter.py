@@ -10,9 +10,9 @@ class GUITSConverter(customtkinter.CTkToplevel):
                  converter,
                  input_validation):
         super().__init__()
-        self.converter = converter
-        self.input_validation = input_validation
-        self.timezone = "+00:00"
+        self.__converter = converter
+        self.__input_validation = input_validation
+        self.__timezone = "+00:00"
         self.geometry("680x300")
         self.title("elasticfetch - Timestamp Converter")
         # self.resizable(False, False)
@@ -57,9 +57,9 @@ class GUITSConverter(customtkinter.CTkToplevel):
                                                      font=customtkinter.CTkFont(family="Arial", size=12))
         self.timezone_label.grid(row=5, column=0, pady=0, padx=20)
         self.timezone_optionmenu = customtkinter.CTkOptionMenu(master=self.frame_left,
-                                                               values=self.input_validation.valid_timezone_list,
+                                                               values=self.__input_validation.valid_timezone_list,
                                                                command=self.set_timezone)
-        self.timezone_optionmenu.set(self.timezone)
+        self.timezone_optionmenu.set(self.__timezone)
         self.timezone_optionmenu.grid(row=6, column=0, pady=0, padx=20)
 
         self.frame_left_error_label = customtkinter.CTkLabel(master=self.frame_left,
@@ -108,29 +108,29 @@ class GUITSConverter(customtkinter.CTkToplevel):
         start_ts_datetime = self.datetime_start_ts_entry.get().strip()
         end_ts_datetime = self.datetime_end_ts_entry.get().strip()
 
-        if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts_datetime):
+        if not self.__input_validation.is_datetime_timestamp_valid(timestamp=start_ts_datetime):
             self.frame_left_error_label.configure(text="Start Time:\n"
                                                        "Incorrect format")
             self.clear_epoch_entries()
             return
 
-        if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts_datetime):
+        if not self.__input_validation.is_datetime_timestamp_valid(timestamp=end_ts_datetime):
             self.frame_left_error_label.configure(text="End Time:\n"
                                                        "Incorrect format")
             self.clear_epoch_entries()
             return
 
-        if not self.input_validation.is_endts_gte_startts(timestamp_format="datetime",
-                                                          start_ts=start_ts_datetime,
-                                                          end_ts=end_ts_datetime):
+        if not self.__input_validation.is_endts_gte_startts(timestamp_format="datetime",
+                                                            start_ts=start_ts_datetime,
+                                                            end_ts=end_ts_datetime):
             self.frame_left_error_label.configure(text="End Time < Start Time")
             self.clear_epoch_entries()
             return
 
-        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts_datetime,
-                                                                         timezone=self.timezone)
-        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts_datetime,
-                                                                       timezone=self.timezone)
+        start_ts_epoch = self.__converter.convert_datetime_to_epoch_millis(date_time=start_ts_datetime,
+                                                                           timezone=self.__timezone)
+        end_ts_epoch = self.__converter.convert_datetime_to_epoch_millis(date_time=end_ts_datetime,
+                                                                         timezone=self.__timezone)
         self.clear_epoch_entries()
         self.epoch_start_ts_entry.insert(0, start_ts_epoch)
         self.epoch_end_ts_entry.insert(0, end_ts_epoch)
@@ -144,27 +144,27 @@ class GUITSConverter(customtkinter.CTkToplevel):
         start_ts_epoch = self.epoch_start_ts_entry.get().strip()
         end_ts_epoch = self.epoch_end_ts_entry.get().strip()
 
-        if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts_epoch):
+        if not self.__input_validation.is_epoch_timestamp_valid(timestamp=start_ts_epoch):
             self.frame_right_error_label.configure(text="Start Time:\n"
                                                         "Incorrect format")
             self.clear_datetime_entries()
             return
 
-        if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts_epoch):
+        if not self.__input_validation.is_epoch_timestamp_valid(timestamp=end_ts_epoch):
             self.frame_right_error_label.configure(text="End Time:\n"
                                                         "Incorrect Format")
             self.clear_datetime_entries()
             return
 
-        if not self.input_validation.is_endts_gte_startts(timestamp_format="epoch",
-                                                          start_ts=start_ts_epoch,
-                                                          end_ts=end_ts_epoch):
+        if not self.__input_validation.is_endts_gte_startts(timestamp_format="epoch",
+                                                            start_ts=start_ts_epoch,
+                                                            end_ts=end_ts_epoch):
             self.frame_right_error_label.configure(text="End Time < Start Time")
             self.clear_datetime_entries()
             return
 
-        start_ts_date_time = self.converter.convert_epoch_millis_to_datetime(epoch=start_ts_epoch, timezone=self.timezone)
-        end_ts_date_time = self.converter.convert_epoch_millis_to_datetime(epoch=end_ts_epoch, timezone=self.timezone)
+        start_ts_date_time = self.__converter.convert_epoch_millis_to_datetime(epoch=start_ts_epoch, timezone=self.__timezone)
+        end_ts_date_time = self.__converter.convert_epoch_millis_to_datetime(epoch=end_ts_epoch, timezone=self.__timezone)
 
         self.clear_datetime_entries()
         self.datetime_start_ts_entry.insert(0, start_ts_date_time)
@@ -172,7 +172,7 @@ class GUITSConverter(customtkinter.CTkToplevel):
         return
 
     def set_timezone(self, timezone):
-        self.timezone = timezone
+        self.__timezone = timezone
         return
 
     def clear_epoch_entries(self):

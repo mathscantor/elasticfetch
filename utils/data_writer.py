@@ -1,7 +1,7 @@
 from datetime import datetime
 import os
 from typing import *
-from utils.messenger import messenger
+from utils.messenger import Messenger, Severity
 import csv
 import json
 import threading
@@ -11,6 +11,7 @@ from utils.request_sender import RequestSender
 class DataWriter:
 
     def __init__(self):
+        self.__messenger = Messenger()
         self.__datasets_folder = "./datasets"
         self.__csv_filepath = ""
         self.__json_filepath = ""
@@ -24,7 +25,7 @@ class DataWriter:
         current_datetime = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S")
         self.__csv_filepath = "{}/{}Z.csv".format(self.__datasets_folder, current_datetime)
         os.makedirs(os.path.dirname( self.__csv_filepath), exist_ok=True)
-        messenger(3, "Saving data to {}".format( self.__csv_filepath))
+        self.__messenger.print_message(Severity.INFO, "Saving data to {}".format( self.__csv_filepath))
 
         f_csv = open( self.__csv_filepath, "w", newline='', encoding="utf8")
         csv_writer = csv.writer(f_csv)
@@ -77,7 +78,7 @@ class DataWriter:
         self.__json_filepath = "{}/{}Z.json".format(self.__datasets_folder, current_datetime)
         os.makedirs(os.path.dirname(self.__json_filepath), exist_ok=True)
 
-        messenger(3, "Saving data to {}".format(self.__json_filepath))
+        self.__messenger.print_message(Severity.INFO, "Saving data to {}".format(self.__json_filepath))
 
         is_first_data_json = True
         master_data_json = None

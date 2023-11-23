@@ -15,12 +15,12 @@ class CommandLineMenu:
                  converter: Converter,
                  input_validation: InputValidation,
                  parser: Parser):
-        self.description = "Provides users different options when feteching elastic data"
+
         self.__request_sender = request_sender
         self.__data_writer = DataWriter()
-        self.converter = converter
-        self.input_validation = input_validation
-        self.menu_options = {
+        self.__converter = converter
+        self.__input_validation = input_validation
+        self.__menu_options = {
             1: 'Show indices status',
             2: 'Set current index',
             3: 'Set main timestamp name, format and timezone',
@@ -29,45 +29,45 @@ class CommandLineMenu:
             6: 'Fetch data between two timestamps',
             7: 'Exit',
         }
-        self.convert_timestamp_menu_options = {
+        self.__convert_timestamp_menu_options = {
             1: 'Convert datetime to epoch',
             2: 'Convert epoch to datetime'
         }
-        self.input_validation = input_validation
-        self.parser = parser
-        self.index_name = "N/A"
-        self.main_timestamp_name = "@timestamp"
-        self.main_timestamp_format = "datetime"
-        self.main_timezone = "+00:00"
-        self.header = "===============================================================\n" \
-                      "        _              _    _         __       _         _     \n" \
-                      "       | |            | |  (_)       / _|     | |       | |    \n" \
-                      "   ___ | |  __ _  ___ | |_  _   ___ | |_  ___ | |_  ___ | |__  \n" \
-                      "  / _ \| | / _` |/ __|| __|| | / __||  _|/ _ \| __|/ __|| '_ \ \n" \
-                      " |  __/| || (_| |\__ \| |_ | || (__ | | |  __/| |_| (__ | | | |\n" \
-                      "  \___||_| \__,_||___/ \__||_| \___||_|  \___| \__|\___||_| |_|\n\n" \
-                      "    Developed by: Gerald Lim Wee Koon (github: mathscantor)    \n" \
-                      "===============================================================\n"
+        self.__input_validation = input_validation
+        self.__parser = parser
+        self.__index_name = "N/A"
+        self.__main_timestamp_name = "@timestamp"
+        self.__main_timestamp_format = "datetime"
+        self.__main_timezone = "+00:00"
+        self.__header = "===============================================================\n" \
+                        "        _              _    _         __       _         _     \n" \
+                        "       | |            | |  (_)       / _|     | |       | |    \n" \
+                        "   ___ | |  __ _  ___ | |_  _   ___ | |_  ___ | |_  ___ | |__  \n" \
+                        "  / _ \| | / _` |/ __|| __|| | / __||  _|/ _ \| __|/ __|| '_ \ \n" \
+                        " |  __/| || (_| |\__ \| |_ | || (__ | | |  __/| |_| (__ | | | |\n" \
+                        "  \___||_| \__,_||___/ \__||_| \___||_|  \___| \__|\___||_| |_|\n\n" \
+                        "    Developed by: Gerald Lim Wee Koon (github: mathscantor)    \n" \
+                        "===============================================================\n"
         return
 
     def show_menu(self):
 
-        print(self.header)
-        if self.index_name == "N/A":
+        print(self.__header)
+        if self.__index_name == "N/A":
             print("Current index selected:\033[93m N/A (Please set an index before fetching any data!)\033[0m")
         else:
-            print("Current index selected:\033[93m {}\033[0m".format(self.index_name))
-        print("Main Timestamp Field: \033[93m {}\033[0m".format(self.main_timestamp_name))
-        print("Main Timestamp Format: \033[93m {}\033[0m".format(self.main_timestamp_format))
-        print("Main Timezone: \033[93m {}\033[0m\n".format(self.main_timezone))
+            print("Current index selected:\033[93m {}\033[0m".format(self.__index_name))
+        print("Main Timestamp Field: \033[93m {}\033[0m".format(self.__main_timestamp_name))
+        print("Main Timestamp Format: \033[93m {}\033[0m".format(self.__main_timestamp_format))
+        print("Main Timezone: \033[93m {}\033[0m\n".format(self.__main_timezone))
 
-        for key in self.menu_options.keys():
-            print(key, '--', self.menu_options[key])
+        for key in self.__menu_options.keys():
+            print(key, '--', self.__menu_options[key])
         menu_option = input('Enter your choice: ')
-        if not self.input_validation.is_numeric_valid(menu_option):
+        if not self.__input_validation.is_numeric_valid(menu_option):
             return
         menu_option = int(menu_option)
-        if not self.input_validation.is_option_in_available(menu_option, self.menu_options):
+        if not self.__input_validation.is_option_in_available(menu_option, self.__menu_options):
             return
         print("")
 
@@ -76,15 +76,15 @@ class CommandLineMenu:
         elif menu_option == 2:
             self.set_current_index()
         elif menu_option == 3:
-            if self.input_validation.is_index_name_set(self.index_name):
+            if self.__input_validation.is_index_name_set(self.__index_name):
                 self.set_main_timestamp()
         elif menu_option == 4:
-            if self.input_validation.is_index_name_set(self.index_name):
+            if self.__input_validation.is_index_name_set(self.__index_name):
                 self.show_available_fields()
         elif menu_option == 5:
             self.convert_timestamp_format()
         elif menu_option == 6:
-            if self.input_validation.is_index_name_set(self.index_name):
+            if self.__input_validation.is_index_name_set(self.__index_name):
                 self.fetch_elastic_data_between_ts1_ts2()
         elif menu_option == 7:
             exit(0)
@@ -109,19 +109,19 @@ class CommandLineMenu:
             print(key, '--', index_dict[key])
         print("")
         index_option = input('Enter your index choice: ')
-        if not self.input_validation.is_numeric_valid(index_option):
+        if not self.__input_validation.is_numeric_valid(index_option):
             return
         index_option = int(index_option)
-        if not self.input_validation.is_option_in_available(option=index_option, options_dict=index_dict):
+        if not self.__input_validation.is_option_in_available(option=index_option, options_dict=index_dict):
             return
-        self.index_name = index_dict[index_option]
+        self.__index_name = index_dict[index_option]
 
     def set_main_timestamp(self):
 
-        response = self.__request_sender.get_available_fields(index_name=self.index_name)
+        response = self.__request_sender.get_available_fields(index_name=self.__index_name)
         if response is not None:
-            parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.index_name,
-                                                                                         fields_json=response)
+            parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(index_name=self.__index_name,
+                                                                                           fields_json=response)
         print("{:<30} {:<10} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
         print("{:<30} {:<10} {:<30}".format('----------------', '----', '------------------'))
         valid_timestamp_name_list = []
@@ -144,23 +144,23 @@ class CommandLineMenu:
                     print("")
 
         chosen_timestamp_name = input("Main Timestamp Name: ").strip()
-        if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=chosen_timestamp_name,
-                                                             valid_timestamp_name_list=valid_timestamp_name_list):
+        if not self.__input_validation.is_timestamp_name_valid(chosen_timestamp_name=chosen_timestamp_name,
+                                                               valid_timestamp_name_list=valid_timestamp_name_list):
             return
         chosen_timestamp_format = input("Main Timestamp Format: ").strip()
-        if not self.input_validation.is_timestamp_format_valid(chosen_timestamp_format=chosen_timestamp_format):
+        if not self.__input_validation.is_timestamp_format_valid(chosen_timestamp_format=chosen_timestamp_format):
             return
 
         if chosen_timestamp_format == "datetime":
             chosen_timezone = input("Main Timezone: ").strip()
         elif chosen_timestamp_format == "epoch":
             chosen_timezone = "+00:00"
-        if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
+        if not self.__input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
             return
 
-        self.main_timestamp_name = chosen_timestamp_name
-        self.main_timestamp_format = chosen_timestamp_format
-        self.main_timezone = chosen_timezone
+        self.__main_timestamp_name = chosen_timestamp_name
+        self.__main_timestamp_format = chosen_timestamp_format
+        self.__main_timezone = chosen_timezone
         return
 
     '''
@@ -168,10 +168,10 @@ class CommandLineMenu:
     '''
 
     def show_available_fields(self):
-        response = self.__request_sender.get_available_fields(index_name=self.index_name)
+        response = self.__request_sender.get_available_fields(index_name=self.__index_name)
         if response is not None:
-            parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(index_name=self.index_name,
-                                                                                         fields_json=response)
+            parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(index_name=self.__index_name,
+                                                                                           fields_json=response)
             print("{:<30} {:<20} {:<30}".format('TOP LEVEL PARENT', 'TYPE', 'ALL RELATED FIELDS'))
             print("{:<30} {:<20} {:<30}".format('----------------', '----', '------------------'))
 
@@ -192,14 +192,14 @@ class CommandLineMenu:
         return
 
     def convert_timestamp_format(self):
-        for key in self.convert_timestamp_menu_options.keys():
-            print(key, '--', self.convert_timestamp_menu_options[key])
+        for key in self.__convert_timestamp_menu_options.keys():
+            print(key, '--', self.__convert_timestamp_menu_options[key])
         convert_timestamp_menu_option = input('Enter your choice: ')
-        if not self.input_validation.is_numeric_valid(convert_timestamp_menu_option):
+        if not self.__input_validation.is_numeric_valid(convert_timestamp_menu_option):
             return
         convert_timestamp_menu_option = int(convert_timestamp_menu_option)
-        if not self.input_validation.is_option_in_available(convert_timestamp_menu_option,
-                                                            self.convert_timestamp_menu_options):
+        if not self.__input_validation.is_option_in_available(convert_timestamp_menu_option,
+                                                              self.__convert_timestamp_menu_options):
             return
         if convert_timestamp_menu_option == 1:
             self.convert_datetime_range_to_epoch_range()
@@ -211,16 +211,16 @@ class CommandLineMenu:
         print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
               "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
         start_ts = input("Start Timestamp: ")
-        if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
+        if not self.__input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
             return
         end_ts = input("End Timestamp: ")
-        if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
+        if not self.__input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
             return
         chosen_timezone = input("Timezone: ")
-        if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
+        if not self.__input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
             return
-        start_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=start_ts, timezone=chosen_timezone)
-        end_ts_epoch = self.converter.convert_datetime_to_epoch_millis(date_time=end_ts, timezone=chosen_timezone)
+        start_ts_epoch = self.__converter.convert_datetime_to_epoch_millis(date_time=start_ts, timezone=chosen_timezone)
+        end_ts_epoch = self.__converter.convert_datetime_to_epoch_millis(date_time=end_ts, timezone=chosen_timezone)
 
         print("Epoch Range: {} - {}".format(start_ts_epoch, end_ts_epoch))
         return
@@ -229,42 +229,42 @@ class CommandLineMenu:
         print("timestamp format: <10 / 13 digit string>\n"
               "eg. 1420070400 or 1420070400001")
         start_ts = input("Start Timestamp: ")
-        if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
+        if not self.__input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
             return
         end_ts = input("End Timestamp: ")
-        if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
+        if not self.__input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
             return
         chosen_timezone = input("Timezone: ")
-        if not self.input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
+        if not self.__input_validation.is_timezone_valid(chosen_timezone=chosen_timezone):
             return
-        start_ts_datetime = self.converter.convert_epoch_millis_to_datetime(epoch=start_ts, timezone=chosen_timezone)
-        end_ts_datetime = self.converter.convert_epoch_millis_to_datetime(epoch=end_ts, timezone=chosen_timezone)
+        start_ts_datetime = self.__converter.convert_epoch_millis_to_datetime(epoch=start_ts, timezone=chosen_timezone)
+        end_ts_datetime = self.__converter.convert_epoch_millis_to_datetime(epoch=end_ts, timezone=chosen_timezone)
 
         print("Datetime Range: {} - {}".format(start_ts_datetime, end_ts_datetime))
         return
 
     def fetch_elastic_data_between_ts1_ts2(self):
 
-        if self.main_timestamp_format == "datetime":
+        if self.__main_timestamp_format == "datetime":
             print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
                   "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
-        elif self.main_timestamp_format == "epoch":
+        elif self.__main_timestamp_format == "epoch":
             print("timestamp format: <10 / 13 digit string>\n"
                   "eg. 1420070400 or 1420070400001")
 
         start_ts = input("Start Timestamp: ")
-        if self.main_timestamp_format == "datetime":
-            if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
+        if self.__main_timestamp_format == "datetime":
+            if not self.__input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
                 return
             end_ts = input("End Timestamp: ")
-            if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
+            if not self.__input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
                 return
 
-        elif self.main_timestamp_format == "epoch":
-            if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
+        elif self.__main_timestamp_format == "epoch":
+            if not self.__input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
                 return
             end_ts = input("End Timestamp: ")
-            if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
+            if not self.__input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
                 return
             # Since elasticsearch only supports epoch_millis by default,
             # standardize all user input epoch to epoch_millis
@@ -273,12 +273,12 @@ class CommandLineMenu:
             if len(end_ts) == 10:
                 end_ts += "000"
 
-        if not self.input_validation.is_endts_gte_startts(timestamp_format=self.main_timestamp_format,
-                                                          start_ts=start_ts,
-                                                          end_ts=end_ts):
+        if not self.__input_validation.is_endts_gte_startts(timestamp_format=self.__main_timestamp_format,
+                                                            start_ts=start_ts,
+                                                            end_ts=end_ts):
             return
         num_logs = input("Number of logs to retrieve: ")
-        if not self.input_validation.is_numeric_valid(num_logs):
+        if not self.__input_validation.is_numeric_valid(num_logs):
             return
         fields = input("Select your field names (eg. event.created,event.code,message): ")
         fields_list = [x.strip() for x in fields.split(',')]
@@ -301,18 +301,18 @@ class CommandLineMenu:
         print("eg. event.code is_gt 4000; event.code is_lte 5000; event.category is authentication;")
         filter_raw = input("(OPTIONAL - PRESS ENTER TO SKIP) Filter your queries: ")
         if filter_raw.strip() != "":
-            if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
+            if not self.__input_validation.is_filter_valid(filter_raw=filter_raw):
                 return
 
-        keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
-        query_bool_must_list = self.converter.convert_all_is_list_to_must_list(
+        keyword_sentences_dict = self.__parser.parse_filter_raw(filter_raw=filter_raw)
+        query_bool_must_list = self.__converter.convert_all_is_list_to_must_list(
             filter_is_list=keyword_sentences_dict["is"],
             filter_is_gte_list=keyword_sentences_dict["is_gte"],
             filter_is_lte_list=keyword_sentences_dict["is_lte"],
             filter_is_gt_list=keyword_sentences_dict["is_gt"],
             filter_is_lt_list=keyword_sentences_dict["is_lt"],
             filter_is_one_of_list=keyword_sentences_dict["is_one_of"])
-        query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(
+        query_bool_must_not_list = self.__converter.convert_all_is_not_list_to_must_not_list(
             filter_is_not_list=keyword_sentences_dict["is_not"],
             filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
             filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
@@ -321,16 +321,16 @@ class CommandLineMenu:
             filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
         file_format = str(input("File format(json/csv): ")).strip()
-        if not self.input_validation.is_file_format_valid(file_format=file_format):
+        if not self.__input_validation.is_file_format_valid(file_format=file_format):
             return
 
         data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
                                              kwargs={
-                                                "index_name": self.index_name,
+                                                "index_name": self.__index_name,
                                                 "num_logs": num_logs,
-                                                "main_timestamp_name": self.main_timestamp_name,
-                                                "main_timestamp_format": self.main_timestamp_format,
-                                                "main_timezone": self.main_timezone,
+                                                "main_timestamp_name": self.__main_timestamp_name,
+                                                "main_timestamp_format": self.__main_timestamp_format,
+                                                "main_timezone": self.__main_timezone,
                                                 "start_ts": start_ts,
                                                 "end_ts": end_ts,
                                                 "fields_list": fields_list,

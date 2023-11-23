@@ -1,6 +1,6 @@
 import requests
 from utils.config_reader import ConfigReader
-from utils.messenger import messenger
+from utils.messenger import Messenger, Severity
 import json
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from tqdm.auto import tqdm
@@ -13,6 +13,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 class RequestSender:
 
     def __init__(self, protocol, elastic_ip, elastic_port, username, password):
+        self.__messenger = Messenger()
         self.__headers = {"Content-Type": "application/json"}
         self.__protocol = protocol
         self.__elastic_ip = elastic_ip
@@ -29,31 +30,35 @@ class RequestSender:
 
     def get_authentication_status_bool(self):
         if self.__protocol == "https":
-            url = "{}://{}:{}/_security/_authenticate?pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port)
-            messenger(3, "Checking Authentication Credentials...")
+            url = "{}://{}:{}/_security/_authenticate?pretty".format(self.__protocol, 
+                                                                     self.__elastic_ip, 
+                                                                     self.__elastic_port)
+            self.__messenger.print_message(Severity.INFO, "Checking Authentication Credentials...")
             try:
                 response = requests.get(url=url,
                                         verify=False,
                                         auth=(self.__username, self.__password))
 
                 if response.status_code == 200:
-                    messenger(0, "Successfully Authenticated with Credentials.")
+                    self.__messenger.print_message(Severity.INFO, "Successfully Authenticated with Credentials.")
                     return True
                 elif response.status_code == 401:
-                    messenger(2, "Authentication Error.")
+                    self.__messenger.print_message(Severity.ERROR, "Authentication Error.")
                 else:
-                    messenger(2, "Unable to Authenticate. General Error.")
+                    self.__messenger.print_message(Severity.ERROR, "Unable to Authenticate. General Error.")
                 return False
             except requests.RequestException:
-                messenger(2, "Cannot resolve request to {}. Please ensure your elasticsearch's server "
-                             "firewall is configured properly!".format(url))
+                self.__messenger.print_message(Severity.ERROR, 
+                                               "Cannot resolve request to {}. Please ensure your elasticsearch's "
+                                               "server firewall is configured properly!".format(url))
             except requests.ConnectTimeout:
-                messenger(2, "Connection timeout to {}".format(url))
+                self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
             except requests.ConnectionError:
-                messenger(2, "Cannot connect to {}".format(url))
+                self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
 
         elif self.__protocol == "http":
-            messenger(3, "Skipping Authentication as http protocol does not require credentials!")
+            self.__messenger.print_message(Severity.INFO, 
+                                           "Skipping Authentication as http protocol does not require credentials!")
             return True
 
         return False
@@ -66,7 +71,7 @@ class RequestSender:
                               size: int):
         data = {"index.max_result_window": size}
         url = "{}://{}:{}/_settings".format(self.__protocol, self.__elastic_ip, self.__elastic_port)
-        messenger(3, "Changing max_results_window size to {}".format(size))
+        self.__messenger.print_message(Severity.INFO, "Changing max_results_window size to {}".format(size))
         try:
             response = requests.put(url=url,
                                     headers=self.__headers,
@@ -75,22 +80,26 @@ class RequestSender:
                                     auth=(self.__username, self.__password))
             if response.status_code == 200:
                 if size == 10000:
-                    messenger(0, "Successfully changed max_result_window size to {} (default)".format(size))
+                    self.__messenger.print_message(Severity.INFO, "Successfully changed max_result_window "
+                                                                  "size to {} (default)".format(size))
                 else:
-                    messenger(0, "Successfully changed max_result_window size to {}".format(size))
+                    self.__messenger.print_message(Severity.INFO, "Successfully changed max_result_window "
+                                                                  "size to {}".format(size))
                 return
             elif response.status_code == 400:
-                messenger(2, "Unable to change max_result_window_size to {}. Bad Request in headers/data.".format(size))
+                self.__messenger.print_message(Severity.ERROR, "Unable to change max_result_window_size to {}. "
+                                                               "Bad Request in headers/data.".format(size))
             elif response.status_code == 401:
-                messenger(2, "Unable to change max_result_window_size to {}. Authentication Error.".format(size))
+                self.__messenger.print_message(Severity.ERROR, "Unable to change max_result_window_size to {}. "
+                                                               "Authentication Error.".format(size))
             else:
-                messenger(2, "Unable to delete PIT id. General Error.")
+                self.__messenger.print_message(Severity.ERROR, "Unable to delete PIT id. General Error.")
         except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Cannot resolve request to {}".format(url))
         except requests.ConnectTimeout:
-            messenger(2, "Connection timeout to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
         except requests.ConnectionError:
-            messenger(2, "Cannot connect to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
         return
 
     '''
@@ -111,7 +120,7 @@ class RequestSender:
         url = "{}://{}:{}/{}/_search?pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         is_first_loop = True
         last_ids = []
-        messenger(3, "Fetching elastic data...")
+        self.__messenger.print_message(Severity.INFO, "Fetching elastic data...")
 
         pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stdout)
 
@@ -192,7 +201,7 @@ class RequestSender:
                     results_size = len(data_json["hits"]["hits"])
                     if results_size == 0:
                         pbar.close()
-                        messenger(2, "There are no hits! Please try again with a different time range!")
+                        self.__messenger.print_message(Severity.ERROR, "There are no hits! Please try again with a different time range!")
                         self.__has_finished_fetching = True
                         return
 
@@ -213,22 +222,22 @@ class RequestSender:
                     if results_size < size:
                         break
                 elif response.status_code == 400:
-                    messenger(2, "Unable to fetch elastic data. Bad Request in headers/data.")
+                    self.__messenger.print_message(Severity.ERROR, "Unable to fetch elastic data. Bad Request in headers/data.")
                 elif response.status_code == 401:
-                    messenger(2, "Unable to fetch elastic data. Authentication Error.")
+                    self.__messenger.print_message(Severity.ERROR, "Unable to fetch elastic data. Authentication Error.")
 
             except requests.RequestException:
-                messenger(2, "Cannot resolve request to {}".format(url))
+                self.__messenger.print_message(Severity.ERROR, "Cannot resolve request to {}".format(url))
                 return None
             except requests.ConnectTimeout:
-                messenger(2, "Connection timeout to {}".format(url))
+                self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
                 return None
             except requests.ConnectionError:
-                messenger(2, "Cannot connect to {}".format(url))
+                self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
                 return None
 
         pbar.close()
-        messenger(0, "Successfully fetched {} data!".format(self.__total_results_size))
+        self.__messenger.print_message(Severity.INFO, "Successfully fetched {} data!".format(self.__total_results_size))
         self.__has_finished_fetching = True
         return
 
@@ -241,11 +250,11 @@ class RequestSender:
 
             return response.text
         except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Cannot resolve request to {}".format(url))
         except requests.ConnectTimeout:
-            messenger(2, "Connection timeout to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
         except requests.ConnectionError:
-            messenger(2, "Cannot connect to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
         return
 
     def get_available_fields(self, index_name):
@@ -255,16 +264,17 @@ class RequestSender:
                                     verify=False,
                                     auth=(self.__username, self.__password))
             if response is not None:
-                messenger(0, "Retrieved available fields for index: {}\n".format(index_name))
+                self.__messenger.print_message(Severity.INFO, "Retrieved available fields for index: {}\n".format(index_name))
                 return response.json()
             else:
-                messenger(2, "No fields are available! Please check whether elasticsearch is parsing properly!")
+                self.__messenger.print_message(Severity.ERROR, "No fields are available! Please check "
+                                                               "whether elasticsearch is parsing properly!")
         except requests.RequestException:
-            messenger(2, "Cannot resolve request to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Cannot resolve request to {}".format(url))
         except requests.ConnectTimeout:
-            messenger(2, "Connection timeout to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
         except requests.ConnectionError:
-            messenger(2, "Cannot connect to {}".format(url))
+            self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
         return
 
     def pop_from_data_json_list(self) -> Dict:

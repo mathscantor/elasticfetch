@@ -4,19 +4,19 @@ from utils.converter import Converter
 from menu.cli.menu import CommandLineMenu
 from menu.gui.menu import GUIMenu
 from utils.input_validation import InputValidation
-from utils.messenger import messenger
+from utils.messenger import Messenger, Severity
 from utils.parser import Parser
 
 
 def validate_config_inputs():
-    messenger(3, "Checking elasticfetch.ini configuration inputs...")
-    if not input_validation.is_protocol_valid(config_dict["elastic.protocol"]):
+    messenger.print_message(Severity.INFO, "Checking elasticfetch.ini configuration inputs...")
+    if not input_validation.is_protocol_valid(config_reader.elastic_protocol):
         exit(1)
-    if not input_validation.is_ip(config_dict["elastic.ip"]):
+    if not input_validation.is_ip(config_reader.elastic_ip):
         exit(1)
-    if not input_validation.is_port(config_dict["elastic.port"]):
+    if not input_validation.is_port(config_reader.elastic_port):
         exit(1)
-    messenger(0, "All configuration inputs are valid.")
+    messenger.print_message(Severity.INFO, "All configuration inputs are valid.")
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
     if not request_sender.get_authentication_status_bool():
         exit(1)
 
-    if not config_dict["interface.graphical"]:
+    if not config_reader.interface_graphical:
         menu = CommandLineMenu(request_sender=request_sender,
                                converter=converter,
                                input_validation=input_validation,
@@ -41,15 +41,15 @@ def main():
 
 
 if __name__ == "__main__":
+    messenger = Messenger()
     config_reader = ConfigReader()
-    config_dict = config_reader.read_config_file()
     converter = Converter()
     request_sender = RequestSender(
-        protocol=config_dict["elastic.protocol"],
-        elastic_ip=config_dict["elastic.ip"],
-        elastic_port=config_dict["elastic.port"],
-        username=config_dict["credentials.username"],
-        password=config_dict["credentials.password"]
+        protocol=config_reader.elastic_protocol,
+        elastic_ip=config_reader.elastic_ip,
+        elastic_port=config_reader.elastic_port,
+        username=config_reader.credentials_username,
+        password=config_reader.credentials_password
     )
     input_validation = InputValidation()
     parser = Parser()

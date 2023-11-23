@@ -1,25 +1,36 @@
-class bcolors:
-    HEADER = '\033[95m'
-    INFO = '\033[94m'
-    ALERT = '\033[96m'
-    SUCCESS = '\033[92m'
-    WARNING = '\033[93m'
-    FAILURE = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
+from enum import Enum
 
 
-def messenger(sev, message):
+class Severity(Enum):
+    DEBUG = '\033[94m [DEBUG] \033[0m'
+    INFO = '\033[92m [INFO] \033[0m'
+    WARNING = '\033[93m [WARNING] \033[0m'
+    ERROR = '\033[91m [ERROR] \033[0m'
 
-    if sev == 0:
-        print(bcolors.SUCCESS + " [SUCCESS] " + bcolors.ENDC + message)
-    elif sev == 1:
-        print(bcolors.WARNING + " [WARN] " + bcolors.ENDC + message)
-    elif sev == 2:
-        print(bcolors.FAILURE + " [FAILURE] " + bcolors.ENDC + message)
-    elif sev == 3:
-        print(bcolors.INFO + " [INFO] " + bcolors.ENDC + message)
-    elif sev == 4:
-        print(bcolors.ALERT + " [ALERT] " + bcolors.ENDC + message)
-    return
+
+class Messenger:
+    """
+    Messenger class responsible for giving meaning outputs to users and developers.
+    """
+    def __init__(self,
+                 verbosity_level: int = 1):
+        self.__verbosity_level = verbosity_level
+
+    def print_message(self, sev: Severity,
+                      message: str) -> None:
+
+        """
+        Utility function to print messages of different severity levels.
+
+        :param sev: A Severity Enum.
+        :param message: The string to be printed.
+        :return: None
+        """
+
+        # If verbosity is default, then do not print DEBUG messages
+        if self.__verbosity_level == 1 and sev == Severity.DEBUG:
+            return
+
+        # Prints all messages under the sun
+        print(sev.value + message)
+        return

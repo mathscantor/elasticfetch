@@ -8,8 +8,8 @@ from utils.request_sender import RequestSender
 from utils.input_validation import InputValidation
 from utils.parser import Parser
 config_reader = ConfigReader()
-config_dict = config_reader.read_config_file()
-if config_dict["interface.graphical"]:
+
+if config_reader.interface_graphical:
     import tkinter
     import customtkinter
     # from menu.gui.save_fetched_data import GUISaveFetchedData
@@ -34,10 +34,10 @@ class GUIMenu:
                  parser: Parser):
 
         # Backend related
-        self.request_sender = request_sender
-        self.converter = converter
-        self.input_validation = input_validation
-        self.parser = parser
+        self.__request_sender = request_sender
+        self.__converter = converter
+        self.__input_validation = input_validation
+        self.__parser = parser
         self.__data_writer = DataWriter()
 
         # Frontend related
@@ -176,7 +176,7 @@ class GUIMenu:
         del self.indices_status
         del self.index_list
 
-        self.indices_status = self.request_sender.get_indices_status()
+        self.indices_status = self.__request_sender.get_indices_status()
         if self.indices_status is None:
             exit(1)
         temp_list = self.indices_status.split("\n")[1:-1]
@@ -279,7 +279,7 @@ class GUIMenu:
                                                                                              size=self.__default_font_size))
         self.main_timestamp_format_label.grid(row=2, column=2, pady=5, padx=0)
         self.main_timestamp_format_combobox = ttk.Combobox(master=self.frame_info,
-                                                           values=self.input_validation.valid_timestamp_format_list,
+                                                           values=self.__input_validation.valid_timestamp_format_list,
                                                            font=customtkinter.CTkFont(family="Arial",
                                                                                       size=self.__default_font_size),
                                                            textvariable=self.selected_main_timestamp_format)
@@ -293,7 +293,7 @@ class GUIMenu:
                                                                                      size=self.__default_font_size))
         self.main_timezone_label.grid(row=3, column=2, pady=5, padx=0)
         self.main_timezone_combobox = ttk.Combobox(master=self.frame_info,
-                                                   values=self.input_validation.valid_timezone_list,
+                                                   values=self.__input_validation.valid_timezone_list,
                                                    font=customtkinter.CTkFont(family="Arial",
                                                                               size=self.__default_font_size),
                                                    textvariable=self.selected_main_timezone)
@@ -366,7 +366,7 @@ class GUIMenu:
         self.file_format_label.grid(row=8, column=2, pady=5, padx=0)
 
         self.file_format_combobox = ttk.Combobox(master=self.frame_info,
-                                                 values=self.input_validation.valid_file_format,
+                                                 values=self.__input_validation.valid_file_format,
                                                  font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size),
                                                  textvariable=self.selected_file_format)
         self.file_format_combobox.bind('<<ComboboxSelected>>', self.set_file_format)
@@ -469,9 +469,9 @@ class GUIMenu:
                                                          fg_color="grey")
         if self.selected_index.get() != "N/A":
             self.current_index = self.selected_index.get()
-            response = self.request_sender.get_available_fields(index_name=self.current_index)
+            response = self.__request_sender.get_available_fields(index_name=self.current_index)
             if response is not None:
-                self.parent_field_to_type_dict = self.converter.convert_field_mapping_keys_pretty(
+                self.parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(
                     index_name=self.current_index,
                     fields_json=response)
                 self.get_valid_timestamp_name_list()
@@ -506,37 +506,37 @@ class GUIMenu:
         fields = self.fields_list_entry.get().strip()
         filter_raw = self.filter_list_entry.get().strip()
 
-        if not self.input_validation.is_timestamp_name_valid(chosen_timestamp_name=self.main_timestamp_name_combobox.get(),
-                                                             valid_timestamp_name_list=self.valid_timestamp_name_list):
+        if not self.__input_validation.is_timestamp_name_valid(chosen_timestamp_name=self.main_timestamp_name_combobox.get(),
+                                                               valid_timestamp_name_list=self.valid_timestamp_name_list):
             self.frame_info_error_label.configure(text="'Timestamp Field: {}' is not a valid!".format(self.main_timestamp_name_combobox.get()))
             self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                              fg_color="#395E9C")
             return
 
         if self.main_timestamp_format == "datetime":
-            if not self.input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
+            if not self.__input_validation.is_datetime_timestamp_valid(timestamp=start_ts):
                 self.frame_info_error_label.configure(text="Start Time: Incorrect Format!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
-            if not self.input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
+            if not self.__input_validation.is_datetime_timestamp_valid(timestamp=end_ts):
                 self.frame_info_error_label.configure(text="End Time: Incorrect Format!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
         elif self.main_timestamp_format == "epoch":
-            if not self.input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
+            if not self.__input_validation.is_epoch_timestamp_valid(timestamp=start_ts):
                 self.frame_info_error_label.configure(text="Start Time: Incorrect Format!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
-            if not self.input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
+            if not self.__input_validation.is_epoch_timestamp_valid(timestamp=end_ts):
                 self.frame_info_error_label.configure(text="End Time: Incorrect Format!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
 
-        if not self.input_validation.is_numeric_valid(user_input=num_logs):
+        if not self.__input_validation.is_numeric_valid(user_input=num_logs):
             self.frame_info_error_label.configure(text="Number of Logs: Invalid Numeric Expression!")
             self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                              fg_color="#395E9C")
@@ -550,21 +550,21 @@ class GUIMenu:
             return
 
         if filter_raw != "":
-            if not self.input_validation.is_filter_valid(filter_raw=filter_raw):
+            if not self.__input_validation.is_filter_valid(filter_raw=filter_raw):
                 self.frame_info_error_label.configure(text="Filters: Invalid Format!")
                 self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                                  fg_color="#395E9C")
                 return
 
-        keyword_sentences_dict = self.parser.parse_filter_raw(filter_raw=filter_raw)
-        query_bool_must_list = self.converter.convert_all_is_list_to_must_list(
+        keyword_sentences_dict = self.__parser.parse_filter_raw(filter_raw=filter_raw)
+        query_bool_must_list = self.__converter.convert_all_is_list_to_must_list(
             filter_is_list=keyword_sentences_dict["is"],
             filter_is_gte_list=keyword_sentences_dict["is_gte"],
             filter_is_lte_list=keyword_sentences_dict["is_lte"],
             filter_is_gt_list=keyword_sentences_dict["is_gt"],
             filter_is_lt_list=keyword_sentences_dict["is_lt"],
             filter_is_one_of_list=keyword_sentences_dict["is_one_of"])
-        query_bool_must_not_list = self.converter.convert_all_is_not_list_to_must_not_list(
+        query_bool_must_not_list = self.__converter.convert_all_is_not_list_to_must_not_list(
             filter_is_not_list=keyword_sentences_dict["is_not"],
             filter_is_not_gte_list=keyword_sentences_dict["is_not_gte"],
             filter_is_not_lte_list=keyword_sentences_dict["is_not_lte"],
@@ -572,13 +572,13 @@ class GUIMenu:
             filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"],
             filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
-        if not self.input_validation.is_file_format_valid(file_format=self.file_format):
+        if not self.__input_validation.is_file_format_valid(file_format=self.file_format):
             self.frame_info_error_label.configure(text="File Format: Invalid format!")
             self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                              fg_color="#395E9C")
             return
 
-        data_fetch_thread = threading.Thread(target=self.request_sender.get_fetch_elastic_data_between_ts1_ts2,
+        data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
                                              kwargs={
                                                 "index_name": self.current_index,
                                                 "num_logs": num_logs,
@@ -601,17 +601,17 @@ class GUIMenu:
         if self.file_format == "csv":
             data_write_csv_thread = threading.Thread(target=self.__data_writer.write_to_csv,
                                                      kwargs={
-                                                         "request_sender": self.request_sender,
+                                                         "request_sender": self.__request_sender,
                                                          "fields_list": fields_list
                                                      })
             data_write_csv_thread.start()
             data_fetch_thread.start()
 
             self.saved_filepath_label.set_text("Saving data to {}".format(self.__data_writer.csv_filepath))
-            while not self.request_sender.has_finished_fetching:
-                self.progress_bar["value"] = (self.request_sender.total_results_size / float(num_logs)) * 100
+            while not self.__request_sender.has_finished_fetching:
+                self.progress_bar["value"] = (self.__request_sender.total_results_size / float(num_logs)) * 100
                 self.progress_bar_label.set_text(
-                    "Current Progress: {}/{} --- {:.2f}%".format(self.request_sender.total_results_size,
+                    "Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
                                                                  num_logs,
                                                                  self.progress_bar["value"]))
                 self.primary_app_window.update()
@@ -620,23 +620,23 @@ class GUIMenu:
             data_fetch_thread.join()
 
             self.progress_bar_label.set_text("")
-            self.saved_filepath_label.set_text("Successfully saved {} data to {}".format(self.request_sender.total_results_size,
+            self.saved_filepath_label.set_text("Successfully saved {} data to {}".format(self.__request_sender.total_results_size,
                                                                                          self.__data_writer.csv_filepath))
             self.primary_app_window.update()
 
         elif self.file_format == "json":
             data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_json,
                                                       kwargs={
-                                                          "request_sender": self.request_sender,
+                                                          "request_sender": self.__request_sender,
                                                       })
             data_write_json_thread.start()
             data_fetch_thread.start()
 
             self.saved_filepath_label.set_text("Saving data to {}".format(self.__data_writer.json_filepath))
-            while not self.request_sender.has_finished_fetching:
-                self.progress_bar["value"] = (self.request_sender.total_results_size / float(num_logs)) * 100
+            while not self.__request_sender.has_finished_fetching:
+                self.progress_bar["value"] = (self.__request_sender.total_results_size / float(num_logs)) * 100
                 self.progress_bar_label.set_text(
-                    "Current Progress: {}/{} --- {:.2f}%".format(self.request_sender.total_results_size,
+                    "Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
                                                                  num_logs,
                                                                  self.progress_bar["value"]))
 
@@ -654,8 +654,8 @@ class GUIMenu:
         return
 
     def display_ts_converter_window(self):
-        GUITSConverter(converter=self.converter,
-                       input_validation=self.input_validation).focus()
+        GUITSConverter(converter=self.__converter,
+                       input_validation=self.__input_validation).focus()
         return
 
     def on_closing_primary_app_window(self):

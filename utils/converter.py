@@ -1,6 +1,3 @@
-import csv
-from utils.messenger import messenger
-import json
 import time
 import os
 import datetime
@@ -10,7 +7,6 @@ os.environ['TZ'] = 'UTC'
 class Converter:
 
     def __init__(self):
-        self.description = "Converter class to convert objects into more maningful objects"
         self.timestamp_format = '%Y-%m-%dT%H:%M:%S'
 
     def convert_all_is_list_to_must_list(self,
