@@ -593,7 +593,7 @@ class GUIMenu:
                                             })
 
         self.progress_bar["value"] = 0
-        self.progress_bar_label.set_text("Current Progress: {}/{} --- {:.2f}%".format(0,
+        self.progress_bar_label.configure(text="Current Progress: {}/{} --- {:.2f}%".format(0,
                                                                                       num_logs,
                                                                                       self.progress_bar["value"]))
         self.primary_app_window.update()
@@ -607,20 +607,19 @@ class GUIMenu:
             data_write_csv_thread.start()
             data_fetch_thread.start()
 
-            self.saved_filepath_label.set_text("Saving data to {}".format(self.__data_writer.csv_filepath))
+            self.saved_filepath_label.configure(text="Saving data to {}".format(self.__data_writer.csv_filepath))
             while not self.__request_sender.has_finished_fetching:
                 self.progress_bar["value"] = (self.__request_sender.total_results_size / float(num_logs)) * 100
-                self.progress_bar_label.set_text(
-                    "Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
-                                                                 num_logs,
-                                                                 self.progress_bar["value"]))
+                self.progress_bar_label.configure(text="Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
+                                                                                                    num_logs,
+                                                                                                    self.progress_bar["value"]))
                 self.primary_app_window.update()
 
             data_write_csv_thread.join()
             data_fetch_thread.join()
 
-            self.progress_bar_label.set_text("")
-            self.saved_filepath_label.set_text("Successfully saved {} data to {}".format(self.__request_sender.total_results_size,
+            self.progress_bar_label.configure(text="")
+            self.saved_filepath_label.configure(text="Successfully saved {} data to {}".format(self.__request_sender.total_results_size,
                                                                                          self.__data_writer.csv_filepath))
             self.primary_app_window.update()
 
@@ -632,21 +631,20 @@ class GUIMenu:
             data_write_json_thread.start()
             data_fetch_thread.start()
 
-            self.saved_filepath_label.set_text("Saving data to {}".format(self.__data_writer.json_filepath))
+            self.saved_filepath_label.configure(text="Saving data to {}".format(self.__data_writer.json_filepath))
             while not self.__request_sender.has_finished_fetching:
                 self.progress_bar["value"] = (self.__request_sender.total_results_size / float(num_logs)) * 100
-                self.progress_bar_label.set_text(
-                    "Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
-                                                                 num_logs,
-                                                                 self.progress_bar["value"]))
+                self.progress_bar_label.configure(text="Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
+                                                                                                    num_logs,
+                                                                                                    self.progress_bar["value"]))
 
                 self.primary_app_window.update()
 
             data_write_json_thread.join()
             data_fetch_thread.join()
 
-            self.progress_bar_label.set_text("")
-            self.saved_filepath_label.set_text("Successfully saved data to {}".format(self.__data_writer.json_filepath))
+            self.progress_bar_label.configure(text="")
+            self.saved_filepath_label.configure(text="Successfully saved data to {}".format(self.__data_writer.json_filepath))
             self.primary_app_window.update()
 
         self.fetch_data_button.configure(state=customtkinter.NORMAL,
