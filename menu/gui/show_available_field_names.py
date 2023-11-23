@@ -62,7 +62,7 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         self.textbox = tkinter.Text(self,
                                     wrap="none",
                                     highlightthickness=0,
-                                    font=customtkinter.CTkFont(family="Arial", size=15))
+                                    font=customtkinter.CTkFont(family="Consolas", size=15))
         self.textbox.grid(row=1, column=0, sticky="nsew")
 
         # Content

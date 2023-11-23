@@ -57,7 +57,7 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
         self.textbox = tkinter.Text(self,
                                     highlightthickness=0,
                                     wrap="none",
-                                    font=customtkinter.CTkFont(family="Arial", size=15))
+                                    font=customtkinter.CTkFont(family="Consolas", size=15))
         self.textbox.grid(row=1, column=0, sticky="nsew")
         self.textbox.insert(tkinter.INSERT, indices_status)
 
