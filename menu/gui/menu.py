@@ -679,7 +679,7 @@ class GUIMenu:
 
             self.progress_bar_label.configure(text="")
             self.saved_filepath_label.configure(text="Successfully saved {} data to {}".format(self.__request_sender.total_results_size,
-                                                                                         self.__data_writer.csv_filepath))
+                                                                                               self.__data_writer.csv_filepath))
             self.primary_app_window.update()
 
         elif self.file_format == "json":
@@ -703,7 +703,8 @@ class GUIMenu:
             data_fetch_thread.join()
 
             self.progress_bar_label.configure(text="")
-            self.saved_filepath_label.configure(text="Successfully saved data to {}".format(self.__data_writer.json_filepath))
+            self.saved_filepath_label.configure(text="Successfully saved {} data to {}".format(self.__request_sender.total_results_size,
+                                                                                               self.__data_writer.json_filepath))
             self.primary_app_window.update()
 
         self.fetch_data_button.configure(state=customtkinter.NORMAL,
