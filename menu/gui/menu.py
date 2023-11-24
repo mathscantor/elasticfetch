@@ -67,6 +67,7 @@ class GUIMenu:
         self.current_index = "N/A"
         self.selected_index = tkinter.StringVar()
         self.selected_index.set(value="N/A")
+        self.has_pressed_return_key = False
         self.index_list = ["placeholder"]
         self.available_field_list = ["placeholder"]
         self.parent_field_to_type_dict = {}
@@ -263,6 +264,7 @@ class GUIMenu:
                                                                                      size=self.__default_font_size),
                                                           textvariable=self.selected_index,
                                                           placeholder_text="eg. *filebeat*")
+        self.current_index_entry.bind('<KeyRelease>', self.notify_to_press_return_key)
         self.current_index_entry.bind('<Return>', self.set_current_index)
         self.current_index_entry.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         self.current_index_entry.grid_forget()
@@ -491,6 +493,7 @@ class GUIMenu:
         self.show_available_field_names_button.configure(state=customtkinter.DISABLED,
                                                          fg_color="grey")
 
+        self.has_pressed_return_key = True
         self.parent_field_to_type_dict = {}
 
         self.current_index = self.selected_index.get().strip()
@@ -504,6 +507,7 @@ class GUIMenu:
                                              fg_color="#395E9C")
             return
 
+        self.frame_info_error_label.configure(text="")
         response = self.__request_sender.get_available_fields(index_name=self.current_index)
         if response is not None:
             self.parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(fields_json=response)
@@ -713,6 +717,14 @@ class GUIMenu:
 
     def on_closing_primary_app_window(self):
         self.primary_app_window.destroy()
+        return
+
+    def notify_to_press_return_key(self, event):
+        if self.has_pressed_return_key:
+            self.frame_info_error_label.configure(text="")
+            self.has_pressed_return_key = False
+        else:
+            self.frame_info_error_label.configure(text="Hit <Enter> to confirm new index selection!")
         return
 
     def load_image(self, path, image_size):

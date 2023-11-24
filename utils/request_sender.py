@@ -129,15 +129,15 @@ class RequestSender:
         self.__has_finished_fetching = False
         while num_logs > 0:
             if num_logs >= 10000:
-                size = 10000
+                batch_size = 10000
             else:
-                size = num_logs
-            num_logs -= size
+                batch_size = num_logs
+            num_logs -= batch_size
 
             if main_timestamp_format == "datetime":
                 data = \
                 {
-                    "size": size,
+                    "size": batch_size,
                     "_source": fields_list,
                     "query": {
                         "bool": {
@@ -161,7 +161,7 @@ class RequestSender:
             elif main_timestamp_format == "epoch":
                 data = \
                     {
-                        "size": size,
+                        "size": batch_size,
                         "_source": fields_list,
                         "query": {
                             "bool": {
@@ -212,23 +212,23 @@ class RequestSender:
                         self.__data_json_list.append(data_json)
 
                     # LOGIC for getting the next batch by filtering out duplicates
-                    start_ts = data_json["hits"]["hits"][results_size - 1]["sort"][0]
+                    start_ts = data_json["hits"]["hits"][-1]["sort"][0]
 
                     # edge case: if our whole batch of results has the same timestamp,
                     # then we do not clear our last_ids yet
                     # Thus, we will only clear when the last timestamp
                     # is different from the first timestamp in the batch
-                    if data_json["hits"]["hits"][results_size - 1]["sort"][0] != data_json["hits"]["hits"][0]["sort"][0]:
+                    if data_json["hits"]["hits"][-1]["sort"][0] != data_json["hits"]["hits"][0]["sort"][0]:
                         # print("CLearing list - Size {}".format(len(last_ids)))
                         last_ids.clear()
 
-                    for i in range(1, results_size):
+                    for i in range(1, results_size + 1):
                         last_id = data_json["hits"]["hits"][results_size-i]["_id"]
                         last_ids.append(last_id)
                         if data_json["hits"]["hits"][results_size - i]["sort"][0] != start_ts:
                             break
                     is_first_loop = False
-                    if results_size < size:
+                    if results_size < batch_size:
                         break
                 elif response.status_code == 400:
                     self.__messenger.print_message(Severity.ERROR, "Unable to fetch elastic data. Bad Request in headers/data.")
