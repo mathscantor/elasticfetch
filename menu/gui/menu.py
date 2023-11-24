@@ -493,7 +493,17 @@ class GUIMenu:
 
         self.parent_field_to_type_dict = {}
 
-        self.current_index = self.selected_index.get()
+        self.current_index = self.selected_index.get().strip()
+
+        if self.current_index == "N/A" or self.current_index == "":
+            self.frame_info_error_label.configure(text="Current index cannot be empty!")
+            self.valid_timestamp_name_list.clear()
+            self.main_timestamp_name_combobox.configure(values=self.valid_timestamp_name_list,
+                                                        state=tkinter.DISABLED)
+            self.fetch_data_button.configure(state=customtkinter.DISABLED,
+                                             fg_color="#395E9C")
+            return
+
         response = self.__request_sender.get_available_fields(index_name=self.current_index)
         if response is not None:
             self.parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(fields_json=response)
@@ -531,11 +541,25 @@ class GUIMenu:
         self.fetch_data_button.configure(state=customtkinter.DISABLED,
                                          fg_color="grey")
         self.primary_app_window.update()
+
+        self.current_index = self.selected_index.get().strip()
         start_ts = self.start_timestamp_entry.get().strip()
         end_ts = self.end_timestamp_entry.get().strip()
         num_logs = self.num_logs_entry.get().strip()
         fields = self.fields_list_entry.get().strip()
         filter_raw = self.filter_list_entry.get().strip()
+
+        if self.current_index == "N/A" or self.current_index == "":
+            self.frame_info_error_label.configure(text="Current index cannot be empty!")
+            self.valid_timestamp_name_list.clear()
+            self.main_timestamp_name_combobox.configure(values=self.valid_timestamp_name_list,
+                                                        state=tkinter.DISABLED)
+            self.valid_timestamp_name_list.clear()
+            self.main_timestamp_name_combobox.configure(values=self.valid_timestamp_name_list,
+                                                        state=tkinter.DISABLED)
+            self.fetch_data_button.configure(state=customtkinter.DISABLED,
+                                             fg_color="#395E9C")
+            return
 
         if not self.__input_validation.is_timestamp_name_valid(chosen_timestamp_name=self.main_timestamp_name_combobox.get(),
                                                                valid_timestamp_name_list=self.valid_timestamp_name_list):

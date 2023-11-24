@@ -211,8 +211,17 @@ class RequestSender:
                     with self.fetch_lock:
                         self.__data_json_list.append(data_json)
 
+                    # LOGIC for getting the next batch by filtering out duplicates
                     start_ts = data_json["hits"]["hits"][results_size - 1]["sort"][0]
-                    last_ids.clear()
+
+                    # edge case: if our whole batch of results has the same timestamp,
+                    # then we do not clear our last_ids yet
+                    # Thus, we will only clear when the last timestamp
+                    # is different from the first timestamp in the batch
+                    if data_json["hits"]["hits"][results_size - 1]["sort"][0] != data_json["hits"]["hits"][0]["sort"][0]:
+                        # print("CLearing list - Size {}".format(len(last_ids)))
+                        last_ids.clear()
+
                     for i in range(1, results_size):
                         last_id = data_json["hits"]["hits"][results_size-i]["_id"]
                         last_ids.append(last_id)

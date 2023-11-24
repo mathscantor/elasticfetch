@@ -90,20 +90,14 @@ class DataWriter:
             if request_sender.has_finished_fetching and len(request_sender.data_json_list) == 0:
                 return
 
+            # FLAWED LOGIC
             with request_sender.fetch_lock:
                 if request_sender.data_json_list:
                     data_json = request_sender.pop_from_data_json_list()
-                    if is_first_data_json:
-                        master_data_json = data_json
-                        is_first_data_json = False
-                    else:
-                        master_data_json["hits"]["hits"] += (data_json["hits"]["hits"])
-
-                    master_size += len(data_json["hits"]["hits"])
-
-                    master_data_json["hits"]["total"]["value"] = master_size
                     with self.__data_writer_lock:
-                        json.dump(master_data_json, f, ensure_ascii=False, indent=4)
+                        # json.dump(master_data_json, f, ensure_ascii=False, indent=4)
+                        json.dump(data_json, f, ensure_ascii=False, separators=(',', ':'))
+                        f.write("\n")
                         f.flush()
 
         return
