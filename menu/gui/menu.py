@@ -63,7 +63,7 @@ class GUIMenu:
         self.current_index_combobox = None
         self.current_index_entry = None # For custom name and wildcard usage
         self.index_name_wildcard_switch = None
-        self.indices_status = "placeholder"
+        self.__indices_status = "placeholder"
         self.current_index = "N/A"
         self.selected_index = tkinter.StringVar()
         self.selected_index.set(value="N/A")
@@ -175,14 +175,10 @@ class GUIMenu:
 
     def init_indices(self):
 
-        # Clean up properly per refresh
-        del self.indices_status
-        del self.index_list
-
-        self.indices_status = self.__request_sender.get_indices_status()
-        if self.indices_status is None:
+        self.__indices_status = self.__request_sender.get_indices_status()
+        if self.__indices_status is None:
             exit(1)
-        temp_list = self.indices_status.split("\n")[1:-1]
+        temp_list = self.__indices_status.split("\n")[1:-1]
         i = 1
         self.index_list = []
         for entry in temp_list:
@@ -522,7 +518,8 @@ class GUIMenu:
         return
 
     def show_indices_status(self):
-        GUIShowIndicesStatus(indices_status=self.indices_status).focus()
+        self.__indices_status = self.__request_sender.get_indices_status()
+        GUIShowIndicesStatus(indices_status=self.__indices_status).focus()
         return
 
     def show_available_field_names(self):
