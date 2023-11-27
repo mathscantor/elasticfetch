@@ -25,6 +25,7 @@ class Messenger:
         :param sev: A Severity Enum.
         :param message: The string to be printed.
         :return: None
+        :rtype: None
         """
 
         # If verbosity is default, then do not print DEBUG messages

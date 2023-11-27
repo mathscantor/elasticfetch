@@ -134,7 +134,16 @@ class GUIMenu:
     '''
     Easy way to initialize the main window
     '''
-    def init_primary_app_window(self):
+    def init_primary_app_window(self) -> None:
+        """
+        Initialize the primary application window.
+
+        This method sets up and initializes the main window for the application,
+        including any necessary components, widgets, or configurations.
+
+        :return: None
+        :rtype: None
+        """
         self.primary_app_window.title("elasticfetch - Main")
         self.primary_app_window.geometry("1120x640")
         self.primary_app_window.resizable(False, False)
@@ -148,7 +157,16 @@ class GUIMenu:
         self.primary_app_window.grid_rowconfigure(0, weight=1)
         return
 
-    def init_frames(self):
+    def init_frames(self) -> None:
+        """
+        Initialize frames within the application window.
+
+        This method sets up and initializes frames or containers within the main application window.
+        Frames can be used to organize and group different sections or functionalities of the application.
+
+        :return: None
+        :rtype: None
+        """
         # ---------------------LEFT FRAME--------------------- #
         self.frame_left = customtkinter.CTkFrame(master=self.primary_app_window,
                                                  width=180)
@@ -175,8 +193,14 @@ class GUIMenu:
         self.frame_info.grid(row=0, column=0, columnspan=2, rowspan=5, pady=20, padx=20, sticky="nsew")
         return
 
-    def init_indices(self):
+    def init_indices(self) -> None:
+        """
+        Initialize Elasticsearch indices for the application.
+        This method sets up and initializes Elasticsearch indices statuses for use within the application.
 
+        :return: None
+        :rtype: None
+        """
         self.__indices_status = self.__request_sender.get_indices_status()
         if self.__indices_status is None:
             exit(1)
@@ -189,8 +213,16 @@ class GUIMenu:
             i += 1
         return
 
-    def show_menu(self):
+    def show_menu(self) -> None:
+        """
+        Display the main menu.
 
+        This method prints the main menu options to the console or user interface,
+        providing the user with choices for interacting with the application.
+
+        :return: None
+        :rtype: None
+        """
         self.label_options = customtkinter.CTkLabel(master=self.frame_left,
                                                     text="Options",
                                                     font=customtkinter.CTkFont(family="Arial",
@@ -429,7 +461,20 @@ class GUIMenu:
         self.primary_app_window.mainloop()
         return
 
-    def change_appearance_mode(self, new_appearance_mode):
+    def change_appearance_mode(self,
+                               new_appearance_mode: str) -> None:
+        """
+        Change the appearance mode of the application.
+
+        This method allows the user to switch between different appearance modes
+        such as light mode, dark mode, or other predefined themes.
+
+        :param new_appearance_mode: The new appearance mode to be set.
+        :type new_appearance_mode: str
+
+        :return: None
+        :rtype: None
+        """
         if new_appearance_mode not in self.available_themes:
             customtkinter.set_appearance_mode("System")
             return
@@ -443,15 +488,54 @@ class GUIMenu:
         customtkinter.set_appearance_mode(value)
         return
 
-    def set_main_timestamp_name(self, event):
+    def set_main_timestamp_name(self,
+                                event: tkinter.Event) -> None:
+        """
+        Set the main timestamp name based on a tkinter event.
+
+        This method allows the user to set the name of the main timestamp field
+        in response to a tkinter event, such as a user interface interaction.
+
+        :param event: The tkinter event triggering the timestamp name setting.
+        :type event: tkinter.Event
+
+        :return: None
+        :rtype: None
+        """
         self.main_timestamp_name = self.selected_main_timestamp_name.get()
         return
 
-    def set_file_format(self, event):
+    def set_file_format(self,
+                        event: tkinter.Event) -> None:
+        """
+        Set the file format based on a tkinter event.
+
+        This method allows the user to set the desired file format
+        in response to a tkinter event, such as a user interface interaction.
+
+        :param event: The tkinter event triggering the file format setting.
+        :type event: tkinter.Event
+
+        :return: None
+        :rtype: None
+        """
         self.file_format = self.selected_file_format.get()
         return
 
-    def set_main_timestamp_format(self, event):
+    def set_main_timestamp_format(self,
+                                  event: tkinter.Event) -> None:
+        """
+        Set the main timestamp format based on a tkinter event.
+
+        This method allows the user to set the format of the main timestamp field
+        in response to a tkinter event, such as a user interface interaction.
+
+        :param event: The tkinter event triggering the main timestamp format setting.
+        :type event: tkinter.Event
+
+        :return: None
+        :rtype: None
+        """
         self.main_timestamp_format = self.selected_main_timestamp_format.get()
         # change the placeholder of start time and end time accordingly.
         if self.start_timestamp_entry is not None and self.end_timestamp_entry is not None:
@@ -467,27 +551,70 @@ class GUIMenu:
                 self.main_timezone_combobox.configure(state=tkinter.DISABLED)
         return
 
-    def set_main_timezone(self, event):
+    def set_main_timezone(self,
+                          event: tkinter.Event) -> None:
+        """
+        Set the main timezone based on a tkinter event.
+
+        This method allows the user to set the timezone of the main timestamp field
+        in response to a tkinter event, such as a user interface interaction.
+
+        :param event: The tkinter event triggering the main timezone setting.
+        :type event: tkinter.Event
+
+        :return: None
+        :rtype: None
+        """
         self.main_timezone = self.selected_main_timezone.get()
         return
 
-    def get_available_field_list(self):
-        del self.available_field_list
-        self.available_field_list = []
+    def get_available_field_list(self) -> None:
+        """
+        Update the available field list based on parent field and type information.
+
+        This method clears the existing available field list and populates it based on
+        the parent field and type dictionary in the class instance.
+
+        :return: None
+        :rtype: None
+        """
+        self.available_field_list.clear()
         for top_parent_field in self.parent_field_to_type_dict.keys():
             for field_type in self.parent_field_to_type_dict[top_parent_field].keys():
                 self.available_field_list += self.parent_field_to_type_dict[top_parent_field][field_type]
+        return
 
-    def get_valid_timestamp_name_list(self):
-        del self.valid_timestamp_name_list
-        self.valid_timestamp_name_list = []
+    def get_valid_timestamp_name_list(self) -> None:
+        """
+        Update the valid timestamp name list based on parent field and type information.
+
+        This method clears the existing valid timestamp name list and populates it with
+        timestamp fields found in the parent field and type dictionary with the "date" type.
+
+        :return: None
+        :rtype: None
+        """
+        self.valid_timestamp_name_list.clear()
         for top_parent_field in self.parent_field_to_type_dict.keys():
             for field_type in self.parent_field_to_type_dict[top_parent_field].keys():
                 if field_type == "date":
                     self.valid_timestamp_name_list += self.parent_field_to_type_dict[top_parent_field][field_type]
         return
 
-    def set_current_index(self, event):
+    def set_current_index(self,
+                          event: tkinter.Event) -> None:
+        """
+        Set the current Elasticsearch index based on a tkinter event.
+
+        This method allows the user to set the current Elasticsearch index
+        in response to a tkinter event, such as a user interface interaction.
+
+        :param event: The tkinter event triggering the current index setting.
+        :type event: tkinter.Event
+
+        :return: None
+        :rtype: None
+        """
         self.show_available_field_names_button.configure(state=customtkinter.DISABLED,
                                                          fg_color="grey")
 
@@ -519,17 +646,44 @@ class GUIMenu:
                                          fg_color="#395E9C")
         return
 
-    def show_indices_status(self):
+    def show_indices_status(self) -> None:
+        """
+        Display the status of Elasticsearch indices.
+
+        This method retrieves and prints the status of Elasticsearch indices,
+        providing information such as the number of documents and other relevant details.
+
+        :return: None
+        :rtype: None
+        """
         self.__indices_status = self.__request_sender.get_indices_status()
         GUIShowIndicesStatus(indices_status=self.__indices_status).focus()
         return
 
-    def show_available_field_names(self):
+    def show_available_field_names(self) -> None:
+        """
+        Display the available field names in the current Elasticsearch index.
+
+        This method retrieves and prints the names of available fields in the current Elasticsearch index,
+        providing the user with information about the fields they can interact with.
+
+        :return: None
+        :rtype: None
+        """
         GUIShowAvailableFields(current_index=self.current_index,
                                parent_field_to_type_dict=self.parent_field_to_type_dict).focus()
         return
 
-    def switch_index_input_method(self):
+    def switch_index_input_method(self) -> None:
+        """
+        Switch the input method for specifying Elasticsearch indices.
+
+        This method allows the user to switch between ComboBox or Entry
+        for specifying Elasticsearch indices.
+
+        :return: None
+        :rtype: None
+        """
         if self.index_name_wildcard_switch.get() == 1:
             self.current_index_combobox.grid_forget()
             self.current_index_entry.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
@@ -539,7 +693,16 @@ class GUIMenu:
             self.current_index_combobox.grid(row=0, column=3, columnspan=3, pady=5, padx=0, sticky="we")
         return
 
-    def fetch_elastic_data_between_ts1_ts2(self):
+    def fetch_elastic_data_between_ts1_ts2(self) -> None:
+        """
+        Fetch Elasticsearch data between two specified timestamps.
+
+        This method retrieves data from the configured Elasticsearch index
+        within the time range defined by the start and end timestamps.
+
+        :return: None
+        :rtype: None
+        """
         self.frame_info_error_label.configure(text="")
         self.fetch_data_button.configure(state=customtkinter.DISABLED,
                                          fg_color="grey")
@@ -720,16 +883,47 @@ class GUIMenu:
                 self.__request_sender.put_max_result_window(index_name=index, size=index_max_result_window_dict[index])
         return
 
-    def display_ts_converter_window(self):
+    def display_ts_converter_window(self) -> None:
+        """
+        Display the timestamp converter window.
+
+        This method opens a window or interface allowing the user to convert timestamps
+        between different formats, helping them work with diverse timestamp representations.
+
+        :return: None
+        :rtype: None
+        """
         GUITSConverter(converter=self.__converter,
                        input_validation=self.__input_validation).focus()
         return
 
-    def on_closing_primary_app_window(self):
+    def on_closing_primary_app_window(self) -> None:
+        """
+        Handle the closing event of the primary application window.
+
+        This method is called when the user attempts to close the main application window,
+        allowing for necessary cleanup operations or confirmation dialogs.
+
+        :return: None
+        :rtype: None
+        """
         self.primary_app_window.destroy()
         return
 
-    def notify_to_press_return_key(self, event):
+    def notify_to_press_return_key(self,
+                                   event: tkinter.Event) -> None:
+        """
+        Notify the user to press the return key in response to a tkinter event.
+
+        This method displays a notification or prompts the user,
+        instructing them to press the return key in response to a tkinter event.
+
+        :param event: The tkinter event triggering the notification.
+        :type event: tkinter.Event
+
+        :return: None
+        :rtype: None
+        """
         if self.has_pressed_return_key:
             self.frame_info_error_label.configure(text="")
             self.has_pressed_return_key = False
@@ -737,6 +931,22 @@ class GUIMenu:
             self.frame_info_error_label.configure(text="Hit <Enter> to confirm new index selection!")
         return
 
-    def load_image(self, path, image_size):
-        """ load rectangular image with path relative to PATH """
+    def load_image(self,
+                   path: str,
+                   image_size: int) -> ImageTk.PhotoImage:
+        """
+        Load and resize an image from a specified path.
+
+        This method loads an image from the specified path relative to the global PATH,
+        resizes it to the given image_size, and returns it as a PhotoImage.
+
+        :param path: The relative path to the image file.
+        :type path: str
+
+        :param image_size: The desired size (width) of the loaded image.
+        :type image_size: int
+
+        :return: A PhotoImage object representing the loaded and resized image.
+        :rtype: ImageTk.PhotoImage
+        """
         return ImageTk.PhotoImage(Image.open(os.path.join(PATH, path)).resize((image_size, int(image_size*0.75))))

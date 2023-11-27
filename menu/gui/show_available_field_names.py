@@ -1,6 +1,7 @@
 import customtkinter
 import tkinter
 import os
+from typing import *
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -104,7 +105,20 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
                                xscrollcommand=xscrollbar.set,
                                state=tkinter.DISABLED)
 
-    def find_in_textbox(self, search_term) -> list:
+    def find_in_textbox(self,
+                        search_term: tkinter.Entry) -> None:
+        """
+        Find and highlight occurrences of a search term in the textbox.
+
+        This method searches for the specified search term in the textbox content,
+        highlights the occurrences, and provides navigation buttons for easy traversal.
+
+        :param search_term: The tkinter Entry widget containing the search term.
+        :type search_term: tkinter.Entry
+
+        :return: None
+        :rtype: None
+        """
         # remove tag 'found' from index 1 to END
         self.textbox.tag_remove('found', '1.0', tkinter.END)
         self.textbox.tag_remove("highlight", '1.0', tkinter.END)
@@ -150,6 +164,15 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         return
 
     def get_search_result_next(self) -> None:
+        """
+        Navigate to the next search result in the textbox.
+
+        This method increments the current result index, wraps around if necessary,
+        and updates the textbox display to highlight the next search result.
+
+        :return: None
+        :rtype: None
+        """
         self.current_result_index += 1
         self.current_result_index = self.current_result_index % self.total_num_results
         self.textbox.see(self.idx_list[self.current_result_index][1])
@@ -162,7 +185,16 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         self.total_count_label.configure(text="{} of {}".format(self.current_result_index + 1, self.total_num_results))
         return
 
-    def get_search_result_before(self):
+    def get_search_result_before(self) -> None:
+        """
+        Navigate to the previous search result in the textbox.
+
+        This method decrements the current result index, wraps around if necessary,
+        and updates the textbox display to highlight the previous search result.
+
+        :return: None
+        :rtype: None
+        """
         self.current_result_index -= 1
         self.current_result_index = self.current_result_index % self.total_num_results
         self.textbox.see(self.idx_list[self.current_result_index][1])

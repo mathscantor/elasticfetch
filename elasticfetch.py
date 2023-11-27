@@ -8,7 +8,12 @@ from utils.messenger import Messenger, Severity
 from utils.parser import Parser
 
 
-def validate_config_inputs():
+def validate_config_inputs() -> None:
+    """
+    Further validates user inputs in elasticfetch.ini configuration before running the rest of the logic.
+    :return: None
+    :rtype: None
+    """
     messenger.print_message(Severity.INFO, "Checking elasticfetch.ini configuration inputs...")
     if not input_validation.is_protocol_valid(config_reader.elastic_protocol):
         exit(1)
@@ -19,6 +24,7 @@ def validate_config_inputs():
     if not input_validation.is_batch_size_valid(config_reader.batch_size):
         exit(1)
     messenger.print_message(Severity.INFO, "All configuration inputs are valid.")
+    return
 
 
 def main():

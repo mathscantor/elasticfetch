@@ -33,8 +33,8 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.frame_right.grid_columnconfigure(0, weight=1)
         self.frame_right.grid_columnconfigure(1, weight=1)
 
-        self.left_arrow_image = self.load_image("/images/icons8-left-arrow-50.png", 20)
-        self.right_arrow_image = self.load_image("/images/icons8-right-arrow-50.png", 20)
+        self.left_arrow_image = customtkinter.CTkImage(Image.open(os.path.join(PATH, "images/icons8-left-arrow-50.png")), size=(20, 15))
+        self.right_arrow_image = customtkinter.CTkImage(Image.open(os.path.join(PATH, "images/icons8-right-arrow-50.png")), size=(20, 15))
 
         self.datetime_label = customtkinter.CTkLabel(master=self.frame_left, text="DateTime Format",
                                                      font=customtkinter.CTkFont(family="Arial", size=15))
@@ -101,7 +101,17 @@ class GUITSConverter(customtkinter.CTkToplevel):
                                                               text_color="red")
         self.frame_right_error_label.grid(row=5, column=0, pady=55, padx=20, sticky="we")
 
-    def convert_datetime_to_epoch(self):
+    def convert_datetime_to_epoch(self) -> None:
+        """
+        Convert datetime inputs to epoch timestamps and update the corresponding entry fields.
+
+        This method extracts start and end datetime inputs from the GUI, validates their formats,
+        checks the relationship between start and end times, and converts them to epoch timestamps.
+        If the inputs are valid, the epoch timestamp values are displayed in the corresponding entry fields.
+
+        :return: None
+        :rtype: None
+        """
         self.frame_left_error_label.configure(text="")
         self.frame_right_error_label.configure(text="")
 
@@ -136,8 +146,17 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.epoch_end_ts_entry.insert(0, end_ts_epoch)
         return
 
-    def convert_epoch_to_datetime(self):
+    def convert_epoch_to_datetime(self) -> None:
+        """
+        Convert epoch timestamp inputs to datetime values and update the corresponding entry fields.
 
+        This method extracts start and end epoch timestamp inputs from the GUI, validates their formats,
+        checks the relationship between start and end times, and converts them to datetime values.
+        If the inputs are valid, the datetime values are displayed in the corresponding entry fields.
+
+        :return: None
+        :rtype: None
+        """
         self.frame_left_error_label.configure(text="")
         self.frame_right_error_label.configure(text="")
 
@@ -171,21 +190,43 @@ class GUITSConverter(customtkinter.CTkToplevel):
         self.datetime_end_ts_entry.insert(0, end_ts_date_time)
         return
 
-    def set_timezone(self, timezone):
+    def set_timezone(self, timezone) -> None:
+        """
+        Set the timezone for datetime conversion.
+
+        This method updates the timezone used for converting between datetime and epoch timestamps.
+
+        :param timezone: The timezone to be set.
+        :type timezone: str
+
+        :return: None
+        :rtype: None
+        """
         self.__timezone = timezone
         return
 
-    def clear_epoch_entries(self):
+    def clear_epoch_entries(self) -> None:
+        """
+        Clear epoch timestamp entry fields.
+
+        This method removes any existing values from the epoch timestamp entry fields.
+
+        :return: None
+        :rtype: None
+        """
         self.epoch_start_ts_entry.delete(0, customtkinter.END)
         self.epoch_end_ts_entry.delete(0, customtkinter.END)
         return
 
-    def clear_datetime_entries(self):
+    def clear_datetime_entries(self) -> None:
+        """
+        Clear datetime entry fields.
+
+        This method removes any existing values from the datetime entry fields.
+
+        :return: None
+        :rtype: None
+        """
         self.datetime_start_ts_entry.delete(0, customtkinter.END)
         self.datetime_end_ts_entry.delete(0, customtkinter.END)
         return
-
-    def load_image(self, path, image_size):
-        """ load rectangular image with path relative to PATH """
-        return ImageTk.PhotoImage(Image.open(PATH + path).resize((image_size, image_size)))
-

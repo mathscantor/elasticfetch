@@ -35,7 +35,13 @@ class RequestSender:
         self.__has_finished_fetching = False
         return
 
-    def get_authentication_status_bool(self):
+    def get_authentication_status_bool(self) -> bool:
+        """
+        Get the authentication status as a boolean.
+
+        :return: True if authentication is successful, False otherwise.
+        :rtype: bool
+        """
         if self.__protocol == "https":
             url = "{}://{}:{}/_security/_authenticate?pretty".format(self.__protocol, 
                                                                      self.__elastic_ip, 
@@ -72,7 +78,31 @@ class RequestSender:
 
     def get_max_result_window(self,
                               index_name: str) -> Dict[str, int]:
+        """
+        Get the maximum result window size for a given Elasticsearch index.
 
+        :param index_name: The name of the Elasticsearch index. (Wildcard is accepted as well)
+        :type index_name: str
+        Example:
+        ```
+        index_name = *filebeat*
+        This matches:
+        1. .ds-filebeat-8.11.1-2023.11.21-000001
+        2. .ds-filebeat-8.11.1-2023.11.22-000002
+        3. .ds-filebeat-8.11.1-2023.11.23-000003
+
+        Thus, our dictionary returned would look like this:
+        {
+            ".ds-filebeat-8.11.1-2023.11.21-000001": 10000,
+            ".ds-filebeat-8.11.1-2023.11.22-000002": 10000,
+            ".ds-filebeat-8.11.1-2023.11.23-000003": 10000
+        }
+        ```
+
+        :return: A dictionary containing the maximum result window size for the provided index.
+                 The key is the actual index name and the value is the maximum window size.
+        :rtype: Dict[str, int]
+        """
         index_max_result_window_dict = dict()
         url = "{}://{}:{}/{}/_settings".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         # Get the current index.max_result_window first for a particular index or indices if you use wildcard matching.
@@ -108,14 +138,21 @@ class RequestSender:
             self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
         return index_max_result_window_dict
 
-    '''
-    The maximum value of from + size for searches to this index. Defaults to 10000. 
-    Search requests take heap memory and time proportional to from + size and this limits that memory.
-    '''
     def put_max_result_window(self,
                               index_name: str,
-                              size: int):
+                              size: int) -> None:
+        """
+        Set the maximum result window size for a given Elasticsearch index.
 
+        :param index_name: The name of the Elasticsearch index.
+        :type index_name: str
+
+        :param size: The maximum result window size to be set.
+        :type size: int
+
+        :return: None
+        :rtype: None
+        """
         url = "{}://{}:{}/{}/_settings".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         data = {"index.max_result_window": size}
 
@@ -152,10 +189,6 @@ class RequestSender:
             self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
         return
 
-    '''
-    Loops through and through to fetch in batches of 10,000 data entries.
-    Returns a list of data_json objects which will be converted into either a .json or .csv file.
-    '''
     def get_fetch_elastic_data_between_ts1_ts2(self,
                                                index_name: str,
                                                num_logs: int,
@@ -164,9 +197,45 @@ class RequestSender:
                                                main_timezone: str,
                                                start_ts: str,
                                                end_ts: str,
-                                               fields_list: list,
-                                               query_bool_must_list: list,
-                                               query_bool_must_not_list: list) -> None:
+                                               fields_list: List[str],
+                                               query_bool_must_list: List[Dict[str, Dict]],
+                                               query_bool_must_not_list: List[Dict[str, Dict]]) -> None:
+        """
+        Fetch Elasticsearch data between two timestamps for a given index.
+
+        :param index_name: The name of the Elasticsearch index.
+        :type index_name: str
+
+        :param num_logs: The number of logs to fetch.
+        :type num_logs: int
+
+        :param main_timestamp_name: The name of the main timestamp field.
+        :type main_timestamp_name: str
+
+        :param main_timestamp_format: The format of the main timestamp field.
+        :type main_timestamp_format: str
+
+        :param main_timezone: The timezone of the main timestamp field.
+        :type main_timezone: str
+
+        :param start_ts: The start timestamp for data retrieval.
+        :type start_ts: str
+
+        :param end_ts: The end timestamp for data retrieval.
+        :type end_ts: str
+
+        :param fields_list: A list of field names to include in the fetched data.
+        :type fields_list: List[str]
+
+        :param query_bool_must_list: A list of dictionaries representing must clauses in the Elasticsearch query.
+        :type query_bool_must_list: List[Dict[str, Dict]]
+
+        :param query_bool_must_not_list: A list of dictionaries representing must_not clauses in the Elasticsearch query.
+        :type query_bool_must_not_list: List[Dict[str, Dict]]
+
+        :return: None
+        :rtype: None
+        """
         url = "{}://{}:{}/{}/_search?pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         is_first_loop = True
         last_ids = []
@@ -239,7 +308,7 @@ class RequestSender:
             else:
                 if not is_first_loop:
                     data["query"]["bool"]["must_not"] = [{"terms": {"_id": last_ids}}]
-            #print(json.dumps(data, indent=4))
+            # print(json.dumps(data, indent=4))
             try:
                 response = requests.get(url=url,
                                         headers=self.__headers,
@@ -300,7 +369,15 @@ class RequestSender:
         self.__has_finished_fetching = True
         return
 
-    def get_indices_status(self):
+    def get_indices_status(self) -> str:
+        """
+        Get the status of Elasticsearch indices.
+
+        This method retrieves and prints the status of all indices in the Elasticsearch cluster.
+
+        :return: The string of the response.
+        :rtype: str
+        """
         url = "{}://{}:{}/_cat/indices/*?v=true&s=index&pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port)
         try:
             response = requests.get(url=url,
@@ -314,9 +391,22 @@ class RequestSender:
             self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
         except requests.ConnectionError:
             self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
-        return
+        return ""
 
-    def get_available_fields(self, index_name):
+    def get_available_fields(self,
+                             index_name: str) -> Dict:
+        """
+        Get the available fields and their types in a specific Elasticsearch index.
+
+        This method queries the specified Elasticsearch index and returns a dictionary
+        where keys are field names, and values are the corresponding field types.
+
+        :param index_name: The name of the Elasticsearch index.
+        :type index_name: str
+
+        :return: A dictionary mapping field names to their types in the specified index.
+        :rtype: Dict
+        """
         url = "{}://{}:{}/{}/_mapping/field/*".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         try:
             response = requests.get(url=url,
@@ -337,25 +427,64 @@ class RequestSender:
         return
 
     def pop_from_data_json_list(self) -> Dict:
+        """
+        Pop and return the first element from the data JSON list.
+
+        :return: The first element from the data JSON list.
+        :rtype: Dict
+        """
         return self.__data_json_list.pop(0)
 
     @property
     def total_results_size(self) -> int:
+        """
+        Get the total size of results.
+
+        :return: The total size of results.
+        :rtype: int
+        """
         return self.__total_results_size
 
     @property
     def data_json_list(self) -> List[Dict]:
+        """
+        Get the list of data in JSON format.
+
+        :return: The list of data in JSON format.
+        :rtype: List[Dict]
+        """
         return self.__data_json_list
 
     @property
     def has_finished_fetching(self) -> bool:
+        """
+        Get the flag indicating whether fetching has finished.
+
+        :return: True if fetching has finished, False otherwise.
+        :rtype: bool
+        """
         return self.__has_finished_fetching
 
     @has_finished_fetching.setter
     def has_finished_fetching(self, value: bool) -> None:
+        """
+        Set the flag indicating whether fetching has finished.
+
+        :param value: The value to set for the flag.
+        :type value: bool
+
+        :return: None
+        :rtype: None
+        """
         self.__has_finished_fetching = value
         return
 
     @property
-    def fetch_lock(self):
+    def fetch_lock(self) -> threading.Lock:
+        """
+        Get the lock used for synchronization during fetching.
+
+        :return: The lock object.
+        :rtype: threading.Lock
+        """
         return self.__fetch_lock

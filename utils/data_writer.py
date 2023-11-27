@@ -21,7 +21,18 @@ class DataWriter:
     def write_to_csv(self,
                      request_sender: RequestSender,
                      fields_list: List[str]):
+        """
+        Write data received from a RequestSender to a CSV file.
 
+        :param request_sender: An instance of RequestSender used to fetch data.
+        :type request_sender: RequestSender
+
+        :param fields_list: A list of field names to include in the CSV file.
+        :type fields_list: List[str]
+
+        :return: None
+        :rtype: None
+        """
         current_datetime = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S")
         self.__csv_filepath = "{}/{}Z.csv".format(self.__datasets_folder, current_datetime)
         os.makedirs(os.path.dirname( self.__csv_filepath), exist_ok=True)
@@ -72,8 +83,16 @@ class DataWriter:
         return
 
     def write_to_jsonl(self,
-                       request_sender: RequestSender):
+                       request_sender: RequestSender) -> None:
+        """
+        Write data received from a RequestSender to a JSON Lines (JSONL) file.
 
+        :param request_sender: An instance of RequestSender used to fetch and process data.
+        :type request_sender: RequestSender
+
+        :return: None
+        :rtype: None
+        """
         current_datetime = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S")
         self.__json_filepath = "{}/{}Z.jsonl".format(self.__datasets_folder, current_datetime)
         os.makedirs(os.path.dirname(self.__json_filepath), exist_ok=True)
@@ -95,13 +114,31 @@ class DataWriter:
         return
 
     @property
-    def csv_filepath(self):
+    def csv_filepath(self) -> str:
+        """
+        Get the filepath for the CSV file where data is written or read.
+
+        :return: The filepath for the CSV file.
+        :rtype: str
+        """
         return self.__csv_filepath
 
     @property
-    def json_filepath(self):
+    def json_filepath(self) -> str:
+        """
+        Get the filepath for the JSON Lines (JSONL) file where data is written or read.
+
+        :return: The filepath for the JSONL file.
+        :rtype: str
+        """
         return self.__json_filepath
 
     @property
-    def data_writer_lock(self):
+    def data_writer_lock(self) -> threading.Lock:
+        """
+        Get the threading lock used to synchronize access to data writing operations.
+
+        :return: The threading lock.
+        :rtype: threading.Lock
+        """
         return self.__data_writer_lock

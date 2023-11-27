@@ -17,12 +17,16 @@ class ConfigReader:
         self.__interface_graphical = None
         self.__messenger = Messenger()
         self.__read_config_file()
+        return
 
-    '''
-    Reads in the user input from the configuration file and put them into a config_dict for easy access to 
-    user's chosen parameters.
-    '''
-    def __read_config_file(self) -> dict:
+    def __read_config_file(self) -> None:
+        """
+        Reads in the user input from the configuration file and put them into a config_dict for easy access to
+        user's chosen parameters.
+
+        :return: None
+        :rtype: None
+        """
         config_options = ConfigParser()
 
         try:
@@ -123,30 +127,72 @@ class ConfigReader:
         return
 
     @property
-    def elastic_protocol(self) -> int:
+    def elastic_protocol(self) -> str:
+        """
+         Get the ElasticSearch protocol used for communication.
+
+         :return: The ElasticSearch protocol (e.g. 'https' or 'http')
+         :rtype: str
+         """
         return self.__elastic_protocol
 
     @property
     def elastic_ip(self) -> str:
+        """
+        Get the ElasticSearch server IP address.
+
+        :return: The ElasticSearch server IP address.
+        :rtype: str
+        """
         return self.__elastic_ip
 
     @property
     def elastic_port(self) -> int:
+        """
+        Get the ElasticSearch server port.
+
+        :return: The ElasticSearch server port. (eg. 9200)
+        :rtype: int
+        """
         return self.__elastic_port
 
     @property
     def credentials_username(self) -> str:
+        """
+        Get the username used for authentication.
+
+        :return: The username used for authentication.
+        :rtype: str
+        """
         return self.__credentials_username
 
     @property
     def credentials_password(self) -> str:
+        """
+        Get the password used for authentication.
+
+        :return: The password used for authentication.
+        :rtype: str
+        """
         return self.__credentials_password
 
     @property
     def interface_graphical(self) -> bool:
+        """
+        Check if the interface is set to graphical mode.
+
+        :return: True if the interface is graphical, False otherwise.
+        :rtype: bool
+        """
         return self.__interface_graphical
 
     @property
     def batch_size(self) -> int:
+        """
+         Get the size of the data per fetch.
+
+         :return: The size of the data per fetch.
+         :rtype: int
+         """
         return self.__batch_size
 
