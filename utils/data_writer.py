@@ -71,35 +71,27 @@ class DataWriter:
                             f_csv.flush()
         return
 
-    def write_to_json(self,
-                      request_sender: RequestSender):
+    def write_to_jsonl(self,
+                       request_sender: RequestSender):
 
         current_datetime = datetime.utcnow().strftime("%Y-%m-%dT%H-%M-%S")
-        self.__json_filepath = "{}/{}Z.json".format(self.__datasets_folder, current_datetime)
+        self.__json_filepath = "{}/{}Z.jsonl".format(self.__datasets_folder, current_datetime)
         os.makedirs(os.path.dirname(self.__json_filepath), exist_ok=True)
 
         self.__messenger.print_message(Severity.INFO, "Saving data to {}".format(self.__json_filepath))
 
-        is_first_data_json = True
-        master_data_json = None
-        master_size = 0
-
         f = open(self.__json_filepath, "w", encoding="utf-8")
         while True:
-
             if request_sender.has_finished_fetching and len(request_sender.data_json_list) == 0:
                 return
 
-            # FLAWED LOGIC
             with request_sender.fetch_lock:
                 if request_sender.data_json_list:
                     data_json = request_sender.pop_from_data_json_list()
                     with self.__data_writer_lock:
-                        # json.dump(master_data_json, f, ensure_ascii=False, indent=4)
                         json.dump(data_json, f, ensure_ascii=False, separators=(',', ':'))
                         f.write("\n")
                         f.flush()
-
         return
 
     @property

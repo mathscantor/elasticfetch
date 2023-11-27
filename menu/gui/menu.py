@@ -685,8 +685,8 @@ class GUIMenu:
                                                                                                self.__data_writer.csv_filepath))
             self.primary_app_window.update()
 
-        elif self.file_format == "json":
-            data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_json,
+        elif self.file_format == "jsonl":
+            data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_jsonl,
                                                       kwargs={
                                                           "request_sender": self.__request_sender,
                                                       })

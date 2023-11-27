@@ -328,7 +328,7 @@ class CommandLineMenu:
             filter_is_not_lt_list=keyword_sentences_dict["is_not_lt"],
             filter_is_not_one_of_list=keyword_sentences_dict["is_not_one_of"])
 
-        file_format = str(input("File format(json/csv): ")).strip()
+        file_format = str(input("File format(jsonl / csv): ")).strip()
         if not self.__input_validation.is_file_format_valid(file_format=file_format):
             return
 
@@ -364,8 +364,8 @@ class CommandLineMenu:
             data_write_csv_thread.join()
             data_fetch_thread.join()
 
-        elif file_format == "json":
-            data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_json,
+        elif file_format == "jsonl":
+            data_write_json_thread = threading.Thread(target=self.__data_writer.write_to_jsonl,
                                                       kwargs={
                                                           "request_sender": self.__request_sender,
                                                       })

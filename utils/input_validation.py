@@ -28,7 +28,7 @@ class InputValidation:
         self.__valid_filter_keywords = ["is_not_gte", "is_not_lte", "is_not_gt", "is_not_lt", "is_not_one_of", "is_not",
                                       "is_gte", "is_lte", "is_gt", "is_lt", "is_one_of", "is"]
         self.__valid_file_extensions = ['.json', '.csv']
-        self.__valid_file_format = ['json', 'csv']
+        self.__valid_file_format = ['jsonl', 'csv']
         self.__valid_timestamp_format_list = ['datetime', 'epoch']
         self.__valid_timezone_list = ["+00:00", "+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00",
                                     "-01:00", "-02:00", "-03:00", "-04:00", "-05:00", "-06:00", "-07:00", "-08:00", "-09:00" , "-10:00", "-11:00", "-12:00"]
