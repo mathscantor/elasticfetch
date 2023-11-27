@@ -12,7 +12,13 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 class RequestSender:
 
-    def __init__(self, protocol, elastic_ip, elastic_port, username, password):
+    def __init__(self,
+                 protocol: str,
+                 elastic_ip: str,
+                 elastic_port: int,
+                 username: str,
+                 password: str,
+                 batch_size: str):
         self.__messenger = Messenger()
         self.__headers = {"Content-Type": "application/json"}
         self.__protocol = protocol
@@ -20,6 +26,7 @@ class RequestSender:
         self.__elastic_port = elastic_port
         self.__username = username
         self.__password = password
+        self.__batch_size = batch_size
 
         # Data related
         self.__data_json_list = []
@@ -128,8 +135,8 @@ class RequestSender:
         self.__data_json_list = []
         self.__has_finished_fetching = False
         while num_logs > 0:
-            if num_logs >= 10000:
-                batch_size = 10000
+            if num_logs >= self.__batch_size:
+                batch_size = self.__batch_size
             else:
                 batch_size = num_logs
             num_logs -= batch_size

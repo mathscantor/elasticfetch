@@ -1,6 +1,8 @@
 import re
 from utils.messenger import Messenger, Severity
 from datetime import datetime
+from typing import *
+
 
 class InputValidation:
 
@@ -25,58 +27,73 @@ class InputValidation:
             r"^(([-_.a-zA-Z\d]+ (is_not_gte|is_not_lte|is_not_gt|is_not_lt|is_not_one_of|is_not|is_gte|is_lte|is_gt|is_lt|is_one_of|is) [,-_.a-zA-Z\d]+;(\s+|))+)$")
         self.__valid_filter_keywords = ["is_not_gte", "is_not_lte", "is_not_gt", "is_not_lt", "is_not_one_of", "is_not",
                                       "is_gte", "is_lte", "is_gt", "is_lt", "is_one_of", "is"]
-        self.__valid_file_extensions = ('.json', '.csv')
+        self.__valid_file_extensions = ['.json', '.csv']
         self.__valid_file_format = ['json', 'csv']
         self.__valid_timestamp_format_list = ['datetime', 'epoch']
         self.__valid_timezone_list = ["+00:00", "+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00",
                                     "-01:00", "-02:00", "-03:00", "-04:00", "-05:00", "-06:00", "-07:00", "-08:00", "-09:00" , "-10:00", "-11:00", "-12:00"]
 
-    def is_protocol_valid(self, protocol):
+    def is_protocol_valid(self,
+                          protocol: str) -> bool:
         if protocol not in self.__valid_protocols:
-            self.__messenger.print_message(Severity.ERROR, "Protocol '{}' is not supported! Please ensure it is either 'http' or 'https'!".format(protocol))
+            self.__messenger.print_message(Severity.ERROR, "Protocol '{}' is not supported! Please ensure "
+                                                           "it is either 'http' or 'https'!".format(protocol))
             return False
         else:
             return True
 
-    def is_port(self, user_input):
-        match = self.__port_regex.search(user_input)
-        if match:
+    def is_port_valid(self,
+                      user_input: int) -> bool:
+        if 1 <= user_input < 65535:
             return True
         else:
-            self.__messenger.print_message(Severity.ERROR, "Port '{}' is invalid. Please check that it is within 1 to 65535.".format(user_input))
+            self.__messenger.print_message(Severity.ERROR, "Port '{}' is invalid. Please check that "
+                                                           "it is within 1 to 65535.".format(user_input))
             return False
 
-    def is_ip(self, user_input):
+    def is_ip_valid(self,
+                    user_input: str) -> bool:
         match = self.__ip_regex.search(user_input)
         if match:
             return True
         else:
-            self.__messenger.print_message(Severity.ERROR, "IP address '{}' is invalid. Please check that it is within 0.0.0.0 to 255.255.255.255".format(user_input))
+            self.__messenger.print_message(Severity.ERROR, "IP address '{}' is invalid. Please check that it is within"
+                                                           " 0.0.0.0 to 255.255.255.255".format(user_input))
             return False
 
-    def is_numeric_valid(self, user_input):
+    def is_numeric_valid(self,
+                         user_input: str) -> bool:
         match = self.__numeric_regex.search(user_input)
         if match:
             return True
         else:
-            self.__messenger.print_message(Severity.ERROR, "Invalid input. Expected only numbers buy got something else instead. Please try again.")
+            self.__messenger.print_message(Severity.ERROR, "Invalid input. Expected only numbers buy got something "
+                                                           "else instead. Please try again.")
             return False
 
-    def is_datetime_timestamp_valid(self, timestamp: str):
+    def is_datetime_timestamp_valid(self,
+                                    timestamp: str) -> bool:
         if self.__timestamp_datetime_format_seconds_regex.search(timestamp) or self.__timestamp_datetime_format_milliseconds_regex.search(timestamp):
             return True
         else:
-            self.__messenger.print_message(Severity.ERROR, "Invalid input! Expected <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f> but got something else instead. Please try again!")
+            self.__messenger.print_message(Severity.ERROR, "Invalid input! Expected <%Y-%m-%d>T<%H:%M:%S> or "
+                                                           "<%Y-%m-%d>T<%H:%M:%S.%f> but got something else instead. "
+                                                           "Please try again!")
             return False
 
-    def is_epoch_timestamp_valid(self, timestamp: str):
+    def is_epoch_timestamp_valid(self,
+                                 timestamp: str) -> bool:
         if self.__timestamp_epoch_format_regex.search(timestamp):
             return True
         else:
-            self.__messenger.print_message(Severity.ERROR, "Invalid input! Expected <standard unix epoch time> but got something else instead. Please try again!")
+            self.__messenger.print_message(Severity.ERROR, "Invalid input! Expected <standard unix epoch time> "
+                                                           "but got something else instead. Please try again!")
             return False
 
-    def is_endts_gte_startts(self, timestamp_format, start_ts, end_ts):
+    def is_endts_gte_startts(self,
+                             timestamp_format: str,
+                             start_ts: str,
+                             end_ts: str) -> bool:
         tstamp1 = ""
         tstamp2 = ""
         if timestamp_format == "datetime":
@@ -94,24 +111,29 @@ class InputValidation:
                 return True
             else:
                 self.__messenger.print_message(Severity.ERROR, "Invalid end timestamp because "
-                             "end timestamp is earlier than start timestamp. Please try again.")
+                                                               "end timestamp is earlier than start timestamp. "
+                                                               "Please try again.")
                 return False
         elif timestamp_format == "epoch":
             if int(end_ts) >= int(start_ts):
                 return True
             else:
                 self.__messenger.print_message(Severity.ERROR, "Invalid end timestamp because "
-                             "end timestamp is earlier than start timestamp. Please try again.")
+                                                               "end timestamp is earlier than start timestamp. "
+                                                               "Please try again.")
                 return False
 
-    def is_option_in_available(self, option, options_dict):
+    def is_option_in_available(self,
+                               option: int,
+                               options_dict: Dict[int, str]) -> bool:
         if option in options_dict.keys():
             return True
         else:
             self.__messenger.print_message(Severity.ERROR, "Invalid option number. Please try again.")
             return False
 
-    def is_filter_valid(self, filter_raw):
+    def is_filter_valid(self,
+                        filter_raw: str) -> bool:
 
         match = self.__filter_raw_regex.search(filter_raw)
         if match:
@@ -136,21 +158,26 @@ class InputValidation:
                                            " - is\n")
             return False
 
-    def is_file_extension_valid(self, filename):
+    def is_file_extension_valid(self,
+                                filename: str) -> bool:
         if filename.lower().endswith(self.__valid_file_extensions):
             return True
         else:
-            self.__messenger.print_message(Severity.ERROR, "Invalid File Extension. Current supported extensions: {}".format(self.__valid_file_extensions))
+            self.__messenger.print_message(Severity.ERROR, "Invalid File Extension. Current supported "
+                                                           "extensions: {}".format(self.__valid_file_extensions))
             return False
 
-    def is_file_format_valid(self, file_format):
+    def is_file_format_valid(self,
+                             file_format: str) -> bool:
         if file_format in self.__valid_file_format:
             return True
         else:
-            self.__messenger.print_message(Severity.ERROR, "Invalid File Format. Current supported file formats: {}".format(self.__valid_file_format))
+            self.__messenger.print_message(Severity.ERROR, "Invalid File Format. Current supported "
+                                                           "file formats: {}".format(self.__valid_file_format))
             return False
 
-    def is_index_name_set(self, index_name):
+    def is_index_name_set(self,
+                          index_name: str) -> bool:
         if index_name != "N/A":
             return True
         else:
@@ -159,87 +186,90 @@ class InputValidation:
 
     def is_timestamp_name_valid(self,
                                 chosen_timestamp_name: str,
-                                valid_timestamp_name_list: str):
+                                valid_timestamp_name_list: str) -> bool:
         if chosen_timestamp_name not in valid_timestamp_name_list:
-            self.__messenger.print_message(Severity.ERROR, "'{}' is not a valid Main Timestamp! Please try again!".format(chosen_timestamp_name))
+            self.__messenger.print_message(Severity.ERROR, "'{}' is not a valid Main Timestamp! "
+                                                           "Please try again!".format(chosen_timestamp_name))
             return False
         else:
             return True
 
     def is_timestamp_format_valid(self,
-                                  chosen_timestamp_format: str):
+                                  chosen_timestamp_format: str) -> bool:
         if chosen_timestamp_format not in self.__valid_timestamp_format_list:
-            self.__messenger.print_message(Severity.ERROR, "'{}' is not a valid timestamp format option! Please use only {}".format(chosen_timestamp_format, '/'.join(self.__valid_timestamp_format_list)))
+            self.__messenger.print_message(Severity.ERROR, "'{}' is not a valid timestamp format option! "
+                                                           "Please use only {}".format(chosen_timestamp_format, '/'.join(self.__valid_timestamp_format_list)))
             return False
         else:
             return True
 
     def is_timezone_valid(self,
-                          chosen_timezone: str):
+                          chosen_timezone: str) -> bool:
         if chosen_timezone not in self.__valid_timezone_list:
-            self.__messenger.print_message(Severity.ERROR, "'{}' is not a valid timezone! Please use only {}".format(chosen_timezone, '/'.join(self.__valid_timezone_list)))
+            self.__messenger.print_message(Severity.ERROR, "'{}' is not a valid timezone! "
+                                                           "Please use only {}".format(chosen_timezone, '/'.join(self.__valid_timezone_list)))
             return False
         else:
             return True
 
     @property
-    def valid_protocols(self):
+    def valid_protocols(self) -> List[str]:
         return self.__valid_protocols
 
     @property
-    def port_regex(self):
+    def port_regex(self) -> Pattern[str]:
         return self.__port_regex
 
     @property
-    def ip_regex(self):
+    def ip_regex(self) -> Pattern[str]:
         return self.__ip_regex
 
     @property
-    def numeric_regex(self):
+    def numeric_regex(self) -> Pattern[str]:
         return self.__numeric_regex
 
     @property
-    def timestamp_datetime_format_seconds_regex(self):
+    def timestamp_datetime_format_seconds_regex(self) -> Pattern[str]:
         return self.__timestamp_datetime_format_seconds_regex
 
     @property
-    def timestamp_datetime_format_milliseconds_regex(self):
+    def timestamp_datetime_format_milliseconds_regex(self) -> Pattern[str]:
         return self.__timestamp_datetime_format_milliseconds_regex
 
     @property
-    def timestamp_epoch_format_regex(self):
+    def timestamp_epoch_format_regex(self) -> Pattern[str]:
         return self.__timestamp_epoch_format_regex
 
     @property
-    def datetime_format_seconds(self):
+    def datetime_format_seconds(self) -> Pattern[str]:
         return self.__datetime_format_seconds
 
     @property
-    def datetime_format_milliseconds(self):
+    def datetime_format_milliseconds(self) -> Pattern[str]:
         return self.__datetime_format_milliseconds
 
     @property
-    def filter_raw_regex(self):
+    def filter_raw_regex(self) -> Pattern[str]:
         return self.__filter_raw_regex
 
     @property
-    def valid_filter_keywords(self):
+    def valid_filter_keywords(self) -> List[str]:
         return self.__valid_filter_keywords
 
     @property
-    def valid_file_extensions(self):
+    def valid_file_extensions(self) -> List[str]:
         return self.__valid_file_extensions
 
     @property
-    def valid_file_format(self):
+    def valid_file_format(self) -> List[str]:
         return self.__valid_file_format
 
     @property
-    def valid_timestamp_format_list(self):
+    def valid_timestamp_format_list(self) -> List[str]:
         return self.__valid_timestamp_format_list
 
     @property
-    def valid_timezone_list(self):
+    def valid_timezone_list(self) -> List[str]:
         return self.__valid_timezone_list
 
 

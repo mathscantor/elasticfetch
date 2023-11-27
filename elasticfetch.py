@@ -12,9 +12,9 @@ def validate_config_inputs():
     messenger.print_message(Severity.INFO, "Checking elasticfetch.ini configuration inputs...")
     if not input_validation.is_protocol_valid(config_reader.elastic_protocol):
         exit(1)
-    if not input_validation.is_ip(config_reader.elastic_ip):
+    if not input_validation.is_ip_valid(config_reader.elastic_ip):
         exit(1)
-    if not input_validation.is_port(config_reader.elastic_port):
+    if not input_validation.is_port_valid(config_reader.elastic_port):
         exit(1)
     messenger.print_message(Severity.INFO, "All configuration inputs are valid.")
 
@@ -49,7 +49,8 @@ if __name__ == "__main__":
         elastic_ip=config_reader.elastic_ip,
         elastic_port=config_reader.elastic_port,
         username=config_reader.credentials_username,
-        password=config_reader.credentials_password
+        password=config_reader.credentials_password,
+        batch_size=config_reader.batch_size
     )
     input_validation = InputValidation()
     parser = Parser()
