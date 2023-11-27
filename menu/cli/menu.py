@@ -5,6 +5,7 @@ from utils.converter import Converter
 from utils.input_validation import InputValidation
 from utils.parser import Parser
 from utils.data_writer import DataWriter
+from utils.config_reader import ConfigReader
 import time
 
 
@@ -14,7 +15,8 @@ class CommandLineMenu:
                  request_sender: RequestSender,
                  converter: Converter,
                  input_validation: InputValidation,
-                 parser: Parser):
+                 parser: Parser,
+                 config_reader: ConfigReader):
 
         self.__request_sender = request_sender
         self.__data_writer = DataWriter()
@@ -35,6 +37,7 @@ class CommandLineMenu:
         }
         self.__input_validation = input_validation
         self.__parser = parser
+        self.__config_reader = config_reader
         self.__index_name = "N/A"
         self.__main_timestamp_name = "@timestamp"
         self.__main_timestamp_format = "datetime"
@@ -329,6 +332,12 @@ class CommandLineMenu:
         if not self.__input_validation.is_file_format_valid(file_format=file_format):
             return
 
+        # Configure the batch size according to elasticfetch.ini
+        index_max_result_window_dict = self.__request_sender.get_max_result_window(index_name=self.__index_name)
+        for index in index_max_result_window_dict:
+            if self.__config_reader.batch_size > index_max_result_window_dict[index]:
+                self.__request_sender.put_max_result_window(index_name=index, size=self.__config_reader.batch_size)
+
         data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
                                              kwargs={
                                                 "index_name": self.__index_name,
@@ -365,4 +374,9 @@ class CommandLineMenu:
 
             data_write_json_thread.join()
             data_fetch_thread.join()
+
+        # Configure back to the original settings
+        for index in index_max_result_window_dict:
+            if self.__config_reader.batch_size > index_max_result_window_dict[index]:
+                self.__request_sender.put_max_result_window(index_name=index, size=index_max_result_window_dict[index])
         return

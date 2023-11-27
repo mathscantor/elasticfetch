@@ -634,6 +634,12 @@ class GUIMenu:
                                              fg_color="#395E9C")
             return
 
+        # Configure the batch size according to elasticfetch.ini
+        index_max_result_window_dict = self.__request_sender.get_max_result_window(index_name=self.current_index)
+        for index in index_max_result_window_dict:
+            if config_reader.batch_size > index_max_result_window_dict[index]:
+                self.__request_sender.put_max_result_window(index_name=index, size=config_reader.batch_size)
+
         data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
                                              kwargs={
                                                 "index_name": self.current_index,
@@ -706,6 +712,11 @@ class GUIMenu:
 
         self.fetch_data_button.configure(state=customtkinter.NORMAL,
                                          fg_color="#395E9C")
+
+        # Configure back to the original settings
+        for index in index_max_result_window_dict:
+            if config_reader.batch_size > index_max_result_window_dict[index]:
+                self.__request_sender.put_max_result_window(index_name=index, size=index_max_result_window_dict[index])
         return
 
     def display_ts_converter_window(self):

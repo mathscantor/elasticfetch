@@ -16,6 +16,8 @@ def validate_config_inputs():
         exit(1)
     if not input_validation.is_port_valid(config_reader.elastic_port):
         exit(1)
+    if not input_validation.is_batch_size_valid(config_reader.batch_size):
+        exit(1)
     messenger.print_message(Severity.INFO, "All configuration inputs are valid.")
 
 
@@ -29,7 +31,8 @@ def main():
         menu = CommandLineMenu(request_sender=request_sender,
                                converter=converter,
                                input_validation=input_validation,
-                               parser=parser)
+                               parser=parser,
+                               config_reader=config_reader)
         while True:
             menu.show_menu()
     else:

@@ -70,15 +70,57 @@ class RequestSender:
 
         return False
 
+    def get_max_result_window(self,
+                              index_name: str) -> Dict[str, int]:
+
+        index_max_result_window_dict = dict()
+        url = "{}://{}:{}/{}/_settings".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
+        # Get the current index.max_result_window first for a particular index or indices if you use wildcard matching.
+        try:
+            response = requests.get(url=url,
+                                    headers=self.__headers,
+                                    verify=False,
+                                    auth=(self.__username, self.__password))
+            if response.status_code == 200:
+                settings_json = response.json()
+                if len(settings_json) == 0:
+                    self.__messenger.print_message(Severity.ERROR, "There are no matching indices for: {}".format((index_name)))
+                    return index_max_result_window_dict
+
+                for index in settings_json.keys():
+                    index_max_result_window_dict[index] = int(settings_json[index]["settings"]["index"]["max_result_window"])
+                return index_max_result_window_dict
+
+            elif response.status_code == 400:
+                self.__messenger.print_message(Severity.ERROR, "Unable to get settings of index: {}\n"
+                                                               "Bad Request in headers/data.".format(index_name))
+            elif response.status_code == 401:
+                self.__messenger.print_message(Severity.ERROR, "Unable to get settings of index: {}\n"
+                                                               "Authentication Error.".format(index_name))
+            else:
+                self.__messenger.print_message(Severity.ERROR, "Unable to get settings of index: {}\n"
+                                                               "Unknown Error.".format(index_name))
+        except requests.RequestException:
+            self.__messenger.print_message(Severity.ERROR, "Cannot resolve request to {}".format(url))
+        except requests.ConnectTimeout:
+            self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
+        except requests.ConnectionError:
+            self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
+        return index_max_result_window_dict
+
     '''
     The maximum value of from + size for searches to this index. Defaults to 10000. 
     Search requests take heap memory and time proportional to from + size and this limits that memory.
     '''
     def put_max_result_window(self,
+                              index_name: str,
                               size: int):
+
+        url = "{}://{}:{}/{}/_settings".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         data = {"index.max_result_window": size}
-        url = "{}://{}:{}/_settings".format(self.__protocol, self.__elastic_ip, self.__elastic_port)
-        self.__messenger.print_message(Severity.INFO, "Changing max_results_window size to {}".format(size))
+
+        self.__messenger.print_message(Severity.INFO, "Changing max_results_window of {} size to {}".format(index_name,
+                                                                                                            size))
         try:
             response = requests.put(url=url,
                                     headers=self.__headers,
@@ -100,7 +142,8 @@ class RequestSender:
                 self.__messenger.print_message(Severity.ERROR, "Unable to change max_result_window_size to {}. "
                                                                "Authentication Error.".format(size))
             else:
-                self.__messenger.print_message(Severity.ERROR, "Unable to delete PIT id. General Error.")
+                self.__messenger.print_message(Severity.ERROR, "Unable to change max_result_window_size to {}. "
+                                                               "Unknown Error.".format(size))
         except requests.RequestException:
             self.__messenger.print_message(Severity.ERROR, "Cannot resolve request to {}".format(url))
         except requests.ConnectTimeout:

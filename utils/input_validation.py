@@ -212,6 +212,17 @@ class InputValidation:
         else:
             return True
 
+    def is_batch_size_valid(self,
+                            size: int):
+        if size > 0:
+            return True
+        elif size == 0:
+            self.__messenger.print_message(Severity.ERROR, "Batch size cannot be 0!")
+            return False
+        else:
+            self.__messenger.print_message(Severity.ERROR, "Batch size cannot be negative!")
+            return False
+
     @property
     def valid_protocols(self) -> List[str]:
         return self.__valid_protocols
