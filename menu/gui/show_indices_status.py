@@ -9,8 +9,8 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
         self.title("elasticfetch - Indices Status")
         self.geometry("1120x480")
         # self.resizable(False, False)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=4)
+        self.grid_rowconfigure(0, weight=3)
+        self.grid_rowconfigure(1, weight=97)
         self.grid_columnconfigure(0, weight=1)
         self.idx_list = []
         self.current_result_index = 0
@@ -18,7 +18,7 @@ class GUIShowIndicesStatus(customtkinter.CTkToplevel):
 
         # root window is the parent window
         self.frame = tkinter.Frame(self)
-        self.frame.grid(row=0, column=0, sticky="we")
+        self.frame.grid(row=0, column=0, sticky="nsew")
 
         # adding label to search box
         tkinter.Label(self.frame, text='Search:', font=customtkinter.CTkFont(family="Arial", size=15)).grid(row=0, column=0)

@@ -14,8 +14,8 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         self.title("elasticfetch - Available Fields for {}".format(current_index))
         self.geometry("800x400")
         # self.resizable(False, False)
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(1, weight=5)
+        self.grid_rowconfigure(0, weight=3)
+        self.grid_rowconfigure(1, weight=97)
         self.grid_columnconfigure(0, weight=1)
         self.idx_list = []
         self.current_result_index = 0
@@ -23,7 +23,7 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
 
         # root window is the parent window
         self.frame = tkinter.Frame(self)
-        self.frame.grid(row=0, column=0, sticky="ew")
+        self.frame.grid(row=0, column=0, sticky="nsew")
 
         # adding label to search box
         tkinter.Label(self.frame, text='Search:', font=customtkinter.CTkFont(family="Arial", size=15)).grid(row=0, column=0)
