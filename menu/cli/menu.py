@@ -6,7 +6,6 @@ from utils.input_validation import InputValidation
 from utils.parser import Parser
 from utils.data_writer import DataWriter
 from utils.config_reader import ConfigReader
-import time
 
 
 class CommandLineMenu:
@@ -53,8 +52,7 @@ class CommandLineMenu:
                         "===============================================================\n"
         return
 
-    def show_menu(self):
-
+    def show_menu(self) -> None:
         print(self.__header)
         if self.__index_name == "N/A":
             print("Current index selected:\033[93m N/A (Please set an index before fetching any data!)\033[0m")
@@ -93,15 +91,15 @@ class CommandLineMenu:
             exit(0)
         return
 
-    def show_indices_status(self):
+    def show_indices_status(self) -> None:
         indices_status = self.__request_sender.get_indices_status()
         print(indices_status)
         return
 
-    def set_current_index(self):
+    def set_current_index(self) -> None:
         indices_status = self.__request_sender.get_indices_status()
         temp_list = indices_status.split("\n")[1:-1]
-        index_dict = {}
+        index_dict = dict()
 
         index_dict[0] = "Custom Index Name (Wildcard * available for use)"
         i = 1
@@ -126,7 +124,7 @@ class CommandLineMenu:
             self.__index_name = index_dict[index_option]
         return
 
-    def set_main_timestamp(self):
+    def set_main_timestamp(self) -> None:
 
         response = self.__request_sender.get_available_fields(index_name=self.__index_name)
         if response is not None:
@@ -176,7 +174,7 @@ class CommandLineMenu:
     Lists all available fields for the current index.
     '''
 
-    def show_available_fields(self):
+    def show_available_fields(self) -> None:
         response = self.__request_sender.get_available_fields(index_name=self.__index_name)
         if response is not None:
             parent_field_to_type_dict = self.__converter.convert_field_mapping_keys_pretty(fields_json=response)
@@ -199,7 +197,7 @@ class CommandLineMenu:
 
         return
 
-    def convert_timestamp_format(self):
+    def convert_timestamp_format(self) -> None:
         for key in self.__convert_timestamp_menu_options.keys():
             print(key, '--', self.__convert_timestamp_menu_options[key])
         convert_timestamp_menu_option = input('Enter your choice: ')
@@ -215,7 +213,7 @@ class CommandLineMenu:
             self.convert_epoch_range_to_datetime_range()
         return
 
-    def convert_datetime_range_to_epoch_range(self):
+    def convert_datetime_range_to_epoch_range(self) -> None:
         print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"
               "eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000")
         start_ts = input("Start Timestamp: ")
@@ -233,7 +231,7 @@ class CommandLineMenu:
         print("Epoch Range: {} - {}".format(start_ts_epoch, end_ts_epoch))
         return
 
-    def convert_epoch_range_to_datetime_range(self):
+    def convert_epoch_range_to_datetime_range(self) -> None:
         print("timestamp format: <10 / 13 digit string>\n"
               "eg. 1420070400 or 1420070400001")
         start_ts = input("Start Timestamp: ")
@@ -251,7 +249,7 @@ class CommandLineMenu:
         print("Datetime Range: {} - {}".format(start_ts_datetime, end_ts_datetime))
         return
 
-    def fetch_elastic_data_between_ts1_ts2(self):
+    def fetch_elastic_data_between_ts1_ts2(self) -> None:
 
         if self.__main_timestamp_format == "datetime":
             print("timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>\n"

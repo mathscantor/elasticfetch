@@ -55,6 +55,7 @@ class GUIMenu:
         self.theme_optionmenu = None
         self.label_options = None
         self.icon_photo = None
+        self.button_photo = None
         self.__default_font_size = 14
 
         # Index related Assets
@@ -138,7 +139,8 @@ class GUIMenu:
         self.primary_app_window.geometry("1120x640")
         self.primary_app_window.resizable(False, False)
 
-        self.icon_photo = self.load_image(path="/images/icon.png", image_size=60)
+        self.icon_photo = self.load_image(path="images/icon.png", image_size=60)
+        self.button_photo = customtkinter.CTkImage(Image.open(os.path.join(PATH, "images/icon.png")), size=(60, 45))
         self.primary_app_window.wm_iconphoto(False, self.icon_photo)
 
         # configure grid layout (2x1)
@@ -402,7 +404,7 @@ class GUIMenu:
 
         self.fetch_data_button = customtkinter.CTkButton(master=self.frame_right,
                                                          text="Fetch Data  ",
-                                                         image=self.icon_photo,
+                                                         image=self.button_photo,
                                                          fg_color="grey",
                                                          font=customtkinter.CTkFont(family="Arial", size=self.__default_font_size),
                                                          state=customtkinter.DISABLED,
@@ -699,7 +701,6 @@ class GUIMenu:
                 self.progress_bar_label.configure(text="Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
                                                                                                     num_logs,
                                                                                                     self.progress_bar["value"]))
-
                 self.primary_app_window.update()
 
             data_write_json_thread.join()
@@ -738,4 +739,4 @@ class GUIMenu:
 
     def load_image(self, path, image_size):
         """ load rectangular image with path relative to PATH """
-        return ImageTk.PhotoImage(Image.open(PATH + path).resize((image_size, int(image_size*0.75))))
+        return ImageTk.PhotoImage(Image.open(os.path.join(PATH, path)).resize((image_size, int(image_size*0.75))))

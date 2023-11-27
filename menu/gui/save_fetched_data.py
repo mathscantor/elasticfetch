@@ -51,7 +51,7 @@ class GUISaveFetchedData(customtkinter.CTkToplevel):
         self.save_button.grid(row=3, column=0, columnspan=2, pady=30, padx=20, sticky="s")
         return
 
-    def save_file(self):
+    def save_file(self) -> None:
         self.debug_label.configure(text_color="red")
         self.debug_label.set_text("")
         filename = self.filename_entry.get()

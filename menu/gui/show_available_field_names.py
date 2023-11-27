@@ -149,7 +149,7 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
             self.arrow_up_button.grid(row=0, column=5)
         return
 
-    def get_search_result_next(self):
+    def get_search_result_next(self) -> None:
         self.current_result_index += 1
         self.current_result_index = self.current_result_index % self.total_num_results
         self.textbox.see(self.idx_list[self.current_result_index][1])
