@@ -3,28 +3,31 @@
 </p>
 
 # Elasticfetch
-- [Overview](#overview)
-- [Required Python Packages](#required-python-packages)
-- [Current Features](#current-features)
-    - [Supported Time Formats](#supported-time-formats)
-    - [Supported Filters](#supported-filters)
-- [Setting parameters in configuration file](#setting-parameters-in-configuration-file)
-- [Running elasticfetch (CLI)](#running-elasticfetch--cli-)
-    - [Option 1 - Show indices status](#option-1---show-indices-status)
-    - [Option 2 - Set current index](#option-2---set-current-index)
-    - [Option 3 - Set main timestamp, format and timezone](#option-3---set-main-timestamp-format-and-timezone)
-    - [Option 4 - Listing all available fields within the current chosen index](#option-4---listing-all-available-fields-within-the-current-chosen-index)
-    - [Option 5 - Converting datetime string to unix epoch](#option-5---converting-datetime-string-to-unix-epoch)
-    - [Option 6 - Fetching data from a chosen index](#option-6---fetching-data-from-a-chosen-index)
-- [Running elasticfetch (GUI)](#running-elasticfetch--gui-) 
-## Overview
+- [1. Overview](#1-overview)
+- [2. Required Python Packages](#2-required-python-packages)
+- [3. Current Features](#3-current-features)
+    - [3.1. Supported Time Formats](#31-supported-time-formats)
+    - [3.2. Supported Filters](#32-supported-filters)
+    - [3.3. Supported File Formats](#33-supported-file-formats)
+      - [3.3.1 CSV](#331-csv)
+      - [3.3.2 JSONL](#332-jsonl)
+- [4. Setting parameters in configuration file](#4-setting-parameters-in-configuration-file)
+- [5. Running Elasticfetch (CLI)](#5-running-elasticfetch--cli-)
+    - [5.1. Show indices status](#51-show-indices-status)
+    - [5.2. Set current index](#52-set-current-index)
+    - [5.3. Set main timestamp, format and timezone](#53-set-main-timestamp-format-and-timezone)
+    - [5.4. Listing all available fields within the current chosen index](#54-listing-all-available-fields-within-the-current-chosen-index)
+    - [5.5. Converting datetime string to unix epoch](#55-converting-datetime-string-to-unix-epoch)
+    - [5.6. Fetching data from a chosen index](#56-fetching-data-from-a-chosen-index)
+- [6. Running Elasticfetch (GUI)](#6-running-elasticfetch--gui-) 
+## 1. Overview
 Elasticfetch is a simple tool used to export huge amounts of data from elasticsearch. <br>
 
 Currently, Elasticfetch is not reliant on the `scroll API` and therefore, will continue working on elasticsearch servers older than `version 7.7`. However, it is still recommended that you upgrade your elasticsearch to `version 8.x`
 
 Elasticfetch facilitates the work flow for data analysts where the analyst need not request for the server admin to help pull data from elasticsearch.<br>
 It has also been proven to be effective when deployed for threat hunting in multiple cyber military exercises.
-## Required Python Packages
+## 2. Required Python Packages
 ```sh
 # Necessary Python Packages 
 pip3 install requests
@@ -57,15 +60,15 @@ sudo yum install python3-tkinter python3-pillow
 sudo zypper install python3-tk python3-pillow
 ```
 
-## Current Features
+## 3. Current Features
 1. Show index health status
-2. Setting Index to fetch from
+2. Setting Index to fetch from (Can Use Wildcard * too)
 3. Set main timestamp name, format and timezone (This field will be used to sort your data in chronological order)
-4. Showing available field names related to your index (**Not Hardcoded**)
+4. Showing available field names related to your index
 5. Converting datetime to epoch / epoch to datetime format
 6. Fetching data between two timestamps
 
-### Supported Time Formats
+### 3.1. Supported Time Formats
 <div style="margin-left: auto;
             margin-right: auto;
             width: 70%">
@@ -120,7 +123,7 @@ sudo zypper install python3-tk python3-pillow
 </div>
 <p align="center" style="margin-top: 0px;">Table 1. Supported time formats</p><br>
 
-### Supported Filters
+### 3.2. Supported Filters
 Filter Syntax: `FIELD` `FILTER_KEYWORD` `VALUE;`
 
 Current Supported Filter Keywords:
@@ -199,7 +202,7 @@ Current Supported Filter Keywords:
 <p align="center" style="margin-top: 0px;">Table 2. Supported Filter Keywords</p><br>
 
 
-#### Chaining Filters:
+#### 3.2.1. Chaining Filters:
 Example 1:
 ```python
 # Python Equivlant
@@ -227,7 +230,33 @@ srcIp is 105.24.235.13; dstPort is_not_one_of 53,80,443;
 ```
 <p align="center" style="margin-top: 0px;">Listing 4. Example 2 in Elasticfetch Filter Syntax</p>
 
-## Setting parameters in configuration file
+### 3.3 Supported File Formats
+Currently, I only support `csv` and `jsonl` file formats.
+
+#### 3.3.1. CSV
+To read the saved `csv` file, you can follow the example snippet:
+```python
+import pandas as pd
+
+df = pd.read_csv("datasets/2023-11-28T06-29-43Z.csv")
+```
+<p align="center" style="margin-top: 0px;">Listing 5. Reading CSV Files</p>
+
+#### 3.3.2. JSONL
+To read the saved `jsonl` file, you can follow the example snippet:
+```python
+import json
+
+f = open("datasets/2023-11-27T05-48-04Z.jsonl", "r")
+for line in f:
+    # Each line contains <batch_size configured in elasticfetch.ini> of data
+    json_obj = json.loads(line)
+    for i in range(len(json_obj["hits"]["hits"])):
+        # Your code here
+```
+<p align="center" style="margin-top: 0px;">Listing 6. Reading JSONL Files</p>
+
+## 4. Setting parameters in configuration file
 Edit **elasticfetch.ini** and set the following variables to your values : <br>
 - Protocol: `https` or `http`
 - IP address: `XXX.XXX.XXX.XXX` or `domain name`
@@ -238,7 +267,7 @@ Edit **elasticfetch.ini** and set the following variables to your values : <br>
 - Batch Size: Default is `10000`
 
 
-## Running elasticfetch (CLI)
+## 5. Running elasticfetch (CLI)
 Make sure to configure the graphical option under the interface section to be `False` before running **elasticfetch**.
 ```python
 [interface]
@@ -246,12 +275,12 @@ Make sure to configure the graphical option under the interface section to be `F
 # Set this option to True if you want to use CLI
 graphical = False
 ```
-<p align="center" style="margin-top: 0px;">Listing 5. elasticfetch.ini for CLI</p>
+<p align="center" style="margin-top: 0px;">Listing 7. elasticfetch.ini for CLI</p>
 
 ```bash
 python3 elasticfetch.py
 ```
-<p align="center" style="margin-top: 0px;">Listing 6. Running Elasticfetch for CLI</p>
+<p align="center" style="margin-top: 0px;">Listing 8. Running Elasticfetch for CLI</p>
 
 <p align="center" style="margin-bottom: 0px !important;">
   <img src="images/cli_menu.png" width="70%" height="50%" alt="CLI Main Menu" align="center">
@@ -259,7 +288,7 @@ python3 elasticfetch.py
 <p align="center" style="margin-top: 0px;">Figure 1. CLI Main Menu</p>
 
 
-### Option 1 - Show indices status
+### 5.1.  Show indices status
 ```text
 health status index                                           uuid                   pri rep docs.count docs.deleted store.size pri.store.size
 yellow open   .internal.alerts-security.alerts-default-000001 ######################   1   1       1094            0      3.7mb          3.7mb
@@ -286,9 +315,9 @@ yellow open   packetbeat-8.1.0                                ##################
 yellow open   packetbeat-8.1.2                                ######################   1   1   52814104            0     20.8gb         20.8gb
 yellow open   winlogbeat-8.0.1                                ######################   1   1  102336389            0    103.9gb        103.9gb
 ```
-<p align="center" style="margin-top: 0px;">Listing 7. Displaying Indices Status & Statistics</p>
+<p align="center" style="margin-top: 0px;">Listing 9. Displaying Indices Status & Statistics</p>
 
-### Option 2 - Set current index
+### 5.2. Set current index
 
 **NEW FEATURE** for elasticfetch **v4.0.0**: Wildcard Usage
 
@@ -328,9 +357,9 @@ Listing all beats indices:
 Enter your index choice: 0                      ← (Your input)
 Enter your custom index name: *filebeat*        ← (Your input)
 ```
-<p align="center" style="margin-top: 0px;">Listing 8. Example of Wildcard Usage to Select Multiple Indices</p>
+<p align="center" style="margin-top: 0px;">Listing 10. Example of Wildcard Usage to Select Multiple Indices</p>
 
-### Option 3 - Set main timestamp, format and timezone
+### 5.3. Set main timestamp, format and timezone
 
 The main timestamp field name will be used in sorting the timestamps in ascending order. 
 Option 3 allows you to set a new main timestamp field name from the displayed 'ALL RELATED FIELDS' column. 
@@ -359,10 +388,10 @@ Main Timestamp Name: @timestamp        ← (Your input)
 Main Timestamp Format: datetime        ← (Your input)
 Main Timezone: +08:00                  ← (Your input)
 ```
-<p align="center" style="margin-top: 0px;">Listing 10. Example of Setting Timestamp, Format & Timezone</p>
+<p align="center" style="margin-top: 0px;">Listing 11. Example of Setting Timestamp, Format & Timezone</p>
 
 
-### Option 4 - Listing all available fields within the current chosen index
+### 5.4. Listing all available fields within the current chosen index
 It is a known grievance that the users have to manually check what fields are available to them. 
 
 Option 4 allows users to list the whole shebang of fields.
@@ -391,9 +420,9 @@ kibana                         keyword              kibana.alert.top_records.job
 .
 .
 ```
-<p align="center" style="margin-top: 0px;">Listing 10. Displaying All Available Fields Associated to Index / Indices</p>
+<p align="center" style="margin-top: 0px;">Listing 12. Displaying All Available Fields Associated to Index / Indices</p>
 
-### Option 5 - Converting datetime string to unix epoch
+### 5.5. Converting datetime string to unix epoch
 This takes into account of your current timezone when converting to epoch time.
 ```text
 Enter your choice: 5
@@ -401,7 +430,7 @@ Enter your choice: 5
 1 -- Convert datetime to epoch
 2 -- Convert epoch to datetime
 ```
-<p align="center" style="margin-top: 0px;">Listing 11. Menu for Timestamp Format Conversion</p>
+<p align="center" style="margin-top: 0px;">Listing 13. Menu for Timestamp Format Conversion</p>
 
 Converting datetime to epoch
 ```text
@@ -412,7 +441,7 @@ End Timestamp: 2022-05-20T00:00:00              ← (Your input)
 Timezone: +08:00                                ← (Your input)
 Epoch Range: 1651334400000 - 1652976000000
 ```
-<p align="center" style="margin-top: 0px;">Listing 12. DateTime to Epoch Conversion</p>
+<p align="center" style="margin-top: 0px;">Listing 14. DateTime to Epoch Conversion</p>
 
 Converting epoch to datetime
 ```text
@@ -423,9 +452,9 @@ End Timestamp: 1652976000000                    ← (Your input)
 Timezone: +08:00                                ← (Your input)
 Datetime Range: 2022-05-01T00:00:00.000 - 2022-05-20T00:00:00.000
 ```
-<p align="center" style="margin-top: 0px;">Listing 13. Epoch to DateTime Conversion</p>
+<p align="center" style="margin-top: 0px;">Listing 15. Epoch to DateTime Conversion</p>
 
-### Option 6 - Fetching data from a chosen index
+### 5.6. Fetching data from a chosen index
 
 This will prompt you for:
 - Start and End Timestamps (See [Supported Time Formats](#supported-time-formats))
@@ -440,7 +469,7 @@ This will prompt you for:
 </p>
 <p align="center" style="margin-top: 0px;">Figure 2. Data Fetch Example</p><br>
 
-### Running elasticfetch (GUI)
+## 6. Running elasticfetch (GUI)
 Make sure to configure the graphical option under the interface section to be `True` before running **elasticfetch**.
 ```python
 [interface]
@@ -448,12 +477,12 @@ Make sure to configure the graphical option under the interface section to be `T
 # Set this option to True if you want to use CLI
 graphical = True
 ```
-<p align="center" style="margin-top: 0px;">Listing 14. elasticfetch.ini for GUI</p>
+<p align="center" style="margin-top: 0px;">Listing 16. elasticfetch.ini for GUI</p>
 
 ```sh
 python3 elasticfetch.py
 ```
-<p align="center" style="margin-top: 0px;">Listing 15. Running for Elasticfetch GUI</p>
+<p align="center" style="margin-top: 0px;">Listing 17. Running for Elasticfetch GUI</p>
 
 Just like the CLI, the GUI provides the same utilities.
 <p align="center" style="margin-bottom: 0px !important;">
@@ -466,25 +495,19 @@ Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
 (See [Supported Time Formats](#supported-time-formats))<br>
 
 <p align="center" style="margin-bottom: 0px !important;">
-  <img src="images/fetching_data.png" alt="Fetching Data GUI" align="center">
+  <img src="images/gui_fetch_data_example.png" alt="GUI Fetch Data Example" align="center">
 </p>
-<p align="center" style="margin-top: 0px;">Figure 2. Fetching Data GUI</p><br>
-
-Once you have finished fetching the data, there will be a pop-up window, prompting you to save your data as a .csv or .json file.
-<p align="center" style="margin-bottom: 0px !important;">
-  <img src="images/saving_data.png" alt="Saving Data GUI" align="center">
-</p>
-<p align="center" style="margin-top: 0px;">Figure 3. Saving Data GUI</p><br>
+<p align="center" style="margin-top: 0px;">Figure 4. GUI Fetch Data Example</p><br>
 
 Other Quality-Of-Life features include looking up the available field names, whilst being able to cycle through your search terms.
 <p align="center" style="margin-bottom: 0px !important;">
   <img src="images/show_available_fields.png" alt="Show Available Fields GUI" align="center">
 </p>
-<p align="center" style="margin-top: 0px;">Figure 4. Show Available Fields GUI</p><br>
+<p align="center" style="margin-top: 0px;">Figure 5. GUI Show Available Fields</p><br>
 
 In addition, if there is a need to convert datetime to epoch or vice-versa, there is also the timestamp format converter readily available at your disposal!
 <p align="center" style="margin-bottom: 0px !important;">
   <img src="images/timestamp_format_converter.png" alt="Timestamp Format Converter GUI" align="center">
 </p>
-<p align="center" style="margin-top: 0px;">Figure 5. Timestamp Format Converter GUI</p><br>
+<p align="center" style="margin-top: 0px;">Figure 6. Timestamp Format Converter GUI</p><br>
 
