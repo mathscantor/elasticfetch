@@ -9,14 +9,14 @@
     - [Supported Time Formats](#supported-time-formats)
     - [Supported Filters](#supported-filters)
 - [Setting parameters in configuration file](#setting-parameters-in-configuration-file)
-- [Running elasticfetch (CLI)](#running-elasticfetch-cli)
+- [Running elasticfetch (CLI)](#running-elasticfetch--cli-)
     - [Option 1 - Show indices status](#option-1---show-indices-status)
     - [Option 2 - Set current index](#option-2---set-current-index)
     - [Option 3 - Set main timestamp, format and timezone](#option-3---set-main-timestamp-format-and-timezone)
     - [Option 4 - Listing all available fields within the current chosen index](#option-4---listing-all-available-fields-within-the-current-chosen-index)
     - [Option 5 - Converting datetime string to unix epoch](#option-5---converting-datetime-string-to-unix-epoch)
     - [Option 6 - Fetching data from a chosen index](#option-6---fetching-data-from-a-chosen-index)
-- [Running elasticfetch (GUI)](#running-elasticfetch-gui) 
+- [Running elasticfetch (GUI)](#running-elasticfetch--gui-) 
 ## Overview
 Elasticfetch is a simple tool used to export huge amounts of data from elasticsearch. <br>
 
@@ -251,7 +251,7 @@ graphical = False
 ```bash
 python3 elasticfetch.py
 ```
-<p align="center" style="margin-top: 0px;">Listing 6. Running elasticfetch.py</p>
+<p align="center" style="margin-top: 0px;">Listing 6. Running Elasticfetch for CLI</p>
 
 <p align="center" style="margin-bottom: 0px !important;">
   <img src="images/cli_menu.png" width="70%" height="50%" alt="CLI Main Menu" align="center">
@@ -436,19 +436,30 @@ This will prompt you for:
 
 
 <p align="center" style="margin-bottom: 0px !important;">
-  <img src="images/data_fetch_cli.png" width="80%" height="50%" alt="elasticfetch icon" align="center">
+  <img src="images/data_fetch_cli.png" width="80%" height="50%" alt="Data Fetch Example" align="center">
 </p>
 <p align="center" style="margin-top: 0px;">Figure 2. Data Fetch Example</p><br>
 
 ### Running elasticfetch (GUI)
+Make sure to configure the graphical option under the interface section to be `True` before running **elasticfetch**.
+```python
+[interface]
+# Default is False which uses CLI.
+# Set this option to True if you want to use CLI
+graphical = True
+```
+<p align="center" style="margin-top: 0px;">Listing 14. elasticfetch.ini for GUI</p>
+
 ```sh
 python3 elasticfetch.py
 ```
+<p align="center" style="margin-top: 0px;">Listing 15. Running for Elasticfetch GUI</p>
+
 Just like the CLI, the GUI provides the same utilities.
 <p align="center" style="margin-bottom: 0px !important;">
-  <img src="images/main_menu_gui.png" alt="Main Menu GUI" align="center">
+  <img src="images/gui_main_menu.png" alt="GUI Main Menu" align="center">
 </p>
-<p align="center" style="margin-top: 0px;">Figure 1. Main Menu GUI</p><br>
+<p align="center" style="margin-top: 0px;">Figure 3. GUI Main Menu</p><br>
 
 Fill in the appropriate fields and click on the "Fetch Data" Button.<br>
 (See [Supported Filters](#supported-filters)) <br>
