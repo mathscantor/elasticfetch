@@ -652,7 +652,8 @@ class GUIMenu:
         :rtype: None
         """
         self.__indices_status = self.__request_sender.get_indices_status()
-        GUIShowIndicesStatus(indices_status=self.__indices_status).focus()
+        window = GUIShowIndicesStatus(indices_status=self.__indices_status)
+        window.after(10, window.lift)
         return
 
     def show_available_field_names(self) -> None:
@@ -665,8 +666,9 @@ class GUIMenu:
         :return: None
         :rtype: None
         """
-        GUIShowAvailableFields(current_index=self.current_index,
-                               parent_field_to_type_dict=self.parent_field_to_type_dict).focus()
+        window = GUIShowAvailableFields(current_index=self.current_index,
+                                        parent_field_to_type_dict=self.parent_field_to_type_dict)
+        window.after(10, window.lift)
         return
 
     def switch_index_input_method(self) -> None:
@@ -888,8 +890,9 @@ class GUIMenu:
         :return: None
         :rtype: None
         """
-        GUITSConverter(converter=self.__converter,
-                       input_validation=self.__input_validation).focus()
+        window = GUITSConverter(converter=self.__converter,
+                                input_validation=self.__input_validation)
+        window.after(10, window.lift)
         return
 
     def on_closing_primary_app_window(self) -> None:
