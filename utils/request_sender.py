@@ -118,7 +118,9 @@ class RequestSender:
                     return index_max_result_window_dict
 
                 for index in settings_json.keys():
-                    index_max_result_window_dict[index] = int(settings_json[index]["settings"]["index"]["max_result_window"])
+                    if "max_result_window" in settings_json[index]["settings"]["index"]:
+                        index_max_result_window_dict[index] = int(settings_json[index]["settings"]["index"]["max_result_window"])
+
                 return index_max_result_window_dict
 
             elif response.status_code == 400:
