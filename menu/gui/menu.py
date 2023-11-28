@@ -1,5 +1,4 @@
 import threading
-from typing import *
 import os
 from utils.data_writer import DataWriter
 from utils.converter import Converter

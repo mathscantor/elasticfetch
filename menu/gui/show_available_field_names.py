@@ -1,7 +1,6 @@
 import customtkinter
 import tkinter
 import os
-from typing import *
 
 PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -90,19 +89,19 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
         self.textbox.configure(state=tkinter.DISABLED)
 
         # create CTk scrollbar
-        yscrollbar = customtkinter.CTkScrollbar(self,
-                                                orientation="vertical",
-                                                command=self.textbox.yview)
-        yscrollbar.grid(row=1, column=1, sticky="ns")
+        y_scrollbar = customtkinter.CTkScrollbar(self,
+                                                 orientation="vertical",
+                                                 command=self.textbox.yview)
+        y_scrollbar.grid(row=1, column=1, sticky="ns")
 
-        xscrollbar = customtkinter.CTkScrollbar(self,
-                                                orientation="horizontal",
-                                                command=self.textbox.xview)
-        xscrollbar.grid(row=2, column=0, sticky="we")
+        x_scrollbar = customtkinter.CTkScrollbar(self,
+                                                 orientation="horizontal",
+                                                 command=self.textbox.xview)
+        x_scrollbar.grid(row=2, column=0, sticky="we")
 
         # connect textbox scroll event to CTk scrollbar
-        self.textbox.configure(yscrollcommand=yscrollbar.set,
-                               xscrollcommand=xscrollbar.set,
+        self.textbox.configure(yscrollcommand=y_scrollbar.set,
+                               xscrollcommand=x_scrollbar.set,
                                state=tkinter.DISABLED)
 
     def find_in_textbox(self,
@@ -131,18 +130,19 @@ class GUIShowAvailableFields(customtkinter.CTkToplevel):
             idx = '1.0'
             while 1:
                 # searches for desired string from index 1
-                idx = self.textbox.search(s, idx, nocase=1,
+                idx = self.textbox.search(s, idx, nocase=True,
                                           stopindex=tkinter.END)
-                if not idx: break
+                if not idx:
+                    break
 
                 # last index sum of current index and
                 # length of text
-                lastidx = '%s+%dc' % (idx, len(s))
+                last_idx = '%s+%dc' % (idx, len(s))
 
                 # overwrite 'Found' at idx
-                self.textbox.tag_add('found', idx, lastidx)
-                self.idx_list.append((idx, lastidx))
-                idx = lastidx
+                self.textbox.tag_add('found', idx, last_idx)
+                self.idx_list.append((idx, last_idx))
+                idx = last_idx
                 self.total_num_results += 1
 
             # mark located string as red

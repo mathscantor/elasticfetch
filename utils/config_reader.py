@@ -1,5 +1,4 @@
 import configparser
-
 from utils.messenger import Messenger, Severity
 from configparser import ConfigParser
 import ast

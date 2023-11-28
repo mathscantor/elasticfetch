@@ -1,4 +1,3 @@
-import os
 import threading
 from utils.request_sender import RequestSender
 from utils.converter import Converter

@@ -1,5 +1,5 @@
 import customtkinter
-from PIL import Image, ImageTk
+from PIL import Image
 import os
 
 PATH = os.path.dirname(os.path.realpath(__file__))
