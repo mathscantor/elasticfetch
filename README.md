@@ -39,9 +39,22 @@ pip3 install packaging
 
 # For Linux users, you need this additional packages
 # Ubuntu or other distros with Apt:
-sudo apt-get install python3-tk
+sudo apt-get install python3-tk python3-pil python3-pil.imagetk
+
 # For Fedora:
-sudo dnf install python3-tkinter
+sudo dnf install python3-tkinter python3-pillow-tk
+
+# For CentOS:
+sudo yum install python3-tkinter python3-pillow
+
+# For Arch Linux:
+sudo pacman -S tk python-pillow
+
+# For Red Hat:
+sudo yum install python3-tkinter python3-pillow
+
+# For openSUSE:
+sudo zypper install python3-tk python3-pillow
 ```
 
 ## Current Features
