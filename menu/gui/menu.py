@@ -1,5 +1,5 @@
 import threading
-import time
+from typing import *
 import os
 from utils.data_writer import DataWriter
 from utils.converter import Converter
@@ -488,8 +488,7 @@ class GUIMenu:
         customtkinter.set_appearance_mode(value)
         return
 
-    def set_main_timestamp_name(self,
-                                event: tkinter.Event) -> None:
+    def set_main_timestamp_name(self, event) -> None:
         """
         Set the main timestamp name based on a tkinter event.
 
@@ -505,8 +504,7 @@ class GUIMenu:
         self.main_timestamp_name = self.selected_main_timestamp_name.get()
         return
 
-    def set_file_format(self,
-                        event: tkinter.Event) -> None:
+    def set_file_format(self, event) -> None:
         """
         Set the file format based on a tkinter event.
 
@@ -522,8 +520,7 @@ class GUIMenu:
         self.file_format = self.selected_file_format.get()
         return
 
-    def set_main_timestamp_format(self,
-                                  event: tkinter.Event) -> None:
+    def set_main_timestamp_format(self, event) -> None:
         """
         Set the main timestamp format based on a tkinter event.
 
@@ -551,8 +548,7 @@ class GUIMenu:
                 self.main_timezone_combobox.configure(state=tkinter.DISABLED)
         return
 
-    def set_main_timezone(self,
-                          event: tkinter.Event) -> None:
+    def set_main_timezone(self, event) -> None:
         """
         Set the main timezone based on a tkinter event.
 
@@ -601,8 +597,7 @@ class GUIMenu:
                     self.valid_timestamp_name_list += self.parent_field_to_type_dict[top_parent_field][field_type]
         return
 
-    def set_current_index(self,
-                          event: tkinter.Event) -> None:
+    def set_current_index(self,  event) -> None:
         """
         Set the current Elasticsearch index based on a tkinter event.
 
@@ -910,8 +905,7 @@ class GUIMenu:
         self.primary_app_window.destroy()
         return
 
-    def notify_to_press_return_key(self,
-                                   event: tkinter.Event) -> None:
+    def notify_to_press_return_key(self, event) -> None:
         """
         Notify the user to press the return key in response to a tkinter event.
 
@@ -933,7 +927,7 @@ class GUIMenu:
 
     def load_image(self,
                    path: str,
-                   image_size: int) -> ImageTk.PhotoImage:
+                   image_size: int):
         """
         Load and resize an image from a specified path.
 
