@@ -66,6 +66,9 @@ sudo zypper install python3-tk python3-pillow
 6. Fetching data between two timestamps
 
 ### Supported Time Formats
+<div style="margin-left: auto;
+            margin-right: auto;
+            width: 70%">
 <table>
   <tr>
    <td><b>Format</b>
@@ -114,12 +117,17 @@ sudo zypper install python3-tk python3-pillow
    </td>
   </tr>
 </table>
+</div>
+<p align="center" style="margin-top: 0px;">Table 1. Supported time formats</p><br>
 
 ### Supported Filters
 Filter Syntax: `FIELD` `FILTER_KEYWORD` `VALUE;`
 
 Current Supported Filter Keywords:
 
+<div style="margin-left: auto;
+            margin-right: auto;
+            width: 65%">
 <table>
     <tr>
         <td><b>Keyword</b></td>
@@ -187,68 +195,69 @@ Current Supported Filter Keywords:
         <td>event.outcome == "success"</td>
     </tr>
 </table>
+</div>
+<p align="center" style="margin-top: 0px;">Table 2. Supported Filter Keywords</p><br>
+
 
 #### Chaining Filters:
-Example 1: <br>
+Example 1:
 ```python
 # Python Equivlant
 event.code in ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'] 
 and event.outcome == "success"
 ```
-```python
+<p align="center" style="margin-top: 0px;">Listing 1. Example 1 in Python</p>
+
+```text
 # Filters
 event.code is_one_of 1,2,3,4,5,6,7,8,9,10; event.outcome is success;
 ```
+<p align="center" style="margin-top: 0px;">Listing 2. Example 1 in Elasticfetch Filter Syntax</p>
 
 Example 2: 
 ```python
 # Python Equivlant
 srcIp == "105.24.235.13" and dstPort not in ['53', '80', '443']
 ```
-```python
+<p align="center" style="margin-top: 0px;">Listing 3. Example 2 in Python</p>
+
+```text
 # Filters
 srcIp is 105.24.235.13; dstPort is_not_one_of 53,80,443;
 ```
+<p align="center" style="margin-top: 0px;">Listing 4. Example 2 in Elasticfetch Filter Syntax</p>
 
 ## Setting parameters in configuration file
 Edit **elasticfetch.ini** and set the following variables to your values : <br>
-- Protocol (`https` or `http`)
-- IP address (`XXX.XXX.XXX.XXX` or `domain name`)
-- port (Usually `9200`)
-- username (Must have *enough privilege* to use APIs)
-- password 
-- graphical (`True` / `False`) 
+- Protocol: `https` or `http`
+- IP address: `XXX.XXX.XXX.XXX` or `domain name`
+- Port: Default is `9200`
+- Username: Must have *enough privilege* to use APIs
+- Password 
+- Graphical: `True` / `False`
+- Batch Size: Default is `10000`
 
 
 ## Running elasticfetch (CLI)
-```sh
+Make sure to configure the graphical option under the interface section to be `False` before running **elasticfetch**.
+```python
+[interface]
+# Default is False which uses CLI.
+# Set this option to True if you want to use CLI
+graphical = False
+```
+<p align="center" style="margin-top: 0px;">Listing 5. elasticfetch.ini for CLI</p>
+
+```bash
 python3 elasticfetch.py
 ```
-```text
-===============================================================
-        _              _    _         __       _         _     
-       | |            | |  (_)       / _|     | |       | |    
-   ___ | |  __ _  ___ | |_  _   ___ | |_  ___ | |_  ___ | |__  
-  / _ \| | / _` |/ __|| __|| | / __||  _|/ _ \| __|/ __|| '_ \ 
- |  __/| || (_| |\__ \| |_ | || (__ | | |  __/| |_| (__ | | | |
-  \___||_| \__,_||___/ \__||_| \___||_|  \___| \__|\___||_| |_|
+<p align="center" style="margin-top: 0px;">Listing 6. Running elasticfetch.py</p>
 
-    Developed by: Gerald Lim Wee Koon (github: mathscantor)    
-===============================================================
+<p align="center" style="margin-bottom: 0px !important;">
+  <img src="images/cli_menu.png" width="70%" height="50%" alt="CLI Main Menu" align="center">
+</p>
+<p align="center" style="margin-top: 0px;">Figure 1. CLI Main Menu</p>
 
-Current index selected: N/A (Please set an index before fetching any data!)
-Main Timestamp Field:  @timestamp
-Main Timestamp Format:  datetime
-Main Timezone:  +00:00
-
-1 -- Show indices status
-2 -- Set current index
-3 -- Set main timestamp name, format and timezone
-4 -- Show available field names
-5 -- Convert Timestamp Format
-6 -- Fetch data between two timestamps
-7 -- Exit
-```
 
 ### Option 1 - Show indices status
 ```text
@@ -277,11 +286,29 @@ yellow open   packetbeat-8.1.0                                ##################
 yellow open   packetbeat-8.1.2                                ######################   1   1   52814104            0     20.8gb         20.8gb
 yellow open   winlogbeat-8.0.1                                ######################   1   1  102336389            0    103.9gb        103.9gb
 ```
+<p align="center" style="margin-top: 0px;">Listing 7. Displaying Indices Status & Statistics</p>
 
 ### Option 2 - Set current index
+
+**NEW FEATURE** for elasticfetch **v4.0.0**: Wildcard Usage
+
+The wildcard (*) allows you to match multiple indices so that you can 
+fetch your data from all the indices that match it. There was a need for this
+as it is common to rotate your index either daily or when it hits a threshold size.
+To make it easy for users to pull from multiple index sources all at once, this feature
+has been introduced.
+
+In the example below, I have used `*filebeat*` to match with:
+- filebeat-7.15.2-2022.03.11-000001
+- filebeat-7.15.2-2022.04.10-000002
+- filebeat-7.15.2-2022.05.10-000003
+- filebeat-7.15.2-2022.06.09-000004
+- filebeat-7.15.2-2022.07.09-000005
+
 ```text
 Listing all beats indices:
 
+0 -- Custom Index Name (Wildcard * available for use)
 1 -- .internal.alerts-security.alerts-default-000001
 2 -- .internal.alerts-security.alerts-default-000002
 3 -- .internal.alerts-security.alerts-default-000003
@@ -297,77 +324,74 @@ Listing all beats indices:
 13 -- filebeat-7.15.2-2022.05.10-000003
 14 -- filebeat-7.15.2-2022.06.09-000004
 15 -- filebeat-7.15.2-2022.07.09-000005
-16 -- filebeat-8.0.1
-17 -- filebeat-8.1.0
-18 -- filebeat-8.1.2
-19 -- metrics-endpoint.metadata_current_default
-20 -- packetbeat-8.0.1
-21 -- packetbeat-8.1.0
-22 -- packetbeat-8.1.2
-23 -- winlogbeat-8.0.1
 
-Enter your index choice: 23
+Enter your index choice: 0                      ← (Your input)
+Enter your custom index name: *filebeat*        ← (Your input)
 ```
-In the above example, I have chosen the winlogbeat-8.0.1 index.
-Once you have chosen your index, it will be shown that you are fetching from that particular index
+<p align="center" style="margin-top: 0px;">Listing 8. Example of Wildcard Usage to Select Multiple Indices</p>
 
 ### Option 3 - Set main timestamp, format and timezone
 
 The main timestamp field name will be used in sorting the timestamps in ascending order. 
-Option 3 allows you to set a new main timestamp field name from the displayed 'ALL RELATED FIELDS' column.
-```text
- [SUCCESS] Showing available fields...
+Option 3 allows you to set a new main timestamp field name from the displayed 'ALL RELATED FIELDS' column. 
 
+In this example, option 3 will show you all related fields that are of 'date' type.
+The default main timestamp field is @timestamp as elasticsearch uses 
+this field universally for referencing time.
+
+However, I am aware that certain users / organization do 
+rename '@timestamp' to something else. Therefore, I have added this feature to
+support existing organizations that require this. <br>
+
+```text
+ [INFO] Retrieved available fields for index: .internal.alerts-ml.anomaly-detection.alerts-default-000001
 
 TOP LEVEL PARENT               TYPE       ALL RELATED FIELDS            
 ----------------               ----       ------------------            
 @timestamp                     date       @timestamp                    
 
-event                          date       event.created, event.ingested 
-
-winlog                         date       winlog.event_data.ClientCreationTime, winlog.event_data.DeviceTime, winlog.event_data.NewTime, winlog.event_data.OldTime, winlog.event_data.ProcessCreationTime, winlog.event_data.StartTime, winlog.event_data.StopTime, winlog.user_data.UTCStartTime
+kibana                         date       kibana.alert.top_records.timestamp, kibana.alert.anomaly_timestamp, ...
+.
+.
+.
 
 Main Timestamp Name: @timestamp        ← (Your input)
 Main Timestamp Format: datetime        ← (Your input)
 Main Timezone: +08:00                  ← (Your input)
 ```
-In this example, option 3 will show you all related fields that are of 'date' type. <br>
+<p align="center" style="margin-top: 0px;">Listing 10. Example of Setting Timestamp, Format & Timezone</p>
 
-The default main timestamp field is @timestamp as elasticsearch uses this field universally for referencing time. <br>
-
-However, I am aware that certain users / organization do rename '@timestamp' to something else. Therefore, I have added this feature to support existing organizations that require this. <br>
 
 ### Option 4 - Listing all available fields within the current chosen index
-It is a known grievance that the users have to manually check what fields are available to them. Option 4 allows users to list the whole shebang of fields.
+It is a known grievance that the users have to manually check what fields are available to them. 
+
+Option 4 allows users to list the whole shebang of fields.
 ```text
-[SUCCESS] Showing available fields...
+ [INFO] Retrieved available fields for index: .internal.alerts-ml.anomaly-detection.alerts-default-000001
 
+TOP LEVEL PARENT               TYPE                 ALL RELATED FIELDS            
+----------------               ----                 ------------------            
+@timestamp                     date                 @timestamp                    
 
-TOP LEVEL PARENT               TYPE       ALL RELATED FIELDS            
-----------------               ----       ------------------            
-@timestamp                     date       @timestamp                    
+_data_stream_timestamp         NoType               _data_stream_timestamp        
 
-_data_stream_timestamp         NoType     _data_stream_timestamp        
+_doc_count                     NoType               _doc_count                    
 
-_doc_count                     NoType     _doc_count                    
+_feature                       NoType               _feature     
+   
+_version                       NoType               _version                      
 
-_feature                       NoType     _feature                      
+event                          keyword              event.action, event.kind      
 
-_field_names                   NoType     _field_names
-
-file                           text       file.code_signature.status, file.code_signature.subject_name, file.directory, file.extension, file.hash.md5, file.hash.sha256, file.name, file.path, file.pe.imphash
-                               keyword    file.code_signature.status.keyword, file.code_signature.subject_name.keyword, file.directory.keyword, file.extension.keyword, file.hash.md5.keyword, file.hash.sha256.keyword, file.name.keyword, file.path.keyword, file.pe.imphash.keyword
-                               boolean    file.code_signature.valid     
-
-group                          text       group.domain, group.id, group.name
-                               keyword    group.domain.keyword, group.id.keyword, group.name.keyword
-
-host                           text       host.architecture, host.hostname, host.id, host.ip, host.mac, host.name, host.os.build, host.os.family, host.os.kernel, host.os.name, host.os.platform, host.os.type, host.os.version
-                               keyword    host.architecture.keyword, host.hostname.keyword, host.id.keyword, host.ip.keyword, host.mac.keyword, host.name.keyword, host.os.build.keyword, host.os.family.keyword, host.os.kernel.keyword, host.os.name.keyword, host.os.platform.keyword, host.os.type.keyword, host.os.version.keyword
+kibana                         keyword              kibana.alert.top_records.job_id, kibana.alert.rule.uuid ...
+                               double               kibana.alert.top_records.actual, kibana.alert.anomaly_score ...
+                               date                 kibana.alert.top_records.timestamp, kibana.alert.anomaly_timestamp ...
+                               long                 kibana.alert.rule.revision, kibana.alert.duration.us
 .
 .
 .
 ```
+<p align="center" style="margin-top: 0px;">Listing 10. Displaying All Available Fields Associated to Index / Indices</p>
 
 ### Option 5 - Converting datetime string to unix epoch
 This takes into account of your current timezone when converting to epoch time.
@@ -377,6 +401,8 @@ Enter your choice: 5
 1 -- Convert datetime to epoch
 2 -- Convert epoch to datetime
 ```
+<p align="center" style="margin-top: 0px;">Listing 11. Menu for Timestamp Format Conversion</p>
+
 Converting datetime to epoch
 ```text
 timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>
@@ -386,6 +412,8 @@ End Timestamp: 2022-05-20T00:00:00              ← (Your input)
 Timezone: +08:00                                ← (Your input)
 Epoch Range: 1651334400000 - 1652976000000
 ```
+<p align="center" style="margin-top: 0px;">Listing 12. DateTime to Epoch Conversion</p>
+
 Converting epoch to datetime
 ```text
 timestamp format: <10 / 13 digit string>
@@ -395,63 +423,22 @@ End Timestamp: 1652976000000                    ← (Your input)
 Timezone: +08:00                                ← (Your input)
 Datetime Range: 2022-05-01T00:00:00.000 - 2022-05-20T00:00:00.000
 ```
+<p align="center" style="margin-top: 0px;">Listing 13. Epoch to DateTime Conversion</p>
 
 ### Option 6 - Fetching data from a chosen index
-```text
-Current index selected: winlogbeat-8.0.1
-Main Timestamp Field:  @timestamp
-Main Timestamp Type:  datetime
-Main Timezone: +08:00
 
-1 -- Show indices status
-2 -- Set current index
-3 -- Set main timestamp name, format and timezone
-4 -- Show available field names
-5 -- Convert Timestamp Format
-6 -- Fetch data between two timestamps
-7 -- Exit
-Enter your choice: 5                                                                                ← (Your input)
-
-timestamp format: <%Y-%m-%d>T<%H:%M:%S> or <%Y-%m-%d>T<%H:%M:%S.%f>
-eg. 2022-05-01T00:00:00 or 2022-05-01T00:00:00.000
-Start Timestamp: 2022-05-01T00:00:00                                                                ← (Your input)
-End Timestamp: 2022-05-20T00:00:00                                                                  ← (Your input)
-Number of logs to retrieve: 50000                                                                   ← (Your input)
-Select your field names (eg. event.created,event.code,message): event.created, event.code, message  ← (Your input)
-
-Filter Format: <FIELD_NAME> <FILTER_KEYWORD> <VALUE>;
-Supported Filter Keywords:
-- is_not_gte
-- is_not_lte
-- is_not_gt
-- is_not_lt
-- is_not_one_of
-- is_not
-- is_gte
-- is_lte
-- is_gt
-- is_lt
-- is_one_of
-- is
-
-eg. event.code is_gt 4000; event.code is_lte 5000; event.category is authentication;                ← (Your input)
-(OPTIONAL - PRESS ENTER TO SKIP) Filter your queries: event.code is_gte 1000;
- [INFO] Fetching elastic data...
-Fetch Progress: 100%|██████████| 50000/50000 [01:26<00:00, 577.40it/s]
- [SUCCESS] Successfully fetched 50000 data entries!
-File name to save as (.json, .csv): test.csv                                                        ← (Your input)
- [INFO] Saving data to datasets/test.csv
- [SUCCESS] Successfully saved data to datasets/test.csv
-
-```
 This will prompt you for:
-- start and end timestamps (See [Supported Time Formats](#supported-time-formats))
-- number of logs you want to fetch in this time period.
-- field names
-- filters (See [Supported Filters](#supported-filters))
+- Start and End Timestamps (See [Supported Time Formats](#supported-time-formats))
+- Number of Logs
+- Filed Names
+- Filters (See [Supported Filters](#supported-filters))
+- File Format (Either `jsonl` or `csv`)
 
-At the end, it will prompt you for a file name to dump the data in (Currently only support .json, .csv). <br />
-All saved files will be found under the **datasets** folder
+
+<p align="center" style="margin-bottom: 0px !important;">
+  <img src="images/data_fetch_cli.png" width="80%" height="50%" alt="elasticfetch icon" align="center">
+</p>
+<p align="center" style="margin-top: 0px;">Figure 2. Data Fetch Example</p><br>
 
 ### Running elasticfetch (GUI)
 ```sh
