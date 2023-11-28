@@ -12,14 +12,14 @@
       - [3.3.1 CSV](#331-csv)
       - [3.3.2 JSONL](#332-jsonl)
 - [4. Setting parameters in configuration file](#4-setting-parameters-in-configuration-file)
-- [5. Running Elasticfetch (CLI)](#5-running-elasticfetch--cli-)
+- [5. Running Elasticfetch (CLI)](#5-running-elasticfetch-cli)
     - [5.1. Show indices status](#51-show-indices-status)
     - [5.2. Set current index](#52-set-current-index)
     - [5.3. Set main timestamp, format and timezone](#53-set-main-timestamp-format-and-timezone)
     - [5.4. Listing all available fields within the current chosen index](#54-listing-all-available-fields-within-the-current-chosen-index)
     - [5.5. Converting datetime string to unix epoch](#55-converting-datetime-string-to-unix-epoch)
     - [5.6. Fetching data from a chosen index](#56-fetching-data-from-a-chosen-index)
-- [6. Running Elasticfetch (GUI)](#6-running-elasticfetch--gui-) 
+- [6. Running Elasticfetch (GUI)](#6-running-elasticfetch-gui) 
 ## 1. Overview
 Elasticfetch is a simple tool used to export huge amounts of data from elasticsearch. <br>
 
@@ -267,7 +267,7 @@ Edit **elasticfetch.ini** and set the following variables to your values : <br>
 - Batch Size: Default is `10000`
 
 
-## 5. Running elasticfetch (CLI)
+## 5. Running Elasticfetch CLI
 Make sure to configure the graphical option under the interface section to be `False` before running **elasticfetch**.
 ```python
 [interface]
@@ -469,7 +469,7 @@ This will prompt you for:
 </p>
 <p align="center" style="margin-top: 0px;">Figure 2. Data Fetch Example</p><br>
 
-## 6. Running elasticfetch (GUI)
+## 6. Running Elasticfetch GUI
 Make sure to configure the graphical option under the interface section to be `True` before running **elasticfetch**.
 ```python
 [interface]
