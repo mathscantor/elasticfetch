@@ -838,6 +838,13 @@ class GUIMenu:
                                                                                                     self.progress_bar["value"]))
                 self.primary_app_window.update()
 
+            self.progress_bar["value"] = (self.__request_sender.total_results_size / float(num_logs)) * 100
+            self.progress_bar_label.configure(
+                text="Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
+                                                                  num_logs,
+                                                                  self.progress_bar["value"]))
+            self.primary_app_window.update()
+
             data_write_csv_thread.join()
             data_fetch_thread.join()
 
@@ -861,6 +868,13 @@ class GUIMenu:
                                                                                                     num_logs,
                                                                                                     self.progress_bar["value"]))
                 self.primary_app_window.update()
+
+            self.progress_bar["value"] = (self.__request_sender.total_results_size / float(num_logs)) * 100
+            self.progress_bar_label.configure(
+                text="Current Progress: {}/{} --- {:.2f}%".format(self.__request_sender.total_results_size,
+                                                                  num_logs,
+                                                                  self.progress_bar["value"]))
+            self.primary_app_window.update()
 
             data_write_json_thread.join()
             data_fetch_thread.join()
