@@ -11,6 +11,7 @@ class InputValidation:
         self.__valid_protocols = ["http", "https"]
         self.__port_regex = re.compile("^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$")
         self.__ip_regex = re.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
+        self.__domain_regex = re.compile(r"^(?i)([a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})+)$")
         self.__numeric_regex = re.compile("^\d+$")
         self.__timestamp_datetime_format_seconds_regex = re.compile("^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
                                                             "(0[0-9]|1[0-9]|2[0-3]?):"
@@ -80,13 +81,18 @@ class InputValidation:
         :return: True if the IP address is valid, False otherwise.
         :rtype: bool
         """
-        match = self.__ip_regex.search(user_input)
-        if match:
+        match_ip = self.__ip_regex.search(user_input)
+        match_domain = self.__domain_regex.search(user_input)
+        if match_ip:
             return True
-        else:
-            self.__messenger.print_message(Severity.ERROR, "IP address '{}' is invalid. Please check that it is within"
-                                                           " 0.0.0.0 to 255.255.255.255".format(user_input))
-            return False
+        if match_domain:
+            return True
+
+        self.__messenger.print_message(Severity.ERROR, "IP Address / Domain Name: '{}' is invalid. "
+                                                       "Please check that it is within"
+                                                       " 0.0.0.0 to 255.255.255.255 or "
+                                                       "any valid domain name".format(user_input))
+        return False
 
     def is_numeric_valid(self,
                          user_input: str) -> bool:

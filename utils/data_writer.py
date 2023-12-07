@@ -57,22 +57,45 @@ class DataWriter:
                         for field in fields_list:
                             field_tokens = field.split('.')
                             value = ""
+
                             if len(field_tokens) == 1:
+                                if not type(hit["_source"]) == dict:
+                                    continue
                                 if field_tokens[0] in hit["_source"].keys():
                                     value = hit["_source"][field_tokens[0]]
+
                             elif len(field_tokens) == 2:
+                                if not type(hit["_source"]) == dict:
+                                    continue
                                 if field_tokens[0] in hit["_source"].keys():
+                                    if not type(hit["_source"][field_tokens[0]]) == dict:
+                                        continue
                                     if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
                                         value = hit["_source"][field_tokens[0]][field_tokens[1]]
+
                             elif len(field_tokens) == 3:
+                                if not type(hit["_source"]) == dict:
+                                    continue
                                 if field_tokens[0] in hit["_source"].keys():
+                                    if not type(hit["_source"][field_tokens[0]]) == dict:
+                                        continue
                                     if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
+                                        if not type(hit["_source"][field_tokens[0]][field_tokens[1]]) == dict:
+                                            continue
                                         if field_tokens[2] in hit["_source"][field_tokens[0]][field_tokens[1]].keys():
                                             value = hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]]
                             elif len(field_tokens) == 4:
+                                if not type(hit["_source"]) == dict:
+                                    continue
                                 if field_tokens[0] in hit["_source"].keys():
+                                    if not type(hit["_source"][field_tokens[0]]) == dict:
+                                        continue
                                     if field_tokens[1] in hit["_source"][field_tokens[0]].keys():
+                                        if not type(hit["_source"][field_tokens[0]][field_tokens[1]]) == dict:
+                                            continue
                                         if field_tokens[2] in hit["_source"][field_tokens[0]][field_tokens[1]].keys():
+                                            if not type(hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]]) == dict:
+                                                continue
                                             if field_tokens[3] in hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]].keys():
                                                 value = hit["_source"][field_tokens[0]][field_tokens[1]][field_tokens[2]][field_tokens[3]]
                             row_list.append(value)
