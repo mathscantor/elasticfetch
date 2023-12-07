@@ -805,18 +805,18 @@ class GUIMenu:
                 self.__request_sender.put_max_result_window(index_name=index, size=config_reader.batch_size)
 
         self.__data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
-                                             kwargs={
-                                                "index_name": self.current_index,
-                                                "num_logs": num_logs,
-                                                "main_timestamp_name": self.main_timestamp_name,
-                                                "main_timestamp_format": self.main_timestamp_format,
-                                                "main_timezone": self.main_timezone,
-                                                "start_ts": start_ts,
-                                                "end_ts": end_ts,
-                                                "fields_list": fields_list,
-                                                "query_bool_must_list": query_bool_must_list,
-                                                "query_bool_must_not_list": query_bool_must_not_list,
-                                            })
+                                                 kwargs={
+                                                    "index_name": self.current_index,
+                                                    "num_logs": num_logs,
+                                                    "main_timestamp_name": self.main_timestamp_name,
+                                                    "main_timestamp_format": self.main_timestamp_format,
+                                                    "main_timezone": self.main_timezone,
+                                                    "start_ts": start_ts,
+                                                    "end_ts": end_ts,
+                                                    "fields_list": fields_list,
+                                                    "query_bool_must_list": query_bool_must_list,
+                                                    "query_bool_must_not_list": query_bool_must_not_list,
+                                                })
 
         self.progress_bar["value"] = 0
         self.progress_bar_label.configure(text="Current Progress: {}/{} --- {:.2f}%".format(0,

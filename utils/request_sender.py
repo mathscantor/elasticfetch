@@ -241,7 +241,7 @@ class RequestSender:
         url = "{}://{}:{}/{}/_search?pretty".format(self.__protocol, self.__elastic_ip, self.__elastic_port, index_name)
         is_first_loop = True
         last_ids = []
-        self.__messenger.print_message(Severity.INFO, "Fetching elastic data...")
+        self.__messenger.print_message(Severity.INFO, "Fetching elastic data from index: {}".format(index_name))
 
         pbar = tqdm(total=num_logs, desc="Fetch Progress", file=sys.stdout)
 
