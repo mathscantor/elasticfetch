@@ -11,7 +11,7 @@ config_reader = ConfigReader()
 if config_reader.interface_graphical:
     import tkinter
     import customtkinter
-    # from menu.gui.save_fetched_data import GUISaveFetchedData
+    from tkinter import messagebox
     from menu.gui.ts_converter import GUITSConverter
     from menu.gui.show_indices_status import GUIShowIndicesStatus
     from menu.gui.show_available_field_names import GUIShowAvailableFields
@@ -38,6 +38,9 @@ class GUIMenu:
         self.__input_validation = input_validation
         self.__parser = parser
         self.__data_writer = DataWriter()
+        self.__data_fetch_thread = None
+        self.__data_write_csv_thread = None
+        self.__data_write_json_thread = None
 
         # Frontend related
         self.primary_app_window = customtkinter.CTk()
@@ -801,7 +804,7 @@ class GUIMenu:
             if config_reader.batch_size > index_max_result_window_dict[index]:
                 self.__request_sender.put_max_result_window(index_name=index, size=config_reader.batch_size)
 
-        data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
+        self.__data_fetch_thread = threading.Thread(target=self.__request_sender.get_fetch_elastic_data_between_ts1_ts2,
                                              kwargs={
                                                 "index_name": self.current_index,
                                                 "num_logs": num_logs,
@@ -822,13 +825,13 @@ class GUIMenu:
         self.primary_app_window.update()
 
         if self.file_format == "csv":
-            data_write_csv_thread = threading.Thread(target=self.__data_writer.write_to_csv,
+            self.__data_write_csv_thread = threading.Thread(target=self.__data_writer.write_to_csv,
                                                      kwargs={
                                                          "request_sender": self.__request_sender,
                                                          "fields_list": fields_list
                                                      })
-            data_write_csv_thread.start()
-            data_fetch_thread.start()
+            self.__data_write_csv_thread.start()
+            self.__data_fetch_thread.start()
 
             self.saved_filepath_label.configure(text="Saving data to {}".format(self.__data_writer.csv_filepath))
             while not self.__request_sender.has_finished_fetching:
@@ -845,8 +848,8 @@ class GUIMenu:
                                                                   self.progress_bar["value"]))
             self.primary_app_window.update()
 
-            data_write_csv_thread.join()
-            data_fetch_thread.join()
+            self.__data_write_csv_thread.join()
+            self.__data_fetch_thread.join()
 
             self.progress_bar_label.configure(text="")
             self.saved_filepath_label.configure(text="Successfully saved {} data to {}".format(self.__request_sender.total_results_size,
@@ -858,8 +861,8 @@ class GUIMenu:
                                                       kwargs={
                                                           "request_sender": self.__request_sender,
                                                       })
-            data_write_json_thread.start()
-            data_fetch_thread.start()
+            self.__data_write_json_thread.start()
+            self.__data_fetch_thread.start()
 
             self.saved_filepath_label.configure(text="Saving data to {}".format(self.__data_writer.json_filepath))
             while not self.__request_sender.has_finished_fetching:
@@ -876,8 +879,8 @@ class GUIMenu:
                                                                   self.progress_bar["value"]))
             self.primary_app_window.update()
 
-            data_write_json_thread.join()
-            data_fetch_thread.join()
+            self.__data_write_json_thread.join()
+            self.__data_fetch_thread.join()
 
             self.progress_bar_label.configure(text="")
             self.saved_filepath_label.configure(text="Successfully saved {} data to {}".format(self.__request_sender.total_results_size,
@@ -918,6 +921,16 @@ class GUIMenu:
         :return: None
         :rtype: None
         """
+
+        if not messagebox.askokcancel("Quit", "Are you sure?"):
+            return
+
+        if self.__data_fetch_thread:
+            self.__data_fetch_thread.join()
+        if self.__data_write_csv_thread:
+            self.__data_write_csv_thread.join()
+        if self.__data_write_json_thread:
+            self.__data_write_json_thread.join()
         self.primary_app_window.destroy()
         return
 
