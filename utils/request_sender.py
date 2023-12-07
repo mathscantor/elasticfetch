@@ -353,18 +353,26 @@ class RequestSender:
                         break
                 elif response.status_code == 400:
                     self.__messenger.print_message(Severity.ERROR, "Unable to fetch elastic data. Bad Request in headers/data.")
+                    return
                 elif response.status_code == 401:
                     self.__messenger.print_message(Severity.ERROR, "Unable to fetch elastic data. Authentication Error.")
+                    return
+                elif response.status_code == 502:
+                    self.__messenger.print_message(Severity.ERROR, "Unable to fetch elastic data. Bad Gateway.")
+                    return
+                else:
+                    self.__messenger.print_message(Severity.ERROR, "Unable to fetch elastic data. Unknown Error.")
+                    return
 
             except requests.RequestException:
                 self.__messenger.print_message(Severity.ERROR, "Cannot resolve request to {}".format(url))
-                return None
+                return
             except requests.ConnectTimeout:
                 self.__messenger.print_message(Severity.ERROR, "Connection timeout to {}".format(url))
-                return None
+                return
             except requests.ConnectionError:
                 self.__messenger.print_message(Severity.ERROR, "Cannot connect to {}".format(url))
-                return None
+                return
 
         pbar.close()
         self.__messenger.print_message(Severity.INFO, "Successfully fetched {} data!".format(self.__total_results_size))
