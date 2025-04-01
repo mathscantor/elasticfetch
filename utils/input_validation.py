@@ -9,19 +9,19 @@ class InputValidation:
     def __init__(self):
         self.__messenger = Messenger()
         self.__valid_protocols = ["http", "https"]
-        self.__port_regex = re.compile("^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$")
-        self.__ip_regex = re.compile("^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
-        self.__domain_regex = re.compile(r"^(?i)([a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})+)$")
-        self.__numeric_regex = re.compile("^\d+$")
-        self.__timestamp_datetime_format_seconds_regex = re.compile("^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
-                                                            "(0[0-9]|1[0-9]|2[0-3]?):"
-                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
-                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)$")
-        self.__timestamp_datetime_format_milliseconds_regex = re.compile("^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
-                                                            "(0[0-9]|1[0-9]|2[0-3]?):"
-                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
-                                                            "(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)(.\d{3})?$")
-        self.__timestamp_epoch_format_regex = re.compile('^\d{10}$|^\d{13}$')
+        self.__port_regex = re.compile(r"^([1-9][0-9]{0,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5])$")
+        self.__ip_regex = re.compile(r"^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$")
+        self.__domain_regex = re.compile(r"(?i)^([a-zA-Z0-9.-]+(?:\.[a-zA-Z]{2,})+)$")
+        self.__numeric_regex = re.compile(r"^\d+$")
+        self.__timestamp_datetime_format_seconds_regex = re.compile(r"^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
+                                                            r"(0[0-9]|1[0-9]|2[0-3]?):"
+                                                            r"(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
+                                                            r"(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)$")
+        self.__timestamp_datetime_format_milliseconds_regex = re.compile(r"^\d{4}-(0[1-9]|1[0-2]?)-(0[1-9]|1[0-9]|2[0-9]|3[0-1]?)T"
+                                                            r"(0[0-9]|1[0-9]|2[0-3]?):"
+                                                            r"(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?):"
+                                                            r"(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]?)(.\d{3})?$")
+        self.__timestamp_epoch_format_regex = re.compile(r'^\d{10}$|^\d{13}$')
         self.__datetime_format_seconds = '%Y-%m-%dT%H:%M:%S'
         self.__datetime_format_milliseconds = '%Y-%m-%dT%H:%M:%S.%f'
         self.__filter_raw_regex = re.compile(
